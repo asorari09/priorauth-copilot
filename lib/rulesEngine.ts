@@ -1,27 +1,10 @@
-export type ClinicalExtraction = {
-  patientAge: number;
-  diagnosisCodes: string[];
-  requestedProcedureCode: string;
-  priorTreatmentsTried: string[];
-  treatmentFailureDocumented: boolean;
-  clinicalNotesSummary: string;
-  requestedUnits?: number;
-  symptomDurationWeeks?: number;
-  imagingFindingsPresent?: boolean;
-  neurologicDeficitsPresent?: boolean;
-};
+import type { ClinicalExtraction, RulesEngineResult } from "./schemas";
 
 export type RulesEngineRule = {
   ruleId: string;
   appliesToCpt: string[];
   description: string;
   check: (extraction: ClinicalExtraction) => boolean;
-};
-
-export type RulesEngineResult = {
-  eligibleByRules: boolean;
-  failedCriteria: string[];
-  ruleIdsApplied: string[];
 };
 
 const J1745_DIAGNOSIS_CODES = ["K50.90", "K51.90", "M05.79"];

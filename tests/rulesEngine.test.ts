@@ -1,10 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  RULES,
-  type ClinicalExtraction,
-  runRulesEngine,
-} from "../lib/rulesEngine";
+import type { ClinicalExtraction } from "../lib/schemas";
+import { RULES, runRulesEngine } from "../lib/rulesEngine";
 
 function buildExtraction(
   overrides: Partial<ClinicalExtraction> = {},
