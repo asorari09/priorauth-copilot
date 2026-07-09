@@ -15,6 +15,7 @@ const GraphState = Annotation.Root({
   rawNote: Annotation<string>(),
   traceId: Annotation<string | undefined>(),
   caseId: Annotation<string | undefined>(),
+  forceNoRetrieval: Annotation<boolean | undefined>(),
   extraction: Annotation<PriorAuthGraphState["extraction"]>(),
   rulesResult: Annotation<PriorAuthGraphState["rulesResult"]>(),
   citations: Annotation<PriorAuthGraphState["citations"]>(),
@@ -50,6 +51,7 @@ export async function runPriorAuthGraphCase(params: {
   caseId?: string;
   sessionId?: string;
   userId?: string;
+  forceNoRetrieval?: boolean;
 }) {
   const trace = safeStartTrace({
     name: "priorauth-case-run",
@@ -64,6 +66,7 @@ export async function runPriorAuthGraphCase(params: {
     rawNote: params.rawNote,
     traceId: trace.traceId ?? undefined,
     caseId: params.caseId,
+    forceNoRetrieval: params.forceNoRetrieval,
     overrideLog: [],
   })) as PriorAuthGraphState;
 

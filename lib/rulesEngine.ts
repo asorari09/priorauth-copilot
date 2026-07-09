@@ -20,8 +20,8 @@ export const RULES: RulesEngineRule[] = [
   {
     ruleId: "AGE_MINIMUM_001",
     appliesToCpt: ["J1745"],
-    description: "Patient must be 18 or older",
-    check: (e) => e.patientAge >= 18,
+    description: "Patient must be 6 or older per Crohn's disease initial therapy criteria",
+    check: (e) => e.patientAge >= 6,
   },
   {
     ruleId: "DIAGNOSIS_MATCH_001",

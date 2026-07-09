@@ -59,10 +59,10 @@
   },
   {
     "id": "CASE-004",
-    "note": "SYNTHETIC CASE CASE-004: Prior authorization intake for patient D. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 17 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included mesalamine and azathioprine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Adolescent Crohn patient meets therapy history but fails adult age threshold.\"\n\nRequested infusion quantity is 5 units for this authorization period.",
+    "note": "SYNTHETIC CASE CASE-004: Prior authorization intake for patient D. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 4 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included mesalamine and azathioprine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Pediatric Crohn patient meets therapy history but is younger than six.\"\n\nRequested infusion quantity is 5 units for this authorization period.",
     "expectedOutcome": "likely_deny",
     "expectedExtraction": {
-      "patientAge": 17,
+      "patientAge": 4,
       "diagnosisCodes": [
         "K50.90"
       ],
@@ -72,7 +72,7 @@
         "azathioprine"
       ],
       "treatmentFailureDocumented": true,
-      "clinicalNotesSummary": "Adolescent Crohn patient meets therapy history but fails adult age threshold.",
+      "clinicalNotesSummary": "Pediatric Crohn patient meets therapy history but is younger than six.",
       "requestedUnits": 5
     }
   },
@@ -454,6 +454,43 @@
       "treatmentFailureDocumented": true,
       "clinicalNotesSummary": "Headache workup with imaging concern documented but neurologic exam finding unspecified.",
       "imagingFindingsPresent": true
+    }
+  },
+  {
+    "id": "CASE-025",
+    "note": "SYNTHETIC CASE CASE-025: Prior authorization intake for patient Y. The ordering clinician documented diagnosis codes (Z99.89) and requested procedure J9999. The patient is 25 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included therapy alpha, therapy beta, and therapy gamma. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five.\"\n\nSYNTHETIC Meridian Health Plan context: fictional policy for J9999 states exactly three failed therapies and age twenty-one or older.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 25,
+      "diagnosisCodes": [
+        "Z99.89"
+      ],
+      "requestedProcedureCode": "J9999",
+      "priorTreatmentsTried": [
+        "therapy alpha",
+        "therapy beta",
+        "therapy gamma"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five."
+    }
+  },
+  {
+    "id": "CASE-026",
+    "note": "SYNTHETIC CASE CASE-026: Prior authorization intake for patient Z. The ordering clinician documented diagnosis codes (Z99.89) and requested procedure J9999. The patient is 19 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included therapy alpha and therapy beta. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Meridian synthetic canary request has only two prior therapies and patient age nineteen.\"\n\nSYNTHETIC Meridian Health Plan context: fictional policy for J9999 appears in retrieval corpus only, but deterministic rules have no J9999 rule mapping.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 19,
+      "diagnosisCodes": [
+        "Z99.89"
+      ],
+      "requestedProcedureCode": "J9999",
+      "priorTreatmentsTried": [
+        "therapy alpha",
+        "therapy beta"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Meridian synthetic canary request has only two prior therapies and patient age nineteen."
     }
   }
 ]

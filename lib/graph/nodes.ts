@@ -34,6 +34,7 @@ export type PriorAuthGraphState = {
   rawNote: string;
   traceId?: string;
   caseId?: string;
+  forceNoRetrieval?: boolean;
   extraction?: ClinicalExtraction;
   rulesResult?: RulesEngineResult;
   citations?: PolicyCitation[];
@@ -322,6 +323,9 @@ export async function policyRagNode(
       }
 
       try {
+        if (state.forceNoRetrieval) {
+          return { citations: [], retrievedChunks: [] };
+        }
         const retrievedChunks = await retrievePolicyChunks(state.extraction);
         if (retrievedChunks.length === 0) {
           return { citations: [], retrievedChunks };

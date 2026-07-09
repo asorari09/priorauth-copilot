@@ -15,7 +15,7 @@ type GoldenCase = {
 type CaseSeed = {
   id: string;
   patientLabel: string;
-  requestedProcedureCode: "J1745" | "27447" | "70553";
+  requestedProcedureCode: "J1745" | "27447" | "70553" | "J9999";
   diagnosisCodes: string[];
   patientAge: number;
   priorTreatmentsTried: string[];
@@ -71,12 +71,12 @@ const seeds: CaseSeed[] = [
     patientLabel: "D",
     requestedProcedureCode: "J1745",
     diagnosisCodes: ["K50.90"],
-    patientAge: 17,
+    patientAge: 4,
     priorTreatmentsTried: ["mesalamine", "azathioprine"],
     treatmentFailureDocumented: true,
     requestedUnits: 5,
     expectedOutcome: "likely_deny",
-    clinicalNotesSummary: "Adolescent Crohn patient meets therapy history but fails adult age threshold.",
+    clinicalNotesSummary: "Pediatric Crohn patient meets therapy history but is younger than six.",
   },
   {
     id: "CASE-005",
@@ -329,6 +329,34 @@ const seeds: CaseSeed[] = [
     specialContext:
       "The neurologic exam is described as 'concerning changes per family report' without explicitly documenting a focal deficit.",
   },
+  {
+    id: "CASE-025",
+    patientLabel: "Y",
+    requestedProcedureCode: "J9999",
+    diagnosisCodes: ["Z99.89"],
+    patientAge: 25,
+    priorTreatmentsTried: ["therapy alpha", "therapy beta", "therapy gamma"],
+    treatmentFailureDocumented: true,
+    expectedOutcome: "likely_deny",
+    clinicalNotesSummary:
+      "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five.",
+    specialContext:
+      "SYNTHETIC Meridian Health Plan context: fictional policy for J9999 states exactly three failed therapies and age twenty-one or older.",
+  },
+  {
+    id: "CASE-026",
+    patientLabel: "Z",
+    requestedProcedureCode: "J9999",
+    diagnosisCodes: ["Z99.89"],
+    patientAge: 19,
+    priorTreatmentsTried: ["therapy alpha", "therapy beta"],
+    treatmentFailureDocumented: true,
+    expectedOutcome: "likely_deny",
+    clinicalNotesSummary:
+      "Meridian synthetic canary request has only two prior therapies and patient age nineteen.",
+    specialContext:
+      "SYNTHETIC Meridian Health Plan context: fictional policy for J9999 appears in retrieval corpus only, but deterministic rules have no J9999 rule mapping.",
+  },
 ];
 
 function sentenceList(items: string[]): string {
@@ -403,8 +431,8 @@ function toExpectedExtraction(seed: CaseSeed): ClinicalExtraction {
 }
 
 function validate(cases: GoldenCase[]): void {
-  if (cases.length !== 24) {
-    throw new Error(`Expected 24 cases, found ${cases.length}`);
+  if (cases.length !== 26) {
+    throw new Error(`Expected 26 cases, found ${cases.length}`);
   }
 
   const outcomes = cases.reduce<Record<ExpectedOutcome, number>>(
@@ -417,7 +445,7 @@ function validate(cases: GoldenCase[]): void {
 
   if (
     outcomes.likely_approve !== 10 ||
-    outcomes.likely_deny !== 10 ||
+    outcomes.likely_deny !== 12 ||
     outcomes.insufficient_info !== 4
   ) {
     throw new Error(`Unexpected outcome distribution: ${JSON.stringify(outcomes)}`);
@@ -433,6 +461,9 @@ function validate(cases: GoldenCase[]): void {
     if (cptCounts[cpt] !== 8) {
       throw new Error(`Expected 8 cases for ${cpt}, found ${cptCounts[cpt] ?? 0}`);
     }
+  }
+  if (cptCounts.J9999 !== 2) {
+    throw new Error(`Expected 2 cases for J9999, found ${cptCounts.J9999 ?? 0}`);
   }
 
   for (const item of cases) {

@@ -50,7 +50,7 @@ describe("runRulesEngine", () => {
   it("fails targeted J1745 rules when criteria are missing", () => {
     const result = runRulesEngine(
       buildExtraction({
-        patientAge: 17,
+        patientAge: 5,
         diagnosisCodes: ["M54.5"],
         priorTreatmentsTried: ["methotrexate"],
         treatmentFailureDocumented: false,
@@ -61,7 +61,7 @@ describe("runRulesEngine", () => {
     expect(result.eligibleByRules).toBe(false);
     expect(result.failedCriteria).toEqual([
       "STEP_THERAPY_001: Requires at least 2 failed conventional therapies",
-      "AGE_MINIMUM_001: Patient must be 18 or older",
+      "AGE_MINIMUM_001: Patient must be 6 or older per Crohn's disease initial therapy criteria",
       "DIAGNOSIS_MATCH_001: Diagnosis must match an approved inflammatory condition",
       "QUANTITY_LIMIT_001: Requested units may not exceed 8 per authorization period",
     ]);

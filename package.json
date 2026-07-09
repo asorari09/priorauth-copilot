@@ -10,7 +10,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "ingest": "tsx scripts/ingest.ts",
-    "test:graph": "tsx scripts/testGraph.ts"
+    "test:graph": "tsx scripts/testGraph.ts",
+    "eval": "tsx evals/runEvals.ts",
+    "eval:ablation": "tsx evals/runEvals.ts --ablation"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.110.0",
