@@ -34,6 +34,9 @@ yarn-error.log*
 .env*
 !.env.example
 
+# Supabase local/link metadata
+supabase/.temp/
+
 # vercel
 .vercel
 
