@@ -11,7 +11,7 @@ import { extractClinicalExtractionFromNote } from "../llm/openai";
 import { runRulesEngine } from "../rulesEngine";
 import {
   AppealDraftSchema,
-  DecisionSchema,
+  DecisionCoreSchema,
   PolicyCitationSchema,
   type AppealDraft,
   type ClinicalExtraction,
@@ -285,12 +285,13 @@ async function synthesizeCitationsWithValidation(
         JSON.stringify(retrievedPayload),
         "",
         `Allowed sourceChunkId values: ${JSON.stringify(Array.from(allowedIds))}`,
+        "Emit at most 3 citations and choose the most relevant supporting evidence.",
         "Return only citations supported by these chunks. If none are supportable, return [].",
         attempt === 2
           ? "Retry correction: any sourceChunkId not in allowed list is invalid."
           : "",
       ].join("\n"),
-      maxTokens: 1400,
+      maxTokens: 3000,
       telemetry: {
         traceId: telemetry?.traceId ?? null,
         parentObservationId: telemetry?.parentObservationId ?? null,
@@ -441,8 +442,8 @@ export async function decisionNode(
         const claudeDecision = await callClaudeStructured({
           toolName: "emit_decision",
           toolDescription:
-            "Emit prior-auth decision object given deterministic rules and validated policy citations.",
-          schema: DecisionSchema,
+            "Emit prior-auth decision core fields given deterministic rules and validated policy citations.",
+          schema: DecisionCoreSchema,
           systemPrompt:
             "You are a decision-support assistant. Use only supplied evidence. Never invent citations.",
           userPrompt: [
@@ -451,7 +452,7 @@ export async function decisionNode(
             `Extraction: ${JSON.stringify(extraction)}`,
             `Rules result: ${JSON.stringify(rulesResult)}`,
             `Validated citations: ${JSON.stringify(citations)}`,
-            "Return a Decision object.",
+            "Return only outcome, confidence, and reasoningSummary.",
           ].join("\n"),
           maxTokens: 1200,
           telemetry: {
@@ -465,7 +466,6 @@ export async function decisionNode(
           ...claudeDecision,
           supportingCitations: citations,
           rulesResult,
-          outcome: claudeDecision.outcome,
         };
 
         if (decision.outcome !== constraint.forcedOutcome) {

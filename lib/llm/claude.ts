@@ -59,6 +59,24 @@ function isRetryable(error: unknown): boolean {
   return message.includes("timeout") || message.includes("temporar");
 }
 
+function formatError(error: unknown): string {
+  if (error instanceof Error) {
+    const status = typeof (error as { status?: unknown }).status === "number"
+      ? (error as { status: number }).status
+      : undefined;
+    const stopReason = (error as { stop_reason?: unknown }).stop_reason;
+    const details: string[] = [error.message];
+    if (status !== undefined) {
+      details.push(`status=${status}`);
+    }
+    if (typeof stopReason === "string" && stopReason.length > 0) {
+      details.push(`stop_reason=${stopReason}`);
+    }
+    return details.join("; ");
+  }
+  return String(error);
+}
+
 export async function callClaudeStructured<TSchema extends ZodTypeAny>(
   args: ClaudeStructuredCallArgs<TSchema>,
 ): Promise<z.infer<TSchema>> {
@@ -110,7 +128,10 @@ export async function callClaudeStructured<TSchema extends ZodTypeAny>(
         (block) => block.type === "tool_use" && block.name === args.toolName,
       );
       if (!toolBlock || toolBlock.type !== "tool_use") {
-        throw new Error("Claude did not return the required tool_use block.");
+        const stopReason = "stop_reason" in response ? response.stop_reason : undefined;
+        throw new Error(
+          `Claude did not return the required tool_use block (stop_reason=${String(stopReason ?? "unknown")}).`,
+        );
       }
 
       const parsed = args.schema.parse(toolBlock.input);
@@ -120,15 +141,16 @@ export async function callClaudeStructured<TSchema extends ZodTypeAny>(
       });
       return parsed;
     } catch (error) {
+      const retryable = isRetryable(error);
       generation.end({
         level: "ERROR",
         statusMessage: `claude structured attempt ${attempt} failed`,
         metadata: {
-          error: error instanceof Error ? error.message : String(error),
+          error: formatError(error),
+          retryable,
         },
       });
       lastError = error;
-      const retryable = isRetryable(error);
       if (attempt < 2 && retryable) {
         await sleep(300 * attempt);
         continue;
@@ -140,5 +162,8 @@ export async function callClaudeStructured<TSchema extends ZodTypeAny>(
     }
   }
 
-  throw new ClaudeStructuredOutputError("Claude structured output failed after 1 retry.", lastError);
+  throw new ClaudeStructuredOutputError(
+    `Claude structured output failed after 1 retry. Last error: ${formatError(lastError)}`,
+    lastError,
+  );
 }

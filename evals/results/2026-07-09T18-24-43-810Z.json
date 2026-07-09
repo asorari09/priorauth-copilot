@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-07-09T18:24:43.810Z",
+  "mode": "default",
+  "caseFilter": "CASE-006",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 100,
+    "extractionFieldAccuracy": 100,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 48871,
+    "mismatchedCaseIds": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 1,
+    "extractionFieldsCorrect": 10,
+    "extractionFieldsTotal": 10,
+    "validCitations": 3,
+    "totalCitations": 3,
+    "falseApproves": 0,
+    "expectedDenies": 1,
+    "totalLatencyMs": 48871
+  },
+  "perCase": [
+    {
+      "id": "CASE-006",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 44,
+        "diagnosisCodes": [
+          "M54.5"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "methotrexate",
+          "sulfasalazine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Biologic requested for non-covered diagnosis code.",
+        "requestedUnits": 6
+      },
+      "actualExtraction": {
+        "patientAge": 44,
+        "diagnosisCodes": [
+          "M54.5"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "methotrexate",
+          "sulfasalazine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Biologic requested for non-covered diagnosis code.",
+        "requestedUnits": 6
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 44,
+          "actual": 44,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M54.5"
+          ],
+          "actual": [
+            "M54.5"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "methotrexate",
+            "sulfasalazine"
+          ],
+          "actual": [
+            "methotrexate",
+            "sulfasalazine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Biologic requested for non-covered diagnosis code.",
+          "actual": "Biologic requested for non-covered diagnosis code.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 6,
+          "actual": 6,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p7-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p6-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1"
+      ],
+      "latencyMs": 48871,
+      "decisionReasoning": "The prior authorization request for infliximab (J1745) submitted for a 44-year-old patient fails a critical eligibility rule: the submitted diagnosis code M54.5 (low back pain) is not among the covered ICD-10 codes for any infliximab indication under the Blue Shield of California Infliximab Medicare Part B Step Therapy Policy. Covered indications include Rheumatoid Arthritis (M05.XXX, M06.0XX, M06.2XX, M06.3XX, M06.8XX, M06.9), Psoriatic Arthritis, and Ankylosing Spondylitis — none of which map to M54.5. This directly triggers failed rule DIAGNOSIS_MATCH_001. While the patient does have documented failure of methotrexate and sulfasalazine (which would satisfy step therapy requirements for conditions such as Psoriatic Arthritis or Rheumatoid Arthritis), this is insufficient to overcome the fundamental diagnosis mismatch. Additionally, the clinical notes explicitly confirm the biologic is being requested for a non-covered diagnosis code, and the requested 6 units of J1745 may also exceed covered dose limits per policy. All three validated policy citations consistently confirm that M54.5 is not a covered indication for infliximab under this policy.",
+      "overrideLog": []
+    }
+  ]
+}

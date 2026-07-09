@@ -35,6 +35,12 @@ export const DecisionSchema = z.object({
   rulesResult: RulesEngineResultSchema,
 });
 
+export const DecisionCoreSchema = z.object({
+  outcome: z.enum(["likely_approve", "likely_deny", "insufficient_info"]),
+  confidence: z.enum(["high", "medium", "low"]),
+  reasoningSummary: z.string().min(1),
+});
+
 export const AppealDraftSchema = z.object({
   draftText: z.string().min(1),
   citedClause: PolicyCitationSchema,
@@ -45,4 +51,5 @@ export type ClinicalExtraction = z.infer<typeof ClinicalExtractionSchema>;
 export type PolicyCitation = z.infer<typeof PolicyCitationSchema>;
 export type RulesEngineResult = z.infer<typeof RulesEngineResultSchema>;
 export type Decision = z.infer<typeof DecisionSchema>;
+export type DecisionCore = z.infer<typeof DecisionCoreSchema>;
 export type AppealDraft = z.infer<typeof AppealDraftSchema>;

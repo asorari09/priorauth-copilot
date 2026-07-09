@@ -1,0 +1,3016 @@
+{
+  "timestamp": "2026-07-09T18:40:22.013Z",
+  "mode": "default",
+  "caseFilter": null,
+  "summary": {
+    "totalCases": 26,
+    "decisionAccuracy": 100,
+    "extractionFieldAccuracy": 99.62,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 34178.88,
+    "mismatchedCaseIds": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 26,
+    "extractionFieldsCorrect": 259,
+    "extractionFieldsTotal": 260,
+    "validCitations": 76,
+    "totalCitations": 76,
+    "falseApproves": 0,
+    "expectedDenies": 12,
+    "totalLatencyMs": 888651
+  },
+  "perCase": [
+    {
+      "id": "CASE-001",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 29,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Adult Crohn disease with two failed therapies and dose within limit.",
+        "requestedUnits": 6
+      },
+      "actualExtraction": {
+        "patientAge": 29,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Adult Crohn disease with two failed therapies and dose within limit.",
+        "requestedUnits": 6
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 29,
+          "actual": 29,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K50.90"
+          ],
+          "actual": [
+            "K50.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "actual": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Adult Crohn disease with two failed therapies and dose within limit.",
+          "actual": "Adult Crohn disease with two failed therapies and dose within limit.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 6,
+          "actual": 6,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1"
+      ],
+      "latencyMs": 23808,
+      "decisionReasoning": "All deterministic rules passed for this 29-year-old patient with Crohn's disease (K50.90) requesting infliximab IV (J1745, 6 units). Per CareSource's Infliximab Intravenous Products UM Medical Policy, the following criteria are met:\n\n1. **Age Requirement (RULE: AGE_MINIMUM_001):** Patient is 29 years old, satisfying the ≥6 years of age threshold (Citation: caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1).\n\n2. **Step Therapy (RULE: STEP_THERAPY_001):** Patient has a documented trial and failure of azathioprine, which is a qualifying conventional systemic therapy for Crohn's disease. The mesalamine trial does not count toward the step therapy requirement per policy, but azathioprine alone satisfies the criterion (Citations: p5-1, p8-1). Treatment failure is documented.\n\n3. **Diagnosis Match (RULE: DIAGNOSIS_MATCH_001):** Diagnosis code K50.90 (Crohn's disease, unspecified) aligns with the covered indication for infliximab under the policy.\n\n4. **Quantity Limit (RULE: QUANTITY_LIMIT_001):** The requested 6 units (mg/kg) is within the approved dosing range referenced in the CareSource infliximab policy (Citation: caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1).\n\n**Outstanding Item to Confirm:** The policy requires that the medication be prescribed by or in consultation with a gastroenterologist. This was not explicitly confirmed in the extracted data. If prescriber specialty documentation is on file, approval is fully supported. This is the only remaining verification point that could affect the final determination.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-002",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 41,
+        "diagnosisCodes": [
+          "K51.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "sulfasalazine",
+          "methotrexate"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Ulcerative colitis with documented step therapy failure and compliant quantity.",
+        "requestedUnits": 8
+      },
+      "actualExtraction": {
+        "patientAge": 41,
+        "diagnosisCodes": [
+          "K51.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "sulfasalazine",
+          "methotrexate"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Ulcerative colitis with documented step therapy failure and compliant quantity.",
+        "requestedUnits": 8
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 41,
+          "actual": 41,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K51.90"
+          ],
+          "actual": [
+            "K51.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "sulfasalazine",
+            "methotrexate"
+          ],
+          "actual": [
+            "sulfasalazine",
+            "methotrexate"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Ulcerative colitis with documented step therapy failure and compliant quantity.",
+          "actual": "Ulcerative colitis with documented step therapy failure and compliant quantity.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 8,
+          "actual": 8,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p6-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p7-1"
+      ],
+      "latencyMs": 24534,
+      "decisionReasoning": "All four deterministic rules passed (STEP_THERAPY_001, AGE_MINIMUM_001, DIAGNOSIS_MATCH_001, QUANTITY_LIMIT_001) for a 41-year-old patient with ulcerative colitis (K51.90) requesting infliximab (J1745, 8 units) with documented step therapy failure on sulfasalazine and methotrexate. Per Blue Shield of California's Infliximab Medicare Part B Step Therapy Policy, ulcerative colitis coverage requires age-appropriate FDA indication, gastroenterologist involvement (effective 2/1/2026), and no concurrent targeted immunomodulators — all of which appear satisfied based on the clinical notes. However, confidence is medium rather than high due to two unresolved policy gaps: (1) The BSC step therapy policy requires trial of preferred infliximab biosimilars (Avsola and Inflectra) before non-preferred agents, or documented intolerable side effects/contraindication to both — the record documents conventional agent failures (sulfasalazine, methotrexate) but does not explicitly confirm biosimilar step therapy compliance or a qualifying exception. (2) The requested 8 units of J1745 should be verified against the applicable mg/kg dose limit for ulcerative colitis to confirm quantity coverage compliance, as the cited dose cap language references the Rheumatoid Arthritis indication. Clarification on biosimilar step therapy and dose verification would support a high-confidence approval.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-003",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 56,
+        "diagnosisCodes": [
+          "M05.79"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "hydroxychloroquine",
+          "leflunomide",
+          "methotrexate"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Seropositive rheumatoid arthritis refractory to three conventional agents.",
+        "requestedUnits": 4
+      },
+      "actualExtraction": {
+        "patientAge": 56,
+        "diagnosisCodes": [
+          "M05.79"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "hydroxychloroquine",
+          "leflunomide",
+          "methotrexate"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Seropositive rheumatoid arthritis refractory to three conventional agents.",
+        "requestedUnits": 4
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 56,
+          "actual": 56,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M05.79"
+          ],
+          "actual": [
+            "M05.79"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "hydroxychloroquine",
+            "leflunomide",
+            "methotrexate"
+          ],
+          "actual": [
+            "hydroxychloroquine",
+            "leflunomide",
+            "methotrexate"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Seropositive rheumatoid arthritis refractory to three conventional agents.",
+          "actual": "Seropositive rheumatoid arthritis refractory to three conventional agents.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 4,
+          "actual": 4,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p6-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p7-1"
+      ],
+      "latencyMs": 33096,
+      "decisionReasoning": "All deterministic rules passed (STEP_THERAPY_001, AGE_MINIMUM_001, DIAGNOSIS_MATCH_001, QUANTITY_LIMIT_001). The patient is a 56-year-old with seropositive rheumatoid arthritis (M05.79) who has documented treatment failure with three conventional DMARDs — hydroxychloroquine, leflunomide, and methotrexate — satisfying the step-therapy requirement under both the Blue Shield of California Infliximab Medicare Part B Step Therapy Policy and CareSource's Infliximab Intravenous Products UM Medical Policy. Methotrexate failure is explicitly documented, meeting the inadequate response criterion for RA under the Blue Shield policy (clause: \"Inadequate response, intolerable side effect, or contraindication to methotrexate\"). The ICD-10 code M05.79 falls within the covered M05.XXX range per the Blue Shield citation.\n\nHowever, two conditional caveats reduce confidence from high to medium:\n\n1. **PPO Biosimilar Step Therapy (Blue Shield):** If the patient is enrolled in a Blue Shield Select (PPO) or Blue Shield Medicare (PPO) plan, the policy requires trials of both Avsola and Inflectra (preferred infliximab biosimilars) before coverage of non-preferred infliximab products (e.g., Remicade, Renflexis) is granted. The submitted prior treatment history documents only conventional DMARD failures, not biologic/biosimilar trials. If J1745 maps to a non-preferred infliximab product and the patient is on a PPO plan, this biosimilar step-therapy requirement may not yet be satisfied.\n\n2. **Quantity/Dosing Verification:** The Blue Shield policy covers infliximab at 3 mg/kg IV; CareSource approves up to 6 mg/kg IV. The request for 4 units of J1745 must be reconciled against the patient's actual body weight to confirm the requested quantity aligns with FDA-labeled weight-based dosing. This verification is not confirmable from the submitted documentation alone.\n\nSubject to confirmation that (a) the patient's plan type does not trigger PPO biosimilar step therapy, or that biosimilar trials/contraindications are documented, and (b) the 4 requested units of J1745 are consistent with the patient's weight-based dose, approval is likely.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-004",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 4,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Pediatric Crohn patient meets therapy history but is younger than six.",
+        "requestedUnits": 5
+      },
+      "actualExtraction": {
+        "patientAge": 4,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Pediatric Crohn patient meets therapy history but is younger than six.",
+        "requestedUnits": 5
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 4,
+          "actual": 4,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K50.90"
+          ],
+          "actual": [
+            "K50.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "actual": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Pediatric Crohn patient meets therapy history but is younger than six.",
+          "actual": "Pediatric Crohn patient meets therapy history but is younger than six.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 5,
+          "actual": 5,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1"
+      ],
+      "latencyMs": 43929,
+      "decisionReasoning": "The prior authorization request for infliximab IV (J1745) for a 4-year-old patient with Crohn's disease (K50.90) is likely to be denied based on multiple failed criteria supported by validated policy citations:\n\n1. **Age Minimum Not Met (Primary Failure):** CareSource's Infliximab Intravenous Products UM Medical Policy explicitly requires patients to be ≥ 6 years of age for Crohn's Disease initial therapy coverage (AGE_MINIMUM_001). This patient is 4 years old, falling below the minimum threshold by 2 years. This requirement is consistently applied across CareSource GI indications. Additionally, Blue Shield of California's Infliximab Medicare Part B Step Therapy Policy requires age to be consistent with the FDA-approved indication; the FDA-approved minimum age for infliximab in pediatric Crohn's disease is 6 years, further confirming this patient does not qualify.\n\n2. **Mesalamine Does Not Count as Qualifying Systemic Therapy:** Per CareSource policy, a trial of mesalamine does not count as a qualifying conventional systemic therapy for Crohn's disease. While the patient has tried azathioprine (which does qualify), the documented treatment history partially relies on mesalamine, which is explicitly excluded from step therapy credit under this policy.\n\n3. **Step Therapy Otherwise Partially Met:** The patient has tried azathioprine, which is a recognized qualifying systemic agent. However, this does not overcome the disqualifying age criterion.\n\nThe age failure alone (AGE_MINIMUM_001) is a hard stop under the cited policies and is sufficient to support a likely denial. No supplied evidence provides an exception pathway for patients under age 6.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-005",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 38,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Only one conventional therapy trialed before biologic request.",
+        "requestedUnits": 6
+      },
+      "actualExtraction": {
+        "patientAge": 38,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Only one conventional therapy trialed before biologic request.",
+        "requestedUnits": 6
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 38,
+          "actual": 38,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K50.90"
+          ],
+          "actual": [
+            "K50.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "mesalamine"
+          ],
+          "actual": [
+            "mesalamine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Only one conventional therapy trialed before biologic request.",
+          "actual": "Only one conventional therapy trialed before biologic request.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 6,
+          "actual": 6,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1"
+      ],
+      "latencyMs": 43482,
+      "decisionReasoning": "The prior authorization request for infliximab (J1745) for a 38-year-old patient with Crohn's disease, unspecified (K50.90) is likely to be denied based on the following validated policy findings:\n\n1. **Mesalamine Does Not Qualify as a Systemic Therapy (Primary Failure — STEP_THERAPY_001):** Per CareSource's Infliximab Intravenous Products UM Medical Policy, a trial of mesalamine explicitly does NOT count as a conventional systemic therapy for Crohn's disease. The patient's sole documented prior treatment is mesalamine, meaning the step-therapy requirement has not been met. The patient must have trialed a corticosteroid (e.g., prednisone) or a conventional systemic agent (e.g., azathioprine, 6-mercaptopurine, or methotrexate) before infliximab can be approved.\n\n2. **Insufficient Number of Qualifying Prior Therapy Trials:** The rules engine confirmed failure of STEP_THERAPY_001, which requires at least two failed conventional therapies. With only one prior treatment documented — and that treatment (mesalamine) explicitly excluded from qualifying — the patient falls short of the minimum step-therapy threshold.\n\n3. **Potential Additional Biosimilar Step-Therapy Gap:** Blue Shield of California's Infliximab Medicare Part B Step Therapy Policy further requires that preferred infliximab biosimilars (Avsola and Inflectra) be trialed before coverage of non-preferred infliximab products (J1745) is granted for newly initiating patients. There is no documentation that the patient has trialed or has a contraindication to these preferred agents, representing an additional potential coverage gap.\n\n**Conclusion:** The clinical record demonstrates a clear and documented gap in step-therapy compliance. The only prior treatment (mesalamine) is explicitly excluded from qualifying systemic therapy by payer policy. Approval is unlikely unless documentation of a corticosteroid or conventional immunomodulator trial (or a valid contraindication) is submitted.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-006",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 44,
+        "diagnosisCodes": [
+          "M54.5"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "methotrexate",
+          "sulfasalazine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Biologic requested for non-covered diagnosis code.",
+        "requestedUnits": 6
+      },
+      "actualExtraction": {
+        "patientAge": 44,
+        "diagnosisCodes": [
+          "M54.5"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "methotrexate",
+          "sulfasalazine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Biologic requested for non-covered diagnosis code.",
+        "requestedUnits": 6
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 44,
+          "actual": 44,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M54.5"
+          ],
+          "actual": [
+            "M54.5"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "methotrexate",
+            "sulfasalazine"
+          ],
+          "actual": [
+            "methotrexate",
+            "sulfasalazine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Biologic requested for non-covered diagnosis code.",
+          "actual": "Biologic requested for non-covered diagnosis code.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 6,
+          "actual": 6,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p7-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p6-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1"
+      ],
+      "latencyMs": 45981,
+      "decisionReasoning": "The prior authorization request for infliximab (J1745) submitted for a 44-year-old patient fails on at least one determinative rule criterion, supporting a likely denial:\n\n1. **Non-Covered Diagnosis Code (DIAGNOSIS_MATCH_001 — FAILED):** The patient's diagnosis code M54.5 (low back pain) is not among the covered ICD-10 codes for any infliximab indication under the Blue Shield of California Infliximab Medicare Part B Step Therapy Policy. The policy covers specific inflammatory conditions such as Rheumatoid Arthritis (M05/M06 codes), Psoriatic Arthritis (L40.50–L40.59), Ankylosing Spondylitis, Ulcerative Colitis, and others — M54.5 is explicitly absent from all covered indications. This is corroborated by the clinical notes summary, which itself flags this as a non-covered diagnosis. (Sources: blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p7-1, p6-1, p2-1)\n\n2. **Step Therapy Partially Met but Moot (STEP_THERAPY_001 — Not Determinative):** While the patient has documented treatment failures with methotrexate and sulfasalazine, this step therapy evidence cannot be applied to a non-covered diagnosis code. Even if the diagnosis were Psoriatic Arthritis, the DMARD failures could satisfy step therapy requirements — but M54.5 does not map to any covered indication.\n\n3. **Quantity Limit Concern (QUANTITY_LIMIT_001):** The requested 6 units also exceed the covered induction dosing structure of 3 doses (at weeks 0, 2, and 6) for all applicable indications, and the policy explicitly states that doses exceeding the FDA-approved maximum are not covered. (Source: blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1)\n\nThe primary and dispositive basis for denial is the diagnosis mismatch: M54.5 is not a covered indication for infliximab under this policy, regardless of step therapy compliance or other factors.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-007",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 34,
+        "diagnosisCodes": [
+          "K51.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "methotrexate",
+          "sulfasalazine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Ulcerative colitis with step therapy complete and quantity inside limit.",
+        "requestedUnits": 7
+      },
+      "actualExtraction": {
+        "patientAge": 34,
+        "diagnosisCodes": [
+          "K51.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "methotrexate",
+          "sulfasalazine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Ulcerative colitis with step therapy complete and quantity inside limit.",
+        "requestedUnits": 7
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 34,
+          "actual": 34,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K51.90"
+          ],
+          "actual": [
+            "K51.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "methotrexate",
+            "sulfasalazine"
+          ],
+          "actual": [
+            "methotrexate",
+            "sulfasalazine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Ulcerative colitis with step therapy complete and quantity inside limit.",
+          "actual": "Ulcerative colitis with step therapy complete and quantity inside limit.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 7,
+          "actual": 7,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p7-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p6-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p8-1"
+      ],
+      "latencyMs": 27075,
+      "decisionReasoning": "All deterministic rules passed for this 34-year-old patient with Ulcerative Colitis (K51.90) requesting infliximab (J1745). The following criteria are satisfied per validated Blue Shield of California Infliximab Medicare Part B Step Therapy Policy citations:\n\n1. **Diagnosis Match (DIAGNOSIS_MATCH_001):** K51.90 (Ulcerative Colitis, unspecified) is an explicitly covered ICD-10 code under the policy (sourceChunkId: p8-1).\n\n2. **Step Therapy (STEP_THERAPY_001):** Prior treatment with methotrexate and sulfasalazine is documented with confirmed treatment failure. Per the policy (sourceChunkId: p2-1), step therapy requires trials of preferred infliximab biosimilars (Avsola and Inflectra) for PPO plan members before non-preferred agents; the documented step therapy history satisfies this requirement as recorded.\n\n3. **Age Minimum (AGE_MINIMUM_001):** The patient is 34 years old, consistent with FDA-approved indications for infliximab in Ulcerative Colitis (sourceChunkId: p7-1).\n\n4. **Quantity Limit (QUANTITY_LIMIT_001):** 7 units (vials) requested falls within the allowed quantity limit. Covered dosing is up to 5 mg/kg IV per infusion per FDA-labeled dosing (sourceChunkId: p8-1), and the requested units are within the policy limit.\n\n**Residual considerations:** The policy (sourceChunkId: p7-1) notes that effective 2/1/2026, the prescriber must be or consult with a gastroenterologist, and the drug must not be combined with other targeted immunomodulators. These conditions are not flagged as failed criteria, but clinical notes should confirm gastroenterologist involvement if the authorization date falls on or after 2/1/2026. No failed criteria were identified across all four applied rules.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-008",
+      "expectedOutcome": "insufficient_info",
+      "actualOutcome": "insufficient_info",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 48,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "azathioprine",
+          "mesalamine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Crohn disease with step therapy met but infusion units not documented."
+      },
+      "actualExtraction": {
+        "patientAge": 48,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "azathioprine",
+          "mesalamine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Crohn disease with step therapy met but infusion units not documented."
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 48,
+          "actual": 48,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K50.90"
+          ],
+          "actual": [
+            "K50.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "azathioprine",
+            "mesalamine"
+          ],
+          "actual": [
+            "azathioprine",
+            "mesalamine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Crohn disease with step therapy met but infusion units not documented.",
+          "actual": "Crohn disease with step therapy met but infusion units not documented.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p12-1"
+      ],
+      "latencyMs": 25494,
+      "decisionReasoning": "The extraction and rules engine confirm that the sole failed criterion is QUANTITY_LIMIT_001, which depends on infusion units — an optional field that is entirely absent from the submitted documentation. The clinical notes explicitly acknowledge this gap (\"infusion units not documented\"). All validated policy citations (CareSource Infliximab UM Medical Policy, clauses p8-1 and p12-1; Blue Shield of California Infliximab Medicare Part B Step Therapy Policy, clause p2-1) uniformly require that the requested dose and units be explicitly specified as up to 5 mg/kg IV per infusion on the standard induction/maintenance schedule (weeks 0, 2, 6, then every 6–8 weeks). Without this documentation, the quantity limit rule cannot be evaluated, and authorization cannot be granted or denied on the merits. Notably, the step therapy criteria appear otherwise met — azathioprine qualifies as a systemic agent per CareSource policy (mesalamine alone would not suffice, but azathioprine is present), and the patient's age and diagnosis (K50.90, Crohn's disease) satisfy the remaining rules. The request is therefore blocked solely by the missing infusion unit documentation, making the outcome insufficient_info rather than a substantive denial.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-009",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 68,
+        "diagnosisCodes": [
+          "M17.11"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "weight loss"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Advanced unilateral knee OA with prolonged conservative care failure.",
+        "symptomDurationWeeks": 20
+      },
+      "actualExtraction": {
+        "patientAge": 68,
+        "diagnosisCodes": [
+          "M17.11"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "weight loss"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Advanced unilateral knee OA with prolonged conservative care failure.",
+        "symptomDurationWeeks": 20
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 68,
+          "actual": 68,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.11"
+          ],
+          "actual": [
+            "M17.11"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "physical therapy",
+            "nsaid",
+            "weight loss"
+          ],
+          "actual": [
+            "physical therapy",
+            "nsaid",
+            "weight loss"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Advanced unilateral knee OA with prolonged conservative care failure.",
+          "actual": "Advanced unilateral knee OA with prolonged conservative care failure.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "expected": 20,
+          "actual": 20,
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1"
+      ],
+      "latencyMs": 24371,
+      "decisionReasoning": "All deterministic eligibility rules passed (AGE_MINIMUM_002, CONSERVATIVE_CARE_001) with no failed criteria. The patient is a 68-year-old with a confirmed diagnosis of primary unilateral knee osteoarthritis (M17.11) and has documented failure of physical therapy, NSAIDs, and weight loss over 20 weeks — exceeding the 12-week minimum conservative management threshold required by Premera Blue Cross Medical Policy 7.01.550 (Knee Arthroplasty in Adults). The requested procedure, CPT 27447 (total knee arthroplasty), is explicitly listed as a covered code under both Premera Blue Cross Medical Policy 7.01.550 and Kaiser Permanente WA's Total Knee Arthroplasty Clinical Review Criteria. Both payers identify failure of NSAIDs and physical therapy as key clinical indicators supporting medical necessity for TKA in osteoarthritis. Treatment failure is formally documented, and the clinical notes confirm advanced unilateral knee OA with prolonged conservative care failure, satisfying all cited policy requirements for medical necessity.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-010",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 72,
+        "diagnosisCodes": [
+          "M17.12"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "intra-articular injection"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Long-standing left knee OA despite PT and NSAID regimen.",
+        "symptomDurationWeeks": 52
+      },
+      "actualExtraction": {
+        "patientAge": 72,
+        "diagnosisCodes": [
+          "M17.12"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "intra-articular injection"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Long-standing left knee OA despite PT and NSAID regimen.",
+        "symptomDurationWeeks": 52
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 72,
+          "actual": 72,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.12"
+          ],
+          "actual": [
+            "M17.12"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "physical therapy",
+            "nsaid",
+            "intra-articular injection"
+          ],
+          "actual": [
+            "physical therapy",
+            "nsaid",
+            "intra-articular injection"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Long-standing left knee OA despite PT and NSAID regimen.",
+          "actual": "Long-standing left knee OA despite PT and NSAID regimen.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "expected": 52,
+          "actual": 52,
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1"
+      ],
+      "latencyMs": 22917,
+      "decisionReasoning": "All deterministic rules passed (AGE_MINIMUM_002, CONSERVATIVE_CARE_001) with no failed criteria. The 72-year-old patient carries a diagnosis of primary osteoarthritis of the left knee (M17.12) and is requesting CPT 27447 (total knee arthroplasty). Per Premera Blue Cross Medical Policy 7.01.550 (Knee Arthroplasty in Adults), medical necessity requires documented failure of conservative management including at least one medication trial (NSAIDs, acetaminophen, or intra-articular corticosteroid injections) AND at least one physical measure (≥12 weeks). The patient satisfies all three required modalities — physical therapy, NSAIDs, and intra-articular injections — with treatment failure documented over 52 weeks (well exceeding the 3-month threshold). CPT 27447 is explicitly listed as a covered procedure code under this same policy. Additionally, the clinical presentation aligns with Kaiser Permanente WA's Total Knee Arthroplasty Clinical Review Criteria, which cites failure of NSAIDs, physical therapy, and steroid injections as key indications for total knee arthroplasty in osteoarthritis patients. No coverage gaps, missing documentation, or unmet criteria were identified.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-011",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 59,
+        "diagnosisCodes": [
+          "M17.0"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "bracing"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Bilateral knee OA with documented conservative failure over 14 weeks.",
+        "symptomDurationWeeks": 14
+      },
+      "actualExtraction": {
+        "patientAge": 59,
+        "diagnosisCodes": [
+          "M17.0"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "bracing"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Bilateral knee OA with documented conservative failure over 14 weeks.",
+        "symptomDurationWeeks": 14
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 59,
+          "actual": 59,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.0"
+          ],
+          "actual": [
+            "M17.0"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "physical therapy",
+            "nsaid",
+            "bracing"
+          ],
+          "actual": [
+            "physical therapy",
+            "nsaid",
+            "bracing"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Bilateral knee OA with documented conservative failure over 14 weeks.",
+          "actual": "Bilateral knee OA with documented conservative failure over 14 weeks.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "expected": 14,
+          "actual": 14,
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1"
+      ],
+      "latencyMs": 21830,
+      "decisionReasoning": "All deterministic eligibility rules passed (AGE_MINIMUM_002, CONSERVATIVE_CARE_001) for a 59-year-old patient with bilateral knee osteoarthritis (M17.0) requesting CPT 27447 (total knee arthroplasty). The patient has documented failure of 14 weeks of conservative management — physical therapy, NSAIDs, and bracing — satisfying the ≥12-week threshold required by Premera Blue Cross Medical Policy 7.01.550, which mandates a trial of both physical measures and medication prior to approval. CPT 27447 is explicitly listed as a covered procedure under that same policy. Additionally, Kaiser Permanente WA's Total Knee Arthroplasty Clinical Review Criteria independently support medical necessity given documented osteoarthritis with functional limitation and failure of NSAIDs and physical therapy. No criteria failures were identified, and treatment failure is formally documented in the clinical notes.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-012",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 47,
+        "diagnosisCodes": [
+          "M17.11"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Conservative criteria met but age is below threshold.",
+        "symptomDurationWeeks": 18
+      },
+      "actualExtraction": {
+        "patientAge": 47,
+        "diagnosisCodes": [
+          "M17.11"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Conservative criteria met but age is below threshold.",
+        "symptomDurationWeeks": 18
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 47,
+          "actual": 47,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.11"
+          ],
+          "actual": [
+            "M17.11"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "physical therapy",
+            "nsaid"
+          ],
+          "actual": [
+            "physical therapy",
+            "nsaid"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Conservative criteria met but age is below threshold.",
+          "actual": "Conservative criteria met but age is below threshold.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "expected": 18,
+          "actual": 18,
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1"
+      ],
+      "latencyMs": 45821,
+      "decisionReasoning": "The request for CPT 27447 (total knee arthroplasty) for a 47-year-old patient with diagnosis M17.11 (primary osteoarthritis, right knee) was evaluated against applicable payer policies and deterministic rules.\n\n**Failed Rule — AGE_MINIMUM_002:** The rules engine flagged that the patient (age 47) does not meet the minimum age threshold of 50 years required under the applied synthetic joint-replacement criteria. This is the primary basis for the likely_deny outcome.\n\n**Conservative Treatment Criteria — Partially Met:** The patient has documented failure of both physical therapy and NSAIDs over an 18-week period, which satisfies the conservative management requirements under:\n- *Premera Blue Cross Medical Policy 7.01.550* (sourceChunkId: premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1), which requires ≥12 weeks of failed non-operative care including medication and physical measures — met here.\n- *Kaiser Permanente WA Total Knee Arthroplasty Clinical Review Criteria* (sourceChunkId: kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1), which similarly requires failure of NSAIDs and physical therapy — also met here.\n\n**Procedure Code Coverage:** CPT 27447 is explicitly listed as a covered procedure under Premera Blue Cross Medical Policy 7.01.550 (sourceChunkId: premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1), confirming the procedure is within scope for review.\n\n**Key Caveat:** The validated Premera policy citations do not explicitly state a minimum age of 50 in the supplied text chunks. The age threshold is derived from the rules engine (AGE_MINIMUM_002) rather than a directly quoted policy clause, which introduces some uncertainty — hence a **medium** (rather than high) confidence rating. If the payer's full policy document contains an explicit age criterion, denial confidence would increase. Conversely, if no such age criterion exists in the complete policy, the conservative care criteria may be sufficient for approval. A full policy review or peer-to-peer discussion is recommended.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-013",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 63,
+        "diagnosisCodes": [
+          "M17.12"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "acetaminophen",
+          "home exercise"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "No PT and no NSAID despite prolonged knee symptoms.",
+        "symptomDurationWeeks": 30
+      },
+      "actualExtraction": {
+        "patientAge": 63,
+        "diagnosisCodes": [
+          "M17.12"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "acetaminophen",
+          "home exercise"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "No physical therapy and no nsaid despite prolonged knee symptoms.",
+        "symptomDurationWeeks": 30
+      },
+      "extractionFieldAccuracy": 90,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 63,
+          "actual": 63,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.12"
+          ],
+          "actual": [
+            "M17.12"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "acetaminophen",
+            "home exercise"
+          ],
+          "actual": [
+            "acetaminophen",
+            "home exercise"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "No PT and no NSAID despite prolonged knee symptoms.",
+          "actual": "No physical therapy and no nsaid despite prolonged knee symptoms.",
+          "match": false
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "expected": 30,
+          "actual": 30,
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1"
+      ],
+      "latencyMs": 46810,
+      "decisionReasoning": "The request for CPT 27447 (Total Knee Arthroplasty) for a 63-year-old patient with diagnosis M17.12 is likely to be denied based on failure to meet required conservative care criteria prior to surgical intervention.\n\n**Failed Criterion — CONSERVATIVE_CARE_001:**\nThe patient's clinical notes explicitly document the absence of both a physical therapy (PT) trial and an NSAID trial, despite 30 weeks of knee symptoms. Kaiser Permanente WA's Total Knee Arthroplasty Clinical Review Criteria (source: kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1) requires documented failure of conservative therapies including NSAIDs and physical therapy prior to TKA approval. The patient has only trialed acetaminophen and home exercise, leaving a significant gap in the required conservative treatment record.\n\n**Procedure Scope Confirmed:**\nPer Premera Blue Cross Medical Policy 7.01.550 (source: premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1), CPT 27447 is a covered service subject to medical necessity criteria, confirming this request falls within the scope of applicable policy review.\n\n**Nuance — Premera PT Requirement:**\nPremera Blue Cross did remove its specific requirement of 6 PT visits over 12 weeks in a 2016 interim review (source: premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1). However, the broader conservative treatment framework — including NSAID use — remains a relevant and unmet prerequisite under the applicable payer criteria evaluated here.\n\n**Summary:** With no documented NSAID trial and no physical therapy attempted over a 30-week symptomatic period, the case does not satisfy the conservative care prerequisites required for TKA approval. The treating provider should consider initiating and documenting trials of NSAIDs and physical therapy before resubmitting this prior authorization request.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-014",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 66,
+        "diagnosisCodes": [
+          "M17.11"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "Therapies listed but no documented failure statement.",
+        "symptomDurationWeeks": 24
+      },
+      "actualExtraction": {
+        "patientAge": 66,
+        "diagnosisCodes": [
+          "M17.11"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "Therapies listed but no documented failure statement.",
+        "symptomDurationWeeks": 24
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 66,
+          "actual": 66,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.11"
+          ],
+          "actual": [
+            "M17.11"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "physical therapy",
+            "nsaid"
+          ],
+          "actual": [
+            "physical therapy",
+            "nsaid"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": false,
+          "actual": false,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Therapies listed but no documented failure statement.",
+          "actual": "Therapies listed but no documented failure statement.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "expected": 24,
+          "actual": 24,
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1"
+      ],
+      "latencyMs": 45342,
+      "decisionReasoning": "The prior authorization request for CPT 27447 (Total Knee Arthroplasty) for a 66-year-old patient with diagnosis M17.11 (primary osteoarthritis, right knee) is likely to be denied based on the following findings:\n\n**Failed Criterion — CONSERVATIVE_CARE_001: Missing Documentation of Treatment Failure**\n\nPer **Premera Blue Cross Medical Policy 7.01.550 (Knee Arthroplasty in Adults)**, medical necessity requires explicit documentation of at least three months (≥12 weeks) of *failed* non-operative, conservative management — including both a medication trial (e.g., NSAIDs) and a physical measures trial (e.g., physical therapy ≥12 weeks). Similarly, **Kaiser Permanente WA's Total Knee Arthroplasty Clinical Review Criteria** requires documented failure to achieve symptom improvement with conservative therapies including NSAIDs and physical therapy.\n\nWhile the clinical notes confirm that physical therapy and NSAIDs were attempted (and symptom duration of 24 weeks satisfies the duration threshold), **there is no documented statement of treatment failure** for either modality. The clinical notes summary explicitly states: *\"Therapies listed but no documented failure statement.\"* This is a critical gap — both cited payer policies require affirmative documentation that conservative care was tried *and* failed, not merely that it was initiated.\n\n**Passing Criterion — AGE_MINIMUM_002:** The patient is 66 years old and meets the age eligibility threshold.\n\n**Procedure Code Coverage:** CPT 27447 is a recognized covered procedure under Premera's policy; however, coverage is contingent on satisfying all medical necessity criteria, including the documented failure of conservative management — which is not currently met.\n\n**Recommendation:** To support reconsideration or resubmission, the treating clinician should provide an explicit, dated attestation in the clinical record documenting that physical therapy and NSAID therapy were trialed for ≥12 weeks and that the patient failed to achieve adequate symptom relief with these treatments.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-015",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 61,
+        "diagnosisCodes": [
+          "M17.0"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Duration of conservative care is below 12-week requirement.",
+        "symptomDurationWeeks": 8
+      },
+      "actualExtraction": {
+        "patientAge": 61,
+        "diagnosisCodes": [
+          "M17.0"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Duration of conservative care is below 12-week requirement.",
+        "symptomDurationWeeks": 8
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 61,
+          "actual": 61,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.0"
+          ],
+          "actual": [
+            "M17.0"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "physical therapy",
+            "nsaid"
+          ],
+          "actual": [
+            "physical therapy",
+            "nsaid"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Duration of conservative care is below 12-week requirement.",
+          "actual": "Duration of conservative care is below 12-week requirement.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "expected": 8,
+          "actual": 8,
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1"
+      ],
+      "latencyMs": 43170,
+      "decisionReasoning": "The prior authorization request for CPT 27447 (Total Knee Arthroplasty) for a 61-year-old patient with diagnosis M17.0 (bilateral primary osteoarthritis of knee) is likely to be denied based on the following:\n\n**Failed Criterion — CONSERVATIVE_CARE_001:**\nPer **Premera Blue Cross Medical Policy 7.01.550 – Knee Arthroplasty in Adults** (sourceChunkId: premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1), documentation of at least **12 weeks (3 months) of failed non-operative, conservative management** is required before total knee arthroplasty is considered medically necessary. This must include a trial of one or more medications (e.g., NSAIDs) AND a trial of one or more physical measures such as physical therapy ≥ 12 weeks, flexibility/strengthening exercises ≥ 12 weeks, or reasonable restriction of activities ≥ 12 weeks.\n\nThe patient's clinical record documents only **8 weeks** of conservative care (physical therapy and NSAID use), falling **4 weeks short** of the required 12-week minimum. While treatment failure is documented, the duration requirement has not been met.\n\n**Additional Policy Context:**\n- Per sourceChunkId premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1, a 2016 interim review removed the specific physical therapy visit-count requirement (6 visits), but the **12-week duration requirement remains in force**.\n- Per sourceChunkId premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1, CPT 27447 is explicitly subject to all documentation and medical necessity requirements outlined in the policy, including the 12-week conservative care minimum.\n\n**Passing Criterion:** The patient meets the age minimum (AGE_MINIMUM_002; age 61).\n\n**Conclusion:** Because the sole failed criterion (CONSERVATIVE_CARE_001) is directly supported by present clinical data (8-week documented conservative care duration vs. 12-week policy requirement), a likely denial is warranted. The request may be resubmitted once the patient has completed and documented at least 12 weeks of conservative management.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-016",
+      "expectedOutcome": "insufficient_info",
+      "actualOutcome": "insufficient_info",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 70,
+        "diagnosisCodes": [
+          "M17.12"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "cane use"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "OA severity noted, but exact conservative-care duration not documented."
+      },
+      "actualExtraction": {
+        "patientAge": 70,
+        "diagnosisCodes": [
+          "M17.12"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "cane use"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "OA severity noted, but exact conservative-care duration not documented."
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 70,
+          "actual": 70,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.12"
+          ],
+          "actual": [
+            "M17.12"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "physical therapy",
+            "nsaid",
+            "cane use"
+          ],
+          "actual": [
+            "physical therapy",
+            "nsaid",
+            "cane use"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "OA severity noted, but exact conservative-care duration not documented.",
+          "actual": "OA severity noted, but exact conservative-care duration not documented.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1"
+      ],
+      "latencyMs": 27097,
+      "decisionReasoning": "The patient is a 70-year-old with a diagnosis of primary unilateral knee osteoarthritis (M17.12) requesting total knee arthroplasty (CPT 27447). The requested procedure is explicitly within scope under Premera Blue Cross Medical Policy 7.01.550, and the patient has documented failure of physical therapy, NSAIDs, and cane use — satisfying the modality requirements for conservative care under both Premera Blue Cross and Kaiser Permanente WA criteria.\n\nHowever, the critical missing element is the **duration of conservative care**. Premera Blue Cross Medical Policy 7.01.550 (sourceChunkId: premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1) explicitly requires documentation of ≥ 12 weeks (3 months) of failed non-operative conservative management, including both a medication trial and a physical measures trial. The clinical notes summary explicitly states that \"exact conservative-care duration is not documented,\" and the rules engine flagged CONSERVATIVE_CARE_001 as a failed criterion for this reason.\n\nA potential waiver exists: for Kellgren-Lawrence grade 4 (bone-on-bone) radiographic findings, the physical measures duration requirement is waived under the same policy. However, no radiographic grading information is present in the extraction, so this exception cannot be confirmed.\n\nBecause the sole failed criterion (duration of conservative care ≥ 12 weeks) depends on an absent, optional field — and because a grade 4 radiographic finding could potentially waive the physical measures duration requirement — the determination cannot be made with the available information. Additional documentation is needed: (1) explicit records confirming ≥ 12 weeks of conservative care, or (2) radiographic evidence of Kellgren-Lawrence grade 4 (bone-on-bone) findings to invoke the waiver provision.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-017",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 25,
+        "diagnosisCodes": [
+          "G40.909"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "levetiracetam"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Seizure disorder code present with prior imaging abnormalities documented.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": false
+      },
+      "actualExtraction": {
+        "patientAge": 25,
+        "diagnosisCodes": [
+          "G40.909"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "levetiracetam"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Seizure disorder code present with prior imaging abnormalities documented.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": false
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 25,
+          "actual": 25,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "G40.909"
+          ],
+          "actual": [
+            "G40.909"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "70553",
+          "actual": "70553",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "levetiracetam"
+          ],
+          "actual": [
+            "levetiracetam"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Seizure disorder code present with prior imaging abnormalities documented.",
+          "actual": "Seizure disorder code present with prior imaging abnormalities documented.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "expected": false,
+          "actual": false,
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1"
+      ],
+      "latencyMs": 28565,
+      "decisionReasoning": "All deterministic rules passed (RED_FLAG_001, PRIOR_IMAGING_001) with no failed criteria. The request is for CPT 70553 (MRI brain with and without contrast) for a 25-year-old patient with seizure disorder (G40.909), documented prior imaging abnormalities, and a documented treatment failure with levetiracetam.\n\nCoverage is supported by CMS NCD 220.2 (Magnetic Resonance Imaging) on three grounds:\n1. NCD 220.2 establishes MRI of the head/CNS as a nationally covered indication for neuroradiology purposes, provided the service is reasonable and necessary for the specific patient — a standard clearly met here given the active seizure disorder diagnosis and prior imaging abnormalities (sourceChunkId: cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1).\n2. NCD 220.2 explicitly recognizes the use of FDA-approved paramagnetic contrast agents (directly relevant to CPT 70553, the with-and-without contrast variant), supporting the appropriateness of the specific procedure requested (sourceChunkId: cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1).\n3. None of the NCD 220.2 national non-coverage contraindications apply to this patient (no viable pregnancy, no ferromagnetic life support, no claustrophobia, no metallic aneurysm clips, not a cortical bone/calcification study), removing any national-level coverage bar (sourceChunkId: cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1).\n\nThe combination of a validated seizure disorder diagnosis, prior imaging abnormalities, documented first-line antiepileptic treatment and failure, and the absence of any applicable contraindication or non-coverage criterion strongly supports approval.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-018",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 43,
+        "diagnosisCodes": [
+          "R56.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "acetaminophen"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "Red-flag seizure presentation with documented focal imaging concern.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": false
+      },
+      "actualExtraction": {
+        "patientAge": 43,
+        "diagnosisCodes": [
+          "R56.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "acetaminophen"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "Red-flag seizure presentation with documented focal imaging concern.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": false
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 43,
+          "actual": 43,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "R56.9"
+          ],
+          "actual": [
+            "R56.9"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "70553",
+          "actual": "70553",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "acetaminophen"
+          ],
+          "actual": [
+            "acetaminophen"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": false,
+          "actual": false,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Red-flag seizure presentation with documented focal imaging concern.",
+          "actual": "Red-flag seizure presentation with documented focal imaging concern.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "expected": false,
+          "actual": false,
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1"
+      ],
+      "latencyMs": 22768,
+      "decisionReasoning": "All deterministic rules passed (RED_FLAG_001, PRIOR_IMAGING_001) for this 43-year-old patient presenting with unspecified seizure (R56.9) and a documented focal imaging concern. The requested procedure — brain MRI with and without contrast (CPT 70553) — is nationally covered under CMS NCD 220.2, which recognizes MRI as an appropriate standard diagnostic modality for head and CNS indications, including general neuroradiology. The clinical presentation meets the \"reasonable and necessary\" standard: a red-flag seizure with focal imaging concern warrants contrast-enhanced MRI for CNS lesion detection, where MRI's superior soft-tissue contrast resolution provides clinically necessary diagnostic information. No contraindications are documented (no pregnancy, ferromagnetic implants, claustrophobia, or vascular aneurysm clips), and the study does not fall under any nationally non-covered indication per NCD 220.2. Coverage eligibility is well-supported across all three validated policy citations.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-019",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 58,
+        "diagnosisCodes": [
+          "R51.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "topiramate"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "New focal neurologic deficit and concerning prior imaging findings.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": true
+      },
+      "actualExtraction": {
+        "patientAge": 58,
+        "diagnosisCodes": [
+          "R51.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "topiramate"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "New focal neurologic deficit and concerning prior imaging findings.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": true
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 58,
+          "actual": 58,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "R51.9"
+          ],
+          "actual": [
+            "R51.9"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "70553",
+          "actual": "70553",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "topiramate"
+          ],
+          "actual": [
+            "topiramate"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "New focal neurologic deficit and concerning prior imaging findings.",
+          "actual": "New focal neurologic deficit and concerning prior imaging findings.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "expected": true,
+          "actual": true,
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1"
+      ],
+      "latencyMs": 24484,
+      "decisionReasoning": "All deterministic rules passed (RED_FLAG_001, PRIOR_IMAGING_001) with no failed criteria. The request is for CPT 70553 (Brain MRI with and without contrast) for a 58-year-old patient presenting with new focal neurologic deficits, concerning prior imaging findings, and documented treatment failure with topiramate. This aligns with three validated citations from CMS NCD 220.2 (Magnetic Resonance Imaging):\n\n1. **NCD 220.2 (Chunk p2-1):** Brain MRI (CPT 70553) is a nationally covered indication for neuroradiology when reasonable and necessary for the specific patient's diagnosis or treatment. The patient's new focal neurologic deficits and concerning prior imaging findings directly support medical necessity.\n\n2. **NCD 220.2 (Chunk p5-1):** Coverage requires the absence of specific contraindications (viable pregnancy, ferromagnetic life-support dependency, claustrophobia, metallic aneurysm clips). No such contraindications are documented for this patient, supporting coverage eligibility.\n\n3. **NCD 220.2 (Chunk p1-1):** MRI is a covered diagnostic service under the Medicare Diagnostic Services benefit category when reasonable and necessary. The patient's clinical profile — age 58, new focal neurologic deficits, prior imaging findings, and documented treatment history — meets the general clinical utility standard described in the NCD.\n\nAll clinical, policy, and rules-based criteria are satisfied, supporting a likely approval determination with high confidence.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-020",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 39,
+        "diagnosisCodes": [
+          "R51.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "sumatriptan"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "No neurologic deficits and no qualifying red-flag diagnosis code.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": false
+      },
+      "actualExtraction": {
+        "patientAge": 39,
+        "diagnosisCodes": [
+          "R51.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "sumatriptan"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "No neurologic deficits and no qualifying red-flag diagnosis code.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": false
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 39,
+          "actual": 39,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "R51.9"
+          ],
+          "actual": [
+            "R51.9"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "70553",
+          "actual": "70553",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "sumatriptan"
+          ],
+          "actual": [
+            "sumatriptan"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": false,
+          "actual": false,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "No neurologic deficits and no qualifying red-flag diagnosis code.",
+          "actual": "No neurologic deficits and no qualifying red-flag diagnosis code.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "expected": false,
+          "actual": false,
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p3-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1"
+      ],
+      "latencyMs": 48488,
+      "decisionReasoning": "The prior authorization request for CPT 70553 (MRI brain with and without contrast) for a 39-year-old patient with a diagnosis of R51.9 (headache, unspecified) fails at least one determinative rule and does not meet the medical necessity threshold established under CMS NCD 220.2.\n\nKey findings driving the denial:\n\n1. **Failed Rule — RED_FLAG_001**: The clinical notes confirm no neurologic deficits are present, and the only diagnosis code submitted is R51.9 (headache, unspecified), which is not a qualifying red-flag diagnosis code (e.g., no evidence of malignancy, meningitis, stroke, or other serious neurologic pathology). This is a hard-fail criterion.\n\n2. **Medical Necessity Not Established (NCD 220.2, Chunk p2-1)**: CMS requires that MRI services be \"reasonable and necessary for the diagnosis or treatment of the specific patient involved.\" With no neurologic deficits, no red-flag diagnosis, and only an unspecified headache code, the clinical record does not support advanced brain MRI as medically necessary under this standard.\n\n3. **Undocumented Treatment Failure**: Although sumatriptan is listed as a prior treatment tried, treatment failure is explicitly documented as false. The absence of documented failure weakens the clinical justification for escalating to advanced imaging.\n\n4. **No Absolute Contraindications Identified (NCD 220.2, Chunk p5-1)**: No contraindications (e.g., pregnancy, ferromagnetic implants) are present, meaning the denial is based solely on unmet medical necessity criteria — not safety concerns.\n\n5. **R51.9 Not a Specifically Covered Indication (NCD 220.2, Chunk p3-1)**: The NCD does not enumerate unspecified headache without neurologic deficits as a covered indication for brain MRI, further undermining the \"reasonable and necessary\" argument.\n\nIn summary, the request is likely to be denied due to failure of RED_FLAG_001 (no neurologic deficit or qualifying red-flag diagnosis) and insufficient documentation of medical necessity under CMS NCD 220.2.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-021",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 66,
+        "diagnosisCodes": [
+          "G45.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "aspirin"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "Red-flag code present but no prior imaging findings documented.",
+        "imagingFindingsPresent": false,
+        "neurologicDeficitsPresent": false
+      },
+      "actualExtraction": {
+        "patientAge": 66,
+        "diagnosisCodes": [
+          "G45.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "aspirin"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "Red-flag code present but no prior imaging findings documented.",
+        "imagingFindingsPresent": false,
+        "neurologicDeficitsPresent": false
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 66,
+          "actual": 66,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "G45.9"
+          ],
+          "actual": [
+            "G45.9"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "70553",
+          "actual": "70553",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "aspirin"
+          ],
+          "actual": [
+            "aspirin"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": false,
+          "actual": false,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Red-flag code present but no prior imaging findings documented.",
+          "actual": "Red-flag code present but no prior imaging findings documented.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "expected": false,
+          "actual": false,
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "expected": false,
+          "actual": false,
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p3-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1"
+      ],
+      "latencyMs": 46439,
+      "decisionReasoning": "The request is for CPT 70553 (MRI Brain with and without contrast) for a 66-year-old patient with a diagnosis of G45.9 (Transient Ischemic Attack, unspecified). Based on the rules evaluation and validated policy citations, the request fails to meet medical necessity criteria for the following reasons:\n\n1. **Failed Rule – PRIOR_IMAGING_001**: The clinical record does not document prior non-advanced imaging results or focal imaging findings. While CMS NCD 220.2 (via RadMD) does not universally mandate prior imaging before MRI authorization for all indications (e.g., disc disease), the absence of any prior imaging findings or documented neurologic deficits in this case undermines the demonstration of medical necessity for the specific study requested.\n\n2. **Medical Necessity Not Established**: Per CMS NCD 220.2, MRI brain coverage requires that services be \"reasonable and necessary for the diagnosis or treatment of the specific patient involved.\" The clinical notes summary confirms no prior imaging findings are documented and no neurologic deficits are present, leaving the medical necessity justification unsupported in the current record.\n\n3. **No Absolute Contraindications or Non-Coverage Triggers**: The nationally non-covered indications under NCD 220.2 (cortical bone/calcifications, vascular aneurysm clips, viable pregnancy, ferromagnetic life support) do not apply here, so the denial is not contraindication-based — it is solely a failure to document sufficient medical necessity.\n\n4. **Treatment History**: Only aspirin has been tried, and treatment failure is not documented, further limiting the clinical justification for advanced imaging at this stage.\n\nThe request is likely to be denied pending submission of supporting documentation, including prior imaging results, documented neurologic deficits, or other clinical findings that establish the medical necessity of MRI brain with and without contrast for this patient.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-022",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 51,
+        "diagnosisCodes": [
+          "R42"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "meclizine"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "Neither red-flag diagnosis nor focal neurologic deficits are present.",
+        "imagingFindingsPresent": false,
+        "neurologicDeficitsPresent": false
+      },
+      "actualExtraction": {
+        "patientAge": 51,
+        "diagnosisCodes": [
+          "R42"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "meclizine"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "Neither red-flag diagnosis nor focal neurologic deficits are present.",
+        "imagingFindingsPresent": false,
+        "neurologicDeficitsPresent": false
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 51,
+          "actual": 51,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "R42"
+          ],
+          "actual": [
+            "R42"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "70553",
+          "actual": "70553",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "meclizine"
+          ],
+          "actual": [
+            "meclizine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": false,
+          "actual": false,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Neither red-flag diagnosis nor focal neurologic deficits are present.",
+          "actual": "Neither red-flag diagnosis nor focal neurologic deficits are present.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "expected": false,
+          "actual": false,
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "expected": false,
+          "actual": false,
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p3-1"
+      ],
+      "latencyMs": 48900,
+      "decisionReasoning": "The prior authorization request for CPT 70553 (MRI Brain with and without contrast) for a 51-year-old patient with isolated dizziness (R42) fails two deterministic clinical rules and does not meet the medical necessity threshold established under CMS NCD 220.2.\n\n**Failed Criteria:**\n\n1. **RED_FLAG_001** – The clinical notes explicitly confirm the absence of focal neurologic deficits and the absence of any qualifying red-flag diagnosis code. NCD 220.2 (cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1) requires that MRI services be \"reasonable and necessary for the diagnosis or treatment of the specific patient involved.\" For a patient with isolated R42 (dizziness) and no neurologic deficits or red-flag findings, medical necessity under this standard is not established.\n\n2. **PRIOR_IMAGING_001** – There is no documentation of prior non-advanced imaging (e.g., CT head) or focal imaging findings that would support escalation to contrast-enhanced MRI brain. While NCD 220.2 (cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p3-1) notes that MRI may be covered without prior radiological imaging for certain indications (e.g., disc disease), individual MAC discretion applies, and the absence of any imaging workup or documented focal findings weakens the medical necessity argument for this advanced modality.\n\n**Additional Considerations:**\n- Only one prior treatment (meclizine) has been tried, and treatment failure is not documented, further limiting the clinical justification.\n- No absolute contraindications under NCD 220.2 (cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1) apply, but the absence of contraindications does not independently establish coverage.\n- The combination of a non-specific diagnosis (R42), no neurologic deficits, no imaging findings, and undocumented treatment failure collectively fails to meet the \"reasonable and necessary\" standard required for coverage of MRI brain with and without contrast at this time.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-023",
+      "expectedOutcome": "insufficient_info",
+      "actualOutcome": "insufficient_info",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 33,
+        "diagnosisCodes": [
+          "R56.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "levetiracetam"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Seizure red flag documented, but prior imaging documentation is missing.",
+        "neurologicDeficitsPresent": false
+      },
+      "actualExtraction": {
+        "patientAge": 33,
+        "diagnosisCodes": [
+          "R56.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "levetiracetam"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Seizure red flag documented, but prior imaging documentation is missing.",
+        "neurologicDeficitsPresent": false
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 33,
+          "actual": 33,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "R56.9"
+          ],
+          "actual": [
+            "R56.9"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "70553",
+          "actual": "70553",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "levetiracetam"
+          ],
+          "actual": [
+            "levetiracetam"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Seizure red flag documented, but prior imaging documentation is missing.",
+          "actual": "Seizure red flag documented, but prior imaging documentation is missing.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "expected": false,
+          "actual": false,
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1"
+      ],
+      "latencyMs": 30648,
+      "decisionReasoning": "The request is for a brain MRI with contrast (CPT 70553) for a 33-year-old patient with unspecified seizure (R56.9) who has failed levetiracetam and has a documented seizure red flag. While CMS NCD 220.2 broadly supports coverage of brain MRI for neuroradiology purposes including seizure workup — and no contraindications are present — the applicable payer rule PRIOR_IMAGING_001 requires documentation of prior non-advanced imaging (e.g., CT) or focal findings before advanced MRI can be approved. The clinical notes explicitly state that prior imaging documentation is absent, and this field is missing from the extraction. Because the sole failed criterion (PRIOR_IMAGING_001) depends on an optional field that was not supplied, a definitive approve or deny determination cannot be made. Additional documentation of any prior head CT, plain imaging, or focal neurological/EEG findings must be submitted to complete the prior authorization review.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-024",
+      "expectedOutcome": "insufficient_info",
+      "actualOutcome": "insufficient_info",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 46,
+        "diagnosisCodes": [
+          "R51.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "acetaminophen",
+          "propranolol"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Headache workup with imaging concern documented but neurologic exam finding unspecified.",
+        "imagingFindingsPresent": true
+      },
+      "actualExtraction": {
+        "patientAge": 46,
+        "diagnosisCodes": [
+          "R51.9"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "acetaminophen",
+          "propranolol"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Headache workup with imaging concern documented but neurologic exam finding unspecified.",
+        "imagingFindingsPresent": true
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 46,
+          "actual": 46,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "R51.9"
+          ],
+          "actual": [
+            "R51.9"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "70553",
+          "actual": "70553",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "acetaminophen",
+            "propranolol"
+          ],
+          "actual": [
+            "acetaminophen",
+            "propranolol"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Headache workup with imaging concern documented but neurologic exam finding unspecified.",
+          "actual": "Headache workup with imaging concern documented but neurologic exam finding unspecified.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p3-1"
+      ],
+      "latencyMs": 27975,
+      "decisionReasoning": "The rules engine determined ineligibility based on failed criterion RED_FLAG_001, which requires documentation of a neurologic deficit or a qualifying red-flag diagnosis code. The extraction confirms that the neurologic exam finding is unspecified in the clinical notes, and the only diagnosis code present (R51.9 — headache, unspecified) does not constitute a qualifying red-flag code under the applied rule set. Because the sole failed rule depends on an optional field (neurologic exam findings / red-flag diagnosis specificity) that is absent or unspecified in the extraction, a definitive approve or deny outcome cannot be rendered.\n\nUnder CMS NCD 220.2 (MRI, CPT 70553), coverage is supported for neuroradiology workup when the service is reasonable and necessary for the specific patient (citation: cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1). The patient's profile — 46 years old, documented treatment failures with acetaminophen and propranolol, imaging concern noted in clinical notes, and no identified contraindications — is directionally favorable (citation: cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1). Where the specific indication is not explicitly enumerated nationally, local MAC discretion applies and medical necessity documentation is the determining factor (citation: cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1).\n\nHowever, the critical missing information — a documented neurologic deficit (e.g., focal neurologic signs, papilledema, altered consciousness) or a more specific red-flag diagnosis code (e.g., secondary headache etiology, new/thunderclap headache) — is required to satisfy RED_FLAG_001 and support a deterministic approval. The submitting provider should supplement the prior authorization request with: (1) specific neurologic exam findings, and/or (2) a more precise diagnosis code reflecting the clinical red-flag concern, and/or (3) explicit documentation of why advanced imaging is medically necessary given the current symptom profile.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-025",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 25,
+        "diagnosisCodes": [
+          "Z99.89"
+        ],
+        "requestedProcedureCode": "J9999",
+        "priorTreatmentsTried": [
+          "therapy alpha",
+          "therapy beta",
+          "therapy gamma"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five."
+      },
+      "actualExtraction": {
+        "patientAge": 25,
+        "diagnosisCodes": [
+          "Z99.89"
+        ],
+        "requestedProcedureCode": "J9999",
+        "priorTreatmentsTried": [
+          "therapy alpha",
+          "therapy beta",
+          "therapy gamma"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five."
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 25,
+          "actual": 25,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "Z99.89"
+          ],
+          "actual": [
+            "Z99.89"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J9999",
+          "actual": "J9999",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "therapy alpha",
+            "therapy beta",
+            "therapy gamma"
+          ],
+          "actual": [
+            "therapy alpha",
+            "therapy beta",
+            "therapy gamma"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five.",
+          "actual": "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 1,
+      "validCitationCount": 1,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1",
+        "meridian-health-plan-j9999-synthetic-canary-p1-1",
+        "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p3-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p1-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p4-1"
+      ],
+      "latencyMs": 28551,
+      "decisionReasoning": "The rules engine returned eligibleByRules=false with a failed criterion of NO_APPLICABLE_RULES, meaning no recognized policy rules could be matched and applied to this request — a procedural disqualifier that mandates a likely_deny outcome per the code-determined constraint. However, confidence is rated LOW because the validated policy citation (Meridian J9999 Prior Authorization Policy, SYNTHETIC CANARY, chunk meridian-health-plan-j9999-synthetic-canary-p1-1) actually indicates that the clinical data on its face satisfies both stated coverage criteria: (1) exactly three documented prior therapy failures (therapy alpha, beta, gamma) as required, and (2) patient age of 25, which meets the minimum age-21 requirement. The denial is therefore driven entirely by the absence of applicable rules in the rules engine — not by any substantive clinical or policy deficiency in the submitted data. A human reviewer should verify whether the correct policy rules are loaded and applicable before a final determination is issued.",
+      "overrideLog": []
+    },
+    {
+      "id": "CASE-026",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 19,
+        "diagnosisCodes": [
+          "Z99.89"
+        ],
+        "requestedProcedureCode": "J9999",
+        "priorTreatmentsTried": [
+          "therapy alpha",
+          "therapy beta"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Meridian synthetic canary request has only two prior therapies and patient age nineteen."
+      },
+      "actualExtraction": {
+        "patientAge": 19,
+        "diagnosisCodes": [
+          "Z99.89"
+        ],
+        "requestedProcedureCode": "J9999",
+        "priorTreatmentsTried": [
+          "therapy alpha",
+          "therapy beta"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Meridian synthetic canary request has only two prior therapies and patient age nineteen."
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 19,
+          "actual": 19,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "Z99.89"
+          ],
+          "actual": [
+            "Z99.89"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J9999",
+          "actual": "J9999",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "therapy alpha",
+            "therapy beta"
+          ],
+          "actual": [
+            "therapy alpha",
+            "therapy beta"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Meridian synthetic canary request has only two prior therapies and patient age nineteen.",
+          "actual": "Meridian synthetic canary request has only two prior therapies and patient age nineteen.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1",
+        "meridian-health-plan-j9999-synthetic-canary-p1-1",
+        "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p3-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p4-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p1-1"
+      ],
+      "latencyMs": 37076,
+      "decisionReasoning": "Based on the validated policy citations from Meridian Health Plan's J9999 Prior Authorization Policy (SYNTHETIC), this request fails two distinct coverage criteria:\n\n1. **Insufficient Prior Therapy Failures**: Meridian's policy requires documented failure of *exactly 3* prior therapies before J9999 can be authorized. The patient has only 2 documented prior therapy failures (therapy alpha and therapy beta), which does not satisfy this exact-value requirement. (Source: meridian-health-plan-j9999-synthetic-canary-p1-1)\n\n2. **Patient Age Below Minimum Threshold**: Meridian's policy requires the patient to be age 21 or older at the time of the request. The patient is 19 years old, falling below the minimum age requirement of 21. Meridian explicitly classifies submissions with an age below 21 as not meeting this standard. (Source: meridian-health-plan-j9999-synthetic-canary-p1-1)\n\nAdditionally, J9999 is an unlisted/non-standard procedure code. Per Providence Health Plan's policy on unlisted codes, such codes require medical necessity review, and prior authorization is recommended to avoid post-service denial — further underscoring the risk of proceeding without approval. (Source: providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1)\n\nWith two independently failed criteria — both grounded in present, documented data — and no applicable rules returning eligibility, a likely_deny outcome is warranted with high confidence.",
+      "overrideLog": []
+    }
+  ]
+}
