@@ -1,6 +1,8 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { z, type ZodTypeAny } from "zod";
 
+import { safeStartGeneration } from "../langfuse";
+
 const DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-6";
 
 export class ClaudeStructuredOutputError extends Error {
@@ -21,6 +23,11 @@ type ClaudeStructuredCallArgs<TSchema extends ZodTypeAny> = {
   toolDescription: string;
   maxTokens?: number;
   model?: string;
+  telemetry?: {
+    traceId?: string | null;
+    parentObservationId?: string | null;
+    generationName?: string;
+  };
 };
 
 function getClient(): Anthropic {
@@ -61,6 +68,24 @@ export async function callClaudeStructured<TSchema extends ZodTypeAny>(
 
   let lastError: unknown;
   for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const generation = safeStartGeneration({
+      traceId: args.telemetry?.traceId ?? null,
+      parentObservationId: args.telemetry?.parentObservationId ?? null,
+      name: args.telemetry?.generationName ?? `claude.${args.toolName}`,
+      model,
+      input: {
+        attempt,
+        systemPrompt: args.systemPrompt,
+        userPrompt: args.userPrompt,
+        toolName: args.toolName,
+        toolDescription: args.toolDescription,
+      },
+      metadata: {
+        provider: "anthropic",
+        toolName: args.toolName,
+      },
+    });
+
     try {
       const response = await client.messages.create({
         model,
@@ -88,8 +113,20 @@ export async function callClaudeStructured<TSchema extends ZodTypeAny>(
         throw new Error("Claude did not return the required tool_use block.");
       }
 
-      return args.schema.parse(toolBlock.input);
+      const parsed = args.schema.parse(toolBlock.input);
+      generation.end({
+        output: parsed,
+        usage: response.usage ?? undefined,
+      });
+      return parsed;
     } catch (error) {
+      generation.end({
+        level: "ERROR",
+        statusMessage: `claude structured attempt ${attempt} failed`,
+        metadata: {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      });
       lastError = error;
       const retryable = isRetryable(error);
       if (attempt < 2 && retryable) {

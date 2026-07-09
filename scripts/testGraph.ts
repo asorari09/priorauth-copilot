@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 
-import { buildPriorAuthGraph } from "../lib/graph/buildGraph";
+import { runPriorAuthGraphCase } from "../lib/graph/buildGraph";
+import { safeShutdownLangfuse } from "../lib/langfuse";
 
 type GoldenCase = {
   id: string;
@@ -57,7 +58,6 @@ async function run() {
   };
 
   const caseMap = loadCaseMap();
-  const graph = buildPriorAuthGraph();
 
   let mismatchFound = false;
   for (const id of ids) {
@@ -66,10 +66,10 @@ async function run() {
       throw new Error(`Missing ${id} in goldenCases.json`);
     }
 
-    const result = (await graph.invoke({
+    const result = (await runPriorAuthGraphCase({
       rawNote: sample.note,
-      overrideLog: [],
-    })) as Record<string, unknown>;
+      caseId: id,
+    })) as unknown as Record<string, unknown>;
 
     const outcome = (result.decision as { outcome?: string } | undefined)?.outcome;
     console.log(`\n========== ${id} ==========`);
@@ -142,7 +142,11 @@ async function run() {
   }
 }
 
-run().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+run()
+  .catch((error) => {
+    console.error(error);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await safeShutdownLangfuse();
+  });

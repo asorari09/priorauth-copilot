@@ -1,5 +1,6 @@
 import { Annotation, END, START, StateGraph } from "@langchain/langgraph";
 
+import { safeStartTrace, safeUpdateTrace } from "../langfuse";
 import {
   appealDraftNode,
   decisionNode,
@@ -12,6 +13,8 @@ import {
 
 const GraphState = Annotation.Root({
   rawNote: Annotation<string>(),
+  traceId: Annotation<string | undefined>(),
+  caseId: Annotation<string | undefined>(),
   extraction: Annotation<PriorAuthGraphState["extraction"]>(),
   rulesResult: Annotation<PriorAuthGraphState["rulesResult"]>(),
   citations: Annotation<PriorAuthGraphState["citations"]>(),
@@ -40,4 +43,41 @@ export function buildPriorAuthGraph() {
     .addConditionalEdges("decide", routeOnDecision)
     .addEdge("draftAppeal", END)
     .compile();
+}
+
+export async function runPriorAuthGraphCase(params: {
+  rawNote: string;
+  caseId?: string;
+  sessionId?: string;
+  userId?: string;
+}) {
+  const trace = safeStartTrace({
+    name: "priorauth-case-run",
+    input: { rawNote: params.rawNote },
+    metadata: { caseId: params.caseId ?? null },
+    sessionId: params.sessionId,
+    userId: params.userId,
+  });
+
+  const graph = buildPriorAuthGraph();
+  const result = (await graph.invoke({
+    rawNote: params.rawNote,
+    traceId: trace.traceId ?? undefined,
+    caseId: params.caseId,
+    overrideLog: [],
+  })) as PriorAuthGraphState;
+
+  safeUpdateTrace(trace.traceId, {
+    output: {
+      decision: result.decision ?? null,
+      citations: result.citations ?? [],
+      error: result.error ?? null,
+    },
+    metadata: {
+      caseId: params.caseId ?? null,
+      overrideLog: result.overrideLog ?? [],
+    },
+  });
+
+  return result;
 }

@@ -2,6 +2,7 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
+import { safeStartGeneration } from "../langfuse";
 import { ClinicalExtractionSchema, type ClinicalExtraction } from "../schemas";
 
 const DEFAULT_EXTRACTION_MODEL = "gpt-4o-mini";
@@ -77,11 +78,33 @@ function isLikelyParseFailure(error: unknown): boolean {
 export async function extractClinicalExtractionFromNote(
   note: string,
   model = DEFAULT_EXTRACTION_MODEL,
+  telemetry?: {
+    traceId?: string | null;
+    parentObservationId?: string | null;
+  },
 ): Promise<ClinicalExtraction> {
   const client = createClient();
   let lastParseError: unknown;
 
   for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const generation = safeStartGeneration({
+      traceId: telemetry?.traceId ?? null,
+      parentObservationId: telemetry?.parentObservationId ?? null,
+      name: "openai.extract",
+      model,
+      input: {
+        attempt,
+        messages: [
+          { role: "system", content: EXTRACTION_INSTRUCTIONS },
+          { role: "user", content: note },
+        ],
+      },
+      metadata: {
+        provider: "openai",
+        operation: "clinical_extraction",
+      },
+    });
+
     try {
       const completion = await client.chat.completions.parse({
         model,
@@ -129,8 +152,20 @@ export async function extractClinicalExtractionFromNote(
           : { neurologicDeficitsPresent: parsed.neurologicDeficitsPresent }),
       });
 
+      generation.end({
+        output: normalized,
+        usage: completion.usage ?? undefined,
+      });
+
       return normalized;
     } catch (error) {
+      generation.end({
+        level: "ERROR",
+        statusMessage: `extract attempt ${attempt} failed`,
+        metadata: {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      });
       if (isLikelyParseFailure(error)) {
         lastParseError = error;
         if (attempt < 2) {

@@ -1,6 +1,11 @@
 import OpenAI from "openai";
 import { z } from "zod";
 
+import {
+  safeCaptureLangfuseErrorContext,
+  safeStartSpan,
+  safeUpdateTrace,
+} from "../langfuse";
 import { callClaudeStructured } from "../llm/claude";
 import { extractClinicalExtractionFromNote } from "../llm/openai";
 import { runRulesEngine } from "../rulesEngine";
@@ -27,6 +32,8 @@ export type RetrievedChunk = {
 
 export type PriorAuthGraphState = {
   rawNote: string;
+  traceId?: string;
+  caseId?: string;
   extraction?: ClinicalExtraction;
   rulesResult?: RulesEngineResult;
   citations?: PolicyCitation[];
@@ -152,27 +159,73 @@ function determineOutcomeConstraint(
   };
 }
 
+async function withNodeSpan(
+  state: PriorAuthGraphState,
+  nodeName: string,
+  input: unknown,
+  run: (spanId: string | null) => Promise<Partial<PriorAuthGraphState>>,
+): Promise<Partial<PriorAuthGraphState>> {
+  const span = safeStartSpan({
+    traceId: state.traceId ?? null,
+    name: `node.${nodeName}`,
+    input,
+    metadata: { caseId: state.caseId ?? null },
+  });
+
+  try {
+    const output = await run(span.id);
+    span.end({ output });
+    return output;
+  } catch (error) {
+    span.end({
+      level: "ERROR",
+      statusMessage: `${nodeName} failed`,
+      metadata: {
+        error: error instanceof Error ? error.message : String(error),
+      },
+    });
+    safeCaptureLangfuseErrorContext({
+      traceId: state.traceId,
+      location: `node.${nodeName}`,
+      error,
+    });
+    throw error;
+  }
+}
+
 export async function extractNode(
   state: PriorAuthGraphState,
 ): Promise<Partial<PriorAuthGraphState>> {
-  try {
-    const extraction = await extractClinicalExtractionFromNote(state.rawNote);
-    return { extraction };
-  } catch (error) {
-    return {
-      error: `extract node failed: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
+  return withNodeSpan(state, "extract", { rawNote: state.rawNote }, async (spanId) => {
+    try {
+      const extraction = await extractClinicalExtractionFromNote(state.rawNote, undefined, {
+        traceId: state.traceId ?? null,
+        parentObservationId: spanId,
+      });
+      return { extraction };
+    } catch (error) {
+      return {
+        error: `extract node failed: ${error instanceof Error ? error.message : String(error)}`,
+      };
+    }
+  });
 }
 
 export async function rulesCheckNode(
   state: PriorAuthGraphState,
 ): Promise<Partial<PriorAuthGraphState>> {
-  if (!state.extraction) {
-    return { error: "rulesCheck node missing extraction" };
-  }
-  const rulesResult = runRulesEngine(state.extraction);
-  return { rulesResult };
+  return withNodeSpan(
+    state,
+    "rulesCheck",
+    { extraction: state.extraction ?? null },
+    async () => {
+      if (!state.extraction) {
+        return { error: "rulesCheck node missing extraction" };
+      }
+      const rulesResult = runRulesEngine(state.extraction);
+      return { rulesResult };
+    },
+  );
 }
 
 async function retrievePolicyChunks(
@@ -200,6 +253,7 @@ async function retrievePolicyChunks(
 async function synthesizeCitationsWithValidation(
   extraction: ClinicalExtraction,
   retrievedChunks: RetrievedChunk[],
+  telemetry?: { traceId?: string | null; parentObservationId?: string | null },
 ): Promise<PolicyCitation[]> {
   const CitationToolSchema = z.object({
     citations: z.array(PolicyCitationSchema),
@@ -236,6 +290,11 @@ async function synthesizeCitationsWithValidation(
           : "",
       ].join("\n"),
       maxTokens: 1400,
+      telemetry: {
+        traceId: telemetry?.traceId ?? null,
+        parentObservationId: telemetry?.parentObservationId ?? null,
+        generationName: "claude.citation_synthesis",
+      },
     });
 
     const invalid = response.citations.filter((c) => !allowedIds.has(c.sourceChunkId));
@@ -253,28 +312,36 @@ async function synthesizeCitationsWithValidation(
 export async function policyRagNode(
   state: PriorAuthGraphState,
 ): Promise<Partial<PriorAuthGraphState>> {
-  if (!state.extraction) {
-    return { error: "policyRag node missing extraction", citations: [] };
-  }
+  return withNodeSpan(
+    state,
+    "policyRag",
+    { extraction: state.extraction ?? null },
+    async (spanId) => {
+      if (!state.extraction) {
+        return { error: "policyRag node missing extraction", citations: [] };
+      }
 
-  try {
-    const retrievedChunks = await retrievePolicyChunks(state.extraction);
-    if (retrievedChunks.length === 0) {
-      return { citations: [], retrievedChunks };
-    }
+      try {
+        const retrievedChunks = await retrievePolicyChunks(state.extraction);
+        if (retrievedChunks.length === 0) {
+          return { citations: [], retrievedChunks };
+        }
 
-    const citations = await synthesizeCitationsWithValidation(
-      state.extraction,
-      retrievedChunks,
-    );
+        const citations = await synthesizeCitationsWithValidation(
+          state.extraction,
+          retrievedChunks,
+          { traceId: state.traceId ?? null, parentObservationId: spanId },
+        );
 
-    return { citations, retrievedChunks };
-  } catch (error) {
-    return {
-      citations: [],
-      error: `policyRag node failed: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
+        return { citations, retrievedChunks };
+      } catch (error) {
+        return {
+          citations: [],
+          error: `policyRag node failed: ${error instanceof Error ? error.message : String(error)}`,
+        };
+      }
+    },
+  );
 }
 
 async function generateReasoningForForcedOutcome(
@@ -283,6 +350,7 @@ async function generateReasoningForForcedOutcome(
   citations: PolicyCitation[],
   forcedOutcome: Decision["outcome"],
   reason: string,
+  telemetry?: { traceId?: string | null; parentObservationId?: string | null },
 ): Promise<z.infer<typeof DecisionReasoningOnlySchema>> {
   return callClaudeStructured({
     toolName: "emit_forced_decision_reasoning",
@@ -300,153 +368,195 @@ async function generateReasoningForForcedOutcome(
       "Generate confidence and reasoningSummary aligned with the forced outcome.",
     ].join("\n"),
     maxTokens: 700,
+    telemetry: {
+      traceId: telemetry?.traceId ?? null,
+      parentObservationId: telemetry?.parentObservationId ?? null,
+      generationName: "claude.decision_reasoning",
+    },
   });
 }
 
 export async function decisionNode(
   state: PriorAuthGraphState,
 ): Promise<Partial<PriorAuthGraphState>> {
-  const extraction = state.extraction;
-  const rulesResult = state.rulesResult;
-  const citations = state.citations ?? [];
-  const overrideLog = [...(state.overrideLog ?? [])];
+  return withNodeSpan(
+    state,
+    "decide",
+    {
+      extraction: state.extraction ?? null,
+      rulesResult: state.rulesResult ?? null,
+      citationsCount: (state.citations ?? []).length,
+    },
+    async (spanId) => {
+      const extraction = state.extraction;
+      const rulesResult = state.rulesResult;
+      const citations = state.citations ?? [];
+      const overrideLog = [...(state.overrideLog ?? [])];
 
-  if (!extraction || !rulesResult) {
-    return {
-      decision: {
-        outcome: "insufficient_info",
-        confidence: "low",
-        reasoningSummary: "Decision node missing extraction or rules result.",
-        supportingCitations: [],
-        rulesResult:
-          rulesResult ??
-          ({
-            eligibleByRules: false,
-            failedCriteria: ["MISSING_RULES_RESULT"],
-            ruleIdsApplied: [],
-          } as RulesEngineResult),
-      },
-      overrideLog,
-    };
-  }
+      if (!extraction || !rulesResult) {
+        return {
+          decision: {
+            outcome: "insufficient_info",
+            confidence: "low",
+            reasoningSummary: "Decision node missing extraction or rules result.",
+            supportingCitations: [],
+            rulesResult:
+              rulesResult ??
+              ({
+                eligibleByRules: false,
+                failedCriteria: ["MISSING_RULES_RESULT"],
+                ruleIdsApplied: [],
+              } as RulesEngineResult),
+          },
+          overrideLog,
+        };
+      }
 
-  const constraint = determineOutcomeConstraint(extraction, rulesResult, citations);
+      const constraint = determineOutcomeConstraint(extraction, rulesResult, citations);
 
-  try {
-    if (citations.length === 0) {
-      const reasoning = await generateReasoningForForcedOutcome(
-        extraction,
-        rulesResult,
-        citations,
-        "insufficient_info",
-        constraint.reason,
-      );
-      const decision: Decision = {
-        outcome: "insufficient_info",
-        confidence: reasoning.confidence,
-        reasoningSummary: reasoning.reasoningSummary,
-        supportingCitations: [],
-        rulesResult,
-      };
-      return { decision, overrideLog };
-    }
+      try {
+        if (citations.length === 0) {
+          const reasoning = await generateReasoningForForcedOutcome(
+            extraction,
+            rulesResult,
+            citations,
+            "insufficient_info",
+            constraint.reason,
+            { traceId: state.traceId ?? null, parentObservationId: spanId },
+          );
+          const decision: Decision = {
+            outcome: "insufficient_info",
+            confidence: reasoning.confidence,
+            reasoningSummary: reasoning.reasoningSummary,
+            supportingCitations: [],
+            rulesResult,
+          };
+          return { decision, overrideLog };
+        }
 
-    const claudeDecision = await callClaudeStructured({
-      toolName: "emit_decision",
-      toolDescription:
-        "Emit prior-auth decision object given deterministic rules and validated policy citations.",
-      schema: DecisionSchema,
-      systemPrompt:
-        "You are a decision-support assistant. Use only supplied evidence. Never invent citations.",
-      userPrompt: [
-        `Code-determined required outcome: ${constraint.forcedOutcome}`,
-        `Constraint reason: ${constraint.reason}`,
-        `Extraction: ${JSON.stringify(extraction)}`,
-        `Rules result: ${JSON.stringify(rulesResult)}`,
-        `Validated citations: ${JSON.stringify(citations)}`,
-        "Return a Decision object.",
-      ].join("\n"),
-      maxTokens: 1200,
-    });
+        const claudeDecision = await callClaudeStructured({
+          toolName: "emit_decision",
+          toolDescription:
+            "Emit prior-auth decision object given deterministic rules and validated policy citations.",
+          schema: DecisionSchema,
+          systemPrompt:
+            "You are a decision-support assistant. Use only supplied evidence. Never invent citations.",
+          userPrompt: [
+            `Code-determined required outcome: ${constraint.forcedOutcome}`,
+            `Constraint reason: ${constraint.reason}`,
+            `Extraction: ${JSON.stringify(extraction)}`,
+            `Rules result: ${JSON.stringify(rulesResult)}`,
+            `Validated citations: ${JSON.stringify(citations)}`,
+            "Return a Decision object.",
+          ].join("\n"),
+          maxTokens: 1200,
+          telemetry: {
+            traceId: state.traceId ?? null,
+            parentObservationId: spanId,
+            generationName: "claude.decision",
+          },
+        });
 
-    const decision: Decision = {
-      ...claudeDecision,
-      supportingCitations: citations,
-      rulesResult,
-      outcome: claudeDecision.outcome,
-    };
+        const decision: Decision = {
+          ...claudeDecision,
+          supportingCitations: citations,
+          rulesResult,
+          outcome: claudeDecision.outcome,
+        };
 
-    if (decision.outcome !== constraint.forcedOutcome) {
-      overrideLog.push(
-        `Overrode Claude outcome ${decision.outcome} -> ${constraint.forcedOutcome} (${constraint.reason})`,
-      );
-      decision.outcome = constraint.forcedOutcome;
-    }
+        if (decision.outcome !== constraint.forcedOutcome) {
+          overrideLog.push(
+            `Overrode Claude outcome ${decision.outcome} -> ${constraint.forcedOutcome} (${constraint.reason})`,
+          );
+          decision.outcome = constraint.forcedOutcome;
+        }
 
-    return { decision, overrideLog };
-  } catch (error) {
-    return {
-      decision: {
-        outcome: "insufficient_info",
-        confidence: "low",
-        reasoningSummary: `Decision node failed closed: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-        supportingCitations: [],
-        rulesResult,
-      },
-      overrideLog,
-      error: `decision node failed: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
+        if (state.traceId) {
+          safeUpdateTrace(state.traceId, {
+            metadata: {
+              overrideLog,
+            },
+          });
+        }
+
+        return { decision, overrideLog };
+      } catch (error) {
+        return {
+          decision: {
+            outcome: "insufficient_info",
+            confidence: "low",
+            reasoningSummary: `Decision node failed closed: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+            supportingCitations: [],
+            rulesResult,
+          },
+          overrideLog,
+          error: `decision node failed: ${error instanceof Error ? error.message : String(error)}`,
+        };
+      }
+    },
+  );
 }
 
 export async function appealDraftNode(
   state: PriorAuthGraphState,
 ): Promise<Partial<PriorAuthGraphState>> {
-  if (!state.decision || state.decision.outcome !== "likely_deny") {
-    return {};
-  }
+  return withNodeSpan(
+    state,
+    "draftAppeal",
+    { decision: state.decision ?? null, extraction: state.extraction ?? null },
+    async (spanId) => {
+      if (!state.decision || state.decision.outcome !== "likely_deny") {
+        return {};
+      }
 
-  const fallbackCitation =
-    state.decision.supportingCitations[0] ??
-    ({
-      payerName: "Unknown payer",
-      documentTitle: "No citation available",
-      sourceChunkId: "none",
-      clauseTextParaphrased: "No validated citation available.",
-      requirementSummary: "Manual review required due to missing citation evidence.",
-    } satisfies PolicyCitation);
+      const fallbackCitation =
+        state.decision.supportingCitations[0] ??
+        ({
+          payerName: "Unknown payer",
+          documentTitle: "No citation available",
+          sourceChunkId: "none",
+          clauseTextParaphrased: "No validated citation available.",
+          requirementSummary: "Manual review required due to missing citation evidence.",
+        } satisfies PolicyCitation);
 
-  try {
-    const draft = await callClaudeStructured({
-      toolName: "emit_appeal_draft",
-      toolDescription:
-        "Emit an appeal draft object using the provided decision context and citations.",
-      schema: AppealDraftSchema,
-      systemPrompt:
-        "Draft concise prior-authorization appeals grounded only in provided citations.",
-      userPrompt: [
-        `Decision: ${JSON.stringify(state.decision)}`,
-        `Extraction: ${JSON.stringify(state.extraction ?? {})}`,
-        "Use one of the provided citations as citedClause.",
-      ].join("\n"),
-      maxTokens: 1200,
-    });
+      try {
+        const draft = await callClaudeStructured({
+          toolName: "emit_appeal_draft",
+          toolDescription:
+            "Emit an appeal draft object using the provided decision context and citations.",
+          schema: AppealDraftSchema,
+          systemPrompt:
+            "Draft concise prior-authorization appeals grounded only in provided citations.",
+          userPrompt: [
+            `Decision: ${JSON.stringify(state.decision)}`,
+            `Extraction: ${JSON.stringify(state.extraction ?? {})}`,
+            "Use one of the provided citations as citedClause.",
+          ].join("\n"),
+          maxTokens: 1200,
+          telemetry: {
+            traceId: state.traceId ?? null,
+            parentObservationId: spanId,
+            generationName: "claude.appeal_draft",
+          },
+        });
 
-    return { appealDraft: draft };
-  } catch (error) {
-    const fallback: AppealDraft = {
-      draftText:
-        "Appeal draft unavailable due to model failure. Human review required before submission.",
-      citedClause: fallbackCitation,
-      requiresHumanReview: true,
-    };
-    return {
-      appealDraft: fallback,
-      error: `appealDraft node failed: ${error instanceof Error ? error.message : String(error)}`,
-    };
-  }
+        return { appealDraft: draft };
+      } catch (error) {
+        const fallback: AppealDraft = {
+          draftText:
+            "Appeal draft unavailable due to model failure. Human review required before submission.",
+          citedClause: fallbackCitation,
+          requiresHumanReview: true,
+        };
+        return {
+          appealDraft: fallback,
+          error: `appealDraft node failed: ${error instanceof Error ? error.message : String(error)}`,
+        };
+      }
+    },
+  );
 }
 
 export function routeOnDecision(
