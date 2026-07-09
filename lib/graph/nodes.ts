@@ -1,0 +1,456 @@
+import OpenAI from "openai";
+import { z } from "zod";
+
+import { callClaudeStructured } from "../llm/claude";
+import { extractClinicalExtractionFromNote } from "../llm/openai";
+import { runRulesEngine } from "../rulesEngine";
+import {
+  AppealDraftSchema,
+  DecisionSchema,
+  PolicyCitationSchema,
+  type AppealDraft,
+  type ClinicalExtraction,
+  type Decision,
+  type PolicyCitation,
+  type RulesEngineResult,
+} from "../schemas";
+import { supabaseAdmin } from "../supabase";
+
+export type RetrievedChunk = {
+  chunk_id: string;
+  payer_name: string;
+  document_title: string;
+  source_url: string;
+  content: string;
+  similarity: number;
+};
+
+export type PriorAuthGraphState = {
+  rawNote: string;
+  extraction?: ClinicalExtraction;
+  rulesResult?: RulesEngineResult;
+  citations?: PolicyCitation[];
+  retrievedChunks?: RetrievedChunk[];
+  decision?: Decision;
+  appealDraft?: AppealDraft;
+  overrideLog?: string[];
+  error?: string;
+};
+
+const EMBEDDING_MODEL = "text-embedding-3-small";
+
+const OPTIONAL_RULE_DEPENDENCIES: Record<string, Array<keyof ClinicalExtraction>> = {
+  QUANTITY_LIMIT_001: ["requestedUnits"],
+  CONSERVATIVE_CARE_001: ["symptomDurationWeeks"],
+  RED_FLAG_001: ["neurologicDeficitsPresent"],
+  PRIOR_IMAGING_001: ["imagingFindingsPresent"],
+};
+
+const DecisionReasoningOnlySchema = z.object({
+  confidence: z.enum(["high", "medium", "low"]),
+  reasoningSummary: z.string().min(1),
+});
+
+function getOpenAIClient(): OpenAI {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error("Missing OPENAI_API_KEY");
+  }
+  return new OpenAI({ apiKey });
+}
+
+function buildPolicyQuery(extraction: ClinicalExtraction): string {
+  const base = [
+    `Procedure code ${extraction.requestedProcedureCode}`,
+    `Diagnosis codes ${extraction.diagnosisCodes.join(", ")}`,
+    `Prior treatments ${extraction.priorTreatmentsTried.join(", ")}`,
+  ];
+
+  const procedureTerms: Record<string, string[]> = {
+    J1745: [
+      "infliximab intravenous products",
+      "step therapy",
+      "documented treatment failure",
+      "quantity limits",
+    ],
+    "27447": [
+      "total knee arthroplasty",
+      "conservative care",
+      "physical therapy",
+      "NSAID",
+      "12 weeks",
+    ],
+    "70553": [
+      "brain MRI with and without contrast",
+      "neurologic deficits",
+      "red flag diagnosis",
+      "prior imaging findings",
+    ],
+  };
+
+  const criteriaTerms = procedureTerms[extraction.requestedProcedureCode] ?? [
+    "medical necessity criteria",
+  ];
+  return `${base.join(" | ")} | ${criteriaTerms.join(" | ")}`;
+}
+
+function isMissingFieldDrivenRuleFailure(
+  rulesResult: RulesEngineResult,
+  extraction: ClinicalExtraction,
+): boolean {
+  if (rulesResult.failedCriteria.length === 0) {
+    return false;
+  }
+
+  return rulesResult.failedCriteria.every((criterion) => {
+    const ruleId = criterion.split(":")[0]?.trim();
+    const deps = OPTIONAL_RULE_DEPENDENCIES[ruleId];
+    if (!deps || deps.length === 0) {
+      return false;
+    }
+
+    return deps.every((field) => extraction[field] === undefined);
+  });
+}
+
+type OutcomeConstraint = {
+  forcedOutcome: Decision["outcome"];
+  reason: string;
+};
+
+function determineOutcomeConstraint(
+  extraction: ClinicalExtraction,
+  rulesResult: RulesEngineResult,
+  citations: PolicyCitation[],
+): OutcomeConstraint {
+  if (citations.length === 0) {
+    return {
+      forcedOutcome: "insufficient_info",
+      reason: "No validated citations available from retrieval.",
+    };
+  }
+
+  if (rulesResult.eligibleByRules) {
+    return {
+      forcedOutcome: "likely_approve",
+      reason: "All deterministic rules passed.",
+    };
+  }
+
+  if (isMissingFieldDrivenRuleFailure(rulesResult, extraction)) {
+    return {
+      forcedOutcome: "insufficient_info",
+      reason:
+        "All failed rules depend on optional fields that are absent in extraction.",
+    };
+  }
+
+  return {
+    forcedOutcome: "likely_deny",
+    reason:
+      "At least one failed rule is based on present data, so likely_deny is permitted.",
+  };
+}
+
+export async function extractNode(
+  state: PriorAuthGraphState,
+): Promise<Partial<PriorAuthGraphState>> {
+  try {
+    const extraction = await extractClinicalExtractionFromNote(state.rawNote);
+    return { extraction };
+  } catch (error) {
+    return {
+      error: `extract node failed: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+}
+
+export async function rulesCheckNode(
+  state: PriorAuthGraphState,
+): Promise<Partial<PriorAuthGraphState>> {
+  if (!state.extraction) {
+    return { error: "rulesCheck node missing extraction" };
+  }
+  const rulesResult = runRulesEngine(state.extraction);
+  return { rulesResult };
+}
+
+async function retrievePolicyChunks(
+  extraction: ClinicalExtraction,
+): Promise<RetrievedChunk[]> {
+  const openai = getOpenAIClient();
+  const query = buildPolicyQuery(extraction);
+  const embedding = await openai.embeddings.create({
+    model: EMBEDDING_MODEL,
+    input: query,
+  });
+  const queryVector = embedding.data[0].embedding;
+
+  const { data, error } = await supabaseAdmin.rpc("match_policy_chunks", {
+    query_embedding: queryVector,
+    match_count: 5,
+  });
+  if (error) {
+    throw new Error(`match_policy_chunks failed: ${error.message}`);
+  }
+
+  return (data ?? []) as RetrievedChunk[];
+}
+
+async function synthesizeCitationsWithValidation(
+  extraction: ClinicalExtraction,
+  retrievedChunks: RetrievedChunk[],
+): Promise<PolicyCitation[]> {
+  const CitationToolSchema = z.object({
+    citations: z.array(PolicyCitationSchema),
+  });
+  const allowedIds = new Set(retrievedChunks.map((chunk) => chunk.chunk_id));
+  const retrievedPayload = retrievedChunks.map((chunk) => ({
+    chunk_id: chunk.chunk_id,
+    payer_name: chunk.payer_name,
+    document_title: chunk.document_title,
+    source_url: chunk.source_url,
+    content: chunk.content,
+    similarity: chunk.similarity,
+  }));
+
+  let citations: PolicyCitation[] = [];
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const response = await callClaudeStructured({
+      toolName: "emit_policy_citations",
+      toolDescription: "Emit policy citation objects from provided chunk text only.",
+      schema: CitationToolSchema,
+      systemPrompt:
+        "You produce policy citations strictly from supplied retrieval chunks. Never cite outside chunks.",
+      userPrompt: [
+        "Clinical extraction JSON:",
+        JSON.stringify(extraction),
+        "",
+        "Retrieved chunks JSON (only valid evidence):",
+        JSON.stringify(retrievedPayload),
+        "",
+        `Allowed sourceChunkId values: ${JSON.stringify(Array.from(allowedIds))}`,
+        "Return only citations supported by these chunks. If none are supportable, return [].",
+        attempt === 2
+          ? "Retry correction: any sourceChunkId not in allowed list is invalid."
+          : "",
+      ].join("\n"),
+      maxTokens: 1400,
+    });
+
+    const invalid = response.citations.filter((c) => !allowedIds.has(c.sourceChunkId));
+    if (invalid.length === 0) {
+      citations = response.citations;
+      break;
+    }
+
+    citations = response.citations.filter((c) => allowedIds.has(c.sourceChunkId));
+  }
+
+  return citations;
+}
+
+export async function policyRagNode(
+  state: PriorAuthGraphState,
+): Promise<Partial<PriorAuthGraphState>> {
+  if (!state.extraction) {
+    return { error: "policyRag node missing extraction", citations: [] };
+  }
+
+  try {
+    const retrievedChunks = await retrievePolicyChunks(state.extraction);
+    if (retrievedChunks.length === 0) {
+      return { citations: [], retrievedChunks };
+    }
+
+    const citations = await synthesizeCitationsWithValidation(
+      state.extraction,
+      retrievedChunks,
+    );
+
+    return { citations, retrievedChunks };
+  } catch (error) {
+    return {
+      citations: [],
+      error: `policyRag node failed: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+}
+
+async function generateReasoningForForcedOutcome(
+  extraction: ClinicalExtraction,
+  rulesResult: RulesEngineResult,
+  citations: PolicyCitation[],
+  forcedOutcome: Decision["outcome"],
+  reason: string,
+): Promise<z.infer<typeof DecisionReasoningOnlySchema>> {
+  return callClaudeStructured({
+    toolName: "emit_forced_decision_reasoning",
+    toolDescription:
+      "Emit decision confidence and reasoning summary while outcome is fixed by deterministic guardrails.",
+    schema: DecisionReasoningOnlySchema,
+    systemPrompt:
+      "Provide concise clinical coverage reasoning based only on provided rules and citations.",
+    userPrompt: [
+      `Outcome is fixed by code as: ${forcedOutcome}`,
+      `Constraint reason: ${reason}`,
+      `Extraction: ${JSON.stringify(extraction)}`,
+      `Rules result: ${JSON.stringify(rulesResult)}`,
+      `Validated citations: ${JSON.stringify(citations)}`,
+      "Generate confidence and reasoningSummary aligned with the forced outcome.",
+    ].join("\n"),
+    maxTokens: 700,
+  });
+}
+
+export async function decisionNode(
+  state: PriorAuthGraphState,
+): Promise<Partial<PriorAuthGraphState>> {
+  const extraction = state.extraction;
+  const rulesResult = state.rulesResult;
+  const citations = state.citations ?? [];
+  const overrideLog = [...(state.overrideLog ?? [])];
+
+  if (!extraction || !rulesResult) {
+    return {
+      decision: {
+        outcome: "insufficient_info",
+        confidence: "low",
+        reasoningSummary: "Decision node missing extraction or rules result.",
+        supportingCitations: [],
+        rulesResult:
+          rulesResult ??
+          ({
+            eligibleByRules: false,
+            failedCriteria: ["MISSING_RULES_RESULT"],
+            ruleIdsApplied: [],
+          } as RulesEngineResult),
+      },
+      overrideLog,
+    };
+  }
+
+  const constraint = determineOutcomeConstraint(extraction, rulesResult, citations);
+
+  try {
+    if (citations.length === 0) {
+      const reasoning = await generateReasoningForForcedOutcome(
+        extraction,
+        rulesResult,
+        citations,
+        "insufficient_info",
+        constraint.reason,
+      );
+      const decision: Decision = {
+        outcome: "insufficient_info",
+        confidence: reasoning.confidence,
+        reasoningSummary: reasoning.reasoningSummary,
+        supportingCitations: [],
+        rulesResult,
+      };
+      return { decision, overrideLog };
+    }
+
+    const claudeDecision = await callClaudeStructured({
+      toolName: "emit_decision",
+      toolDescription:
+        "Emit prior-auth decision object given deterministic rules and validated policy citations.",
+      schema: DecisionSchema,
+      systemPrompt:
+        "You are a decision-support assistant. Use only supplied evidence. Never invent citations.",
+      userPrompt: [
+        `Code-determined required outcome: ${constraint.forcedOutcome}`,
+        `Constraint reason: ${constraint.reason}`,
+        `Extraction: ${JSON.stringify(extraction)}`,
+        `Rules result: ${JSON.stringify(rulesResult)}`,
+        `Validated citations: ${JSON.stringify(citations)}`,
+        "Return a Decision object.",
+      ].join("\n"),
+      maxTokens: 1200,
+    });
+
+    const decision: Decision = {
+      ...claudeDecision,
+      supportingCitations: citations,
+      rulesResult,
+      outcome: claudeDecision.outcome,
+    };
+
+    if (decision.outcome !== constraint.forcedOutcome) {
+      overrideLog.push(
+        `Overrode Claude outcome ${decision.outcome} -> ${constraint.forcedOutcome} (${constraint.reason})`,
+      );
+      decision.outcome = constraint.forcedOutcome;
+    }
+
+    return { decision, overrideLog };
+  } catch (error) {
+    return {
+      decision: {
+        outcome: "insufficient_info",
+        confidence: "low",
+        reasoningSummary: `Decision node failed closed: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+        supportingCitations: [],
+        rulesResult,
+      },
+      overrideLog,
+      error: `decision node failed: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+}
+
+export async function appealDraftNode(
+  state: PriorAuthGraphState,
+): Promise<Partial<PriorAuthGraphState>> {
+  if (!state.decision || state.decision.outcome !== "likely_deny") {
+    return {};
+  }
+
+  const fallbackCitation =
+    state.decision.supportingCitations[0] ??
+    ({
+      payerName: "Unknown payer",
+      documentTitle: "No citation available",
+      sourceChunkId: "none",
+      clauseTextParaphrased: "No validated citation available.",
+      requirementSummary: "Manual review required due to missing citation evidence.",
+    } satisfies PolicyCitation);
+
+  try {
+    const draft = await callClaudeStructured({
+      toolName: "emit_appeal_draft",
+      toolDescription:
+        "Emit an appeal draft object using the provided decision context and citations.",
+      schema: AppealDraftSchema,
+      systemPrompt:
+        "Draft concise prior-authorization appeals grounded only in provided citations.",
+      userPrompt: [
+        `Decision: ${JSON.stringify(state.decision)}`,
+        `Extraction: ${JSON.stringify(state.extraction ?? {})}`,
+        "Use one of the provided citations as citedClause.",
+      ].join("\n"),
+      maxTokens: 1200,
+    });
+
+    return { appealDraft: draft };
+  } catch (error) {
+    const fallback: AppealDraft = {
+      draftText:
+        "Appeal draft unavailable due to model failure. Human review required before submission.",
+      citedClause: fallbackCitation,
+      requiresHumanReview: true,
+    };
+    return {
+      appealDraft: fallback,
+      error: `appealDraft node failed: ${error instanceof Error ? error.message : String(error)}`,
+    };
+  }
+}
+
+export function routeOnDecision(
+  state: PriorAuthGraphState,
+): "draftAppeal" | "__end__" {
+  return state.decision?.outcome === "likely_deny" ? "draftAppeal" : "__end__";
+}

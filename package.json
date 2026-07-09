@@ -8,11 +8,18 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "ingest": "tsx scripts/ingest.ts",
+    "test:graph": "tsx scripts/testGraph.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.110.0",
+    "@langchain/core": "^1.2.2",
+    "@langchain/langgraph": "^1.4.7",
     "@supabase/supabase-js": "^2.110.1",
     "next": "15.5.20",
+    "openai": "^6.45.0",
+    "pdf-parse": "^2.4.5",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "zod": "^4.4.3"
@@ -28,6 +35,7 @@
     "eslint-config-next": "15.5.20",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4",
+    "tsx": "^4.23.0",
     "typescript": "^5",
     "vitest": "^4.1.10"
   }
