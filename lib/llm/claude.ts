@@ -61,10 +61,10 @@ function isRetryable(error: unknown): boolean {
 
 function formatError(error: unknown): string {
   if (error instanceof Error) {
-    const status = typeof (error as { status?: unknown }).status === "number"
-      ? (error as { status: number }).status
-      : undefined;
-    const stopReason = (error as { stop_reason?: unknown }).stop_reason;
+    const errorWithFields = error as Error & Record<string, unknown>;
+    const maybeStatus = errorWithFields.status;
+    const status = typeof maybeStatus === "number" ? maybeStatus : undefined;
+    const stopReason = errorWithFields.stop_reason;
     const details: string[] = [error.message];
     if (status !== undefined) {
       details.push(`status=${status}`);

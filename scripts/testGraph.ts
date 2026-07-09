@@ -42,16 +42,20 @@ function printCaseResult(result: Record<string, unknown>) {
 
 async function run() {
   const allIds = ["CASE-001", "CASE-004", "CASE-008"] as const;
+  type CaseId = (typeof allIds)[number];
   const cliCaseId = process.argv[2];
-  const ids = cliCaseId
-    ? (allIds.filter((id) => id === cliCaseId) as typeof allIds)
-    : allIds;
+  const ids: CaseId[] =
+    typeof cliCaseId === "string"
+      ? allIds.includes(cliCaseId as CaseId)
+        ? [cliCaseId as CaseId]
+        : []
+      : Array.from(allIds);
   if (cliCaseId && ids.length === 0) {
     throw new Error(
       `Unsupported case id "${cliCaseId}". Use one of: ${allIds.join(", ")}`,
     );
   }
-  const expected: Record<(typeof ids)[number], string> = {
+  const expected: Record<CaseId, string> = {
     "CASE-001": "likely_approve",
     "CASE-004": "likely_deny",
     "CASE-008": "insufficient_info",
