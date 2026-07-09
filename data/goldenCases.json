@@ -1,0 +1,459 @@
+[
+  {
+    "id": "CASE-001",
+    "note": "SYNTHETIC CASE CASE-001: Prior authorization intake for patient A. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 29 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included mesalamine and azathioprine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Adult Crohn disease with two failed therapies and dose within limit.\"\n\nRequested infusion quantity is 6 units for this authorization period.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 29,
+      "diagnosisCodes": [
+        "K50.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "mesalamine",
+        "azathioprine"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Adult Crohn disease with two failed therapies and dose within limit.",
+      "requestedUnits": 6
+    }
+  },
+  {
+    "id": "CASE-002",
+    "note": "SYNTHETIC CASE CASE-002: Prior authorization intake for patient B. The ordering clinician documented diagnosis codes (K51.90) and requested procedure J1745. The patient is 41 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included sulfasalazine and methotrexate. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Ulcerative colitis with documented step therapy failure and compliant quantity.\"\n\nRequested infusion quantity is 8 units for this authorization period.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 41,
+      "diagnosisCodes": [
+        "K51.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "sulfasalazine",
+        "methotrexate"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Ulcerative colitis with documented step therapy failure and compliant quantity.",
+      "requestedUnits": 8
+    }
+  },
+  {
+    "id": "CASE-003",
+    "note": "SYNTHETIC CASE CASE-003: Prior authorization intake for patient C. The ordering clinician documented diagnosis codes (M05.79) and requested procedure J1745. The patient is 56 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included hydroxychloroquine, leflunomide, and methotrexate. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Seropositive rheumatoid arthritis refractory to three conventional agents.\"\n\nRequested infusion quantity is 4 units for this authorization period.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 56,
+      "diagnosisCodes": [
+        "M05.79"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "hydroxychloroquine",
+        "leflunomide",
+        "methotrexate"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Seropositive rheumatoid arthritis refractory to three conventional agents.",
+      "requestedUnits": 4
+    }
+  },
+  {
+    "id": "CASE-004",
+    "note": "SYNTHETIC CASE CASE-004: Prior authorization intake for patient D. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 17 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included mesalamine and azathioprine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Adolescent Crohn patient meets therapy history but fails adult age threshold.\"\n\nRequested infusion quantity is 5 units for this authorization period.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 17,
+      "diagnosisCodes": [
+        "K50.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "mesalamine",
+        "azathioprine"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Adolescent Crohn patient meets therapy history but fails adult age threshold.",
+      "requestedUnits": 5
+    }
+  },
+  {
+    "id": "CASE-005",
+    "note": "SYNTHETIC CASE CASE-005: Prior authorization intake for patient E. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 38 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included mesalamine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Only one conventional therapy trialed before biologic request.\"\n\nRequested infusion quantity is 6 units for this authorization period.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 38,
+      "diagnosisCodes": [
+        "K50.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "mesalamine"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Only one conventional therapy trialed before biologic request.",
+      "requestedUnits": 6
+    }
+  },
+  {
+    "id": "CASE-006",
+    "note": "SYNTHETIC CASE CASE-006: Prior authorization intake for patient F. The ordering clinician documented diagnosis codes (M54.5) and requested procedure J1745. The patient is 44 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included methotrexate and sulfasalazine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Biologic requested for non-covered diagnosis code.\"\n\nRequested infusion quantity is 6 units for this authorization period.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 44,
+      "diagnosisCodes": [
+        "M54.5"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "methotrexate",
+        "sulfasalazine"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Biologic requested for non-covered diagnosis code.",
+      "requestedUnits": 6
+    }
+  },
+  {
+    "id": "CASE-007",
+    "note": "SYNTHETIC CASE CASE-007: Prior authorization intake for patient G. The ordering clinician documented diagnosis codes (K51.90) and requested procedure J1745. The patient is 34 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included methotrexate and sulfasalazine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Ulcerative colitis with step therapy complete and quantity inside limit.\"\n\nRequested infusion quantity is 7 units for this authorization period.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 34,
+      "diagnosisCodes": [
+        "K51.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "methotrexate",
+        "sulfasalazine"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Ulcerative colitis with step therapy complete and quantity inside limit.",
+      "requestedUnits": 7
+    }
+  },
+  {
+    "id": "CASE-008",
+    "note": "SYNTHETIC CASE CASE-008: Prior authorization intake for patient H. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 48 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included azathioprine and mesalamine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Crohn disease with step therapy met but infusion units not documented.\"\n\nOutside infusion-center paperwork did not list the exact number of units requested.",
+    "expectedOutcome": "insufficient_info",
+    "expectedExtraction": {
+      "patientAge": 48,
+      "diagnosisCodes": [
+        "K50.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "azathioprine",
+        "mesalamine"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Crohn disease with step therapy met but infusion units not documented."
+    }
+  },
+  {
+    "id": "CASE-009",
+    "note": "SYNTHETIC CASE CASE-009: Prior authorization intake for patient I. The ordering clinician documented diagnosis codes (M17.11) and requested procedure 27447. The patient is 68 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included physical therapy, nsaid, and weight loss. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Advanced unilateral knee OA with prolonged conservative care failure.\"\n\nSymptoms have persisted for 20 weeks despite conservative management.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 68,
+      "diagnosisCodes": [
+        "M17.11"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "physical therapy",
+        "nsaid",
+        "weight loss"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Advanced unilateral knee OA with prolonged conservative care failure.",
+      "symptomDurationWeeks": 20
+    }
+  },
+  {
+    "id": "CASE-010",
+    "note": "SYNTHETIC CASE CASE-010: Prior authorization intake for patient J. The ordering clinician documented diagnosis codes (M17.12) and requested procedure 27447. The patient is 72 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included physical therapy, nsaid, and intra-articular injection. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Long-standing left knee OA despite PT and NSAID regimen.\"\n\nSymptoms have persisted for 52 weeks despite conservative management.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 72,
+      "diagnosisCodes": [
+        "M17.12"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "physical therapy",
+        "nsaid",
+        "intra-articular injection"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Long-standing left knee OA despite PT and NSAID regimen.",
+      "symptomDurationWeeks": 52
+    }
+  },
+  {
+    "id": "CASE-011",
+    "note": "SYNTHETIC CASE CASE-011: Prior authorization intake for patient K. The ordering clinician documented diagnosis codes (M17.0) and requested procedure 27447. The patient is 59 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included physical therapy, nsaid, and bracing. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Bilateral knee OA with documented conservative failure over 14 weeks.\"\n\nSymptoms have persisted for 14 weeks despite conservative management.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 59,
+      "diagnosisCodes": [
+        "M17.0"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "physical therapy",
+        "nsaid",
+        "bracing"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Bilateral knee OA with documented conservative failure over 14 weeks.",
+      "symptomDurationWeeks": 14
+    }
+  },
+  {
+    "id": "CASE-012",
+    "note": "SYNTHETIC CASE CASE-012: Prior authorization intake for patient L. The ordering clinician documented diagnosis codes (M17.11) and requested procedure 27447. The patient is 47 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included physical therapy and nsaid. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Conservative criteria met but age is below threshold.\"\n\nSymptoms have persisted for 18 weeks despite conservative management.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 47,
+      "diagnosisCodes": [
+        "M17.11"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "physical therapy",
+        "nsaid"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Conservative criteria met but age is below threshold.",
+      "symptomDurationWeeks": 18
+    }
+  },
+  {
+    "id": "CASE-013",
+    "note": "SYNTHETIC CASE CASE-013: Prior authorization intake for patient M. The ordering clinician documented diagnosis codes (M17.12) and requested procedure 27447. The patient is 63 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included acetaminophen and home exercise. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"No PT and no NSAID despite prolonged knee symptoms.\"\n\nSymptoms have persisted for 30 weeks despite conservative management.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 63,
+      "diagnosisCodes": [
+        "M17.12"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "acetaminophen",
+        "home exercise"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "No PT and no NSAID despite prolonged knee symptoms.",
+      "symptomDurationWeeks": 30
+    }
+  },
+  {
+    "id": "CASE-014",
+    "note": "SYNTHETIC CASE CASE-014: Prior authorization intake for patient N. The ordering clinician documented diagnosis codes (M17.11) and requested procedure 27447. The patient is 66 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included physical therapy and nsaid. Treatment failure was documented as false in the assessment narrative. The progress note summary reads: \"Therapies listed but no documented failure statement.\"\n\nSymptoms have persisted for 24 weeks despite conservative management.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 66,
+      "diagnosisCodes": [
+        "M17.11"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "physical therapy",
+        "nsaid"
+      ],
+      "treatmentFailureDocumented": false,
+      "clinicalNotesSummary": "Therapies listed but no documented failure statement.",
+      "symptomDurationWeeks": 24
+    }
+  },
+  {
+    "id": "CASE-015",
+    "note": "SYNTHETIC CASE CASE-015: Prior authorization intake for patient O. The ordering clinician documented diagnosis codes (M17.0) and requested procedure 27447. The patient is 61 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included physical therapy and nsaid. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Duration of conservative care is below 12-week requirement.\"\n\nSymptoms have persisted for 8 weeks despite conservative management.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 61,
+      "diagnosisCodes": [
+        "M17.0"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "physical therapy",
+        "nsaid"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Duration of conservative care is below 12-week requirement.",
+      "symptomDurationWeeks": 8
+    }
+  },
+  {
+    "id": "CASE-016",
+    "note": "SYNTHETIC CASE CASE-016: Prior authorization intake for patient P. The ordering clinician documented diagnosis codes (M17.12) and requested procedure 27447. The patient is 70 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included physical therapy, nsaid, and cane use. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"OA severity noted, but exact conservative-care duration not documented.\"\n\nThe referring note repeatedly says symptoms persisted 'for many months' without listing a specific week count.",
+    "expectedOutcome": "insufficient_info",
+    "expectedExtraction": {
+      "patientAge": 70,
+      "diagnosisCodes": [
+        "M17.12"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "physical therapy",
+        "nsaid",
+        "cane use"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "OA severity noted, but exact conservative-care duration not documented."
+    }
+  },
+  {
+    "id": "CASE-017",
+    "note": "SYNTHETIC CASE CASE-017: Prior authorization intake for patient Q. The ordering clinician documented diagnosis codes (G40.909) and requested procedure 70553. The patient is 25 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included levetiracetam. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Seizure disorder code present with prior imaging abnormalities documented.\"\n\nNeurologic deficits are documented as absent in the exam. Prior imaging or focal findings are documented as present.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 25,
+      "diagnosisCodes": [
+        "G40.909"
+      ],
+      "requestedProcedureCode": "70553",
+      "priorTreatmentsTried": [
+        "levetiracetam"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Seizure disorder code present with prior imaging abnormalities documented.",
+      "imagingFindingsPresent": true,
+      "neurologicDeficitsPresent": false
+    }
+  },
+  {
+    "id": "CASE-018",
+    "note": "SYNTHETIC CASE CASE-018: Prior authorization intake for patient R. The ordering clinician documented diagnosis codes (R56.9) and requested procedure 70553. The patient is 43 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included acetaminophen. Treatment failure was documented as false in the assessment narrative. The progress note summary reads: \"Red-flag seizure presentation with documented focal imaging concern.\"\n\nNeurologic deficits are documented as absent in the exam. Prior imaging or focal findings are documented as present.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 43,
+      "diagnosisCodes": [
+        "R56.9"
+      ],
+      "requestedProcedureCode": "70553",
+      "priorTreatmentsTried": [
+        "acetaminophen"
+      ],
+      "treatmentFailureDocumented": false,
+      "clinicalNotesSummary": "Red-flag seizure presentation with documented focal imaging concern.",
+      "imagingFindingsPresent": true,
+      "neurologicDeficitsPresent": false
+    }
+  },
+  {
+    "id": "CASE-019",
+    "note": "SYNTHETIC CASE CASE-019: Prior authorization intake for patient S. The ordering clinician documented diagnosis codes (R51.9) and requested procedure 70553. The patient is 58 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included topiramate. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"New focal neurologic deficit and concerning prior imaging findings.\"\n\nNeurologic deficits are documented as present in the exam. Prior imaging or focal findings are documented as present.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 58,
+      "diagnosisCodes": [
+        "R51.9"
+      ],
+      "requestedProcedureCode": "70553",
+      "priorTreatmentsTried": [
+        "topiramate"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "New focal neurologic deficit and concerning prior imaging findings.",
+      "imagingFindingsPresent": true,
+      "neurologicDeficitsPresent": true
+    }
+  },
+  {
+    "id": "CASE-020",
+    "note": "SYNTHETIC CASE CASE-020: Prior authorization intake for patient T. The ordering clinician documented diagnosis codes (R51.9) and requested procedure 70553. The patient is 39 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included sumatriptan. Treatment failure was documented as false in the assessment narrative. The progress note summary reads: \"No neurologic deficits and no qualifying red-flag diagnosis code.\"\n\nNeurologic deficits are documented as absent in the exam. Prior imaging or focal findings are documented as present.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 39,
+      "diagnosisCodes": [
+        "R51.9"
+      ],
+      "requestedProcedureCode": "70553",
+      "priorTreatmentsTried": [
+        "sumatriptan"
+      ],
+      "treatmentFailureDocumented": false,
+      "clinicalNotesSummary": "No neurologic deficits and no qualifying red-flag diagnosis code.",
+      "imagingFindingsPresent": true,
+      "neurologicDeficitsPresent": false
+    }
+  },
+  {
+    "id": "CASE-021",
+    "note": "SYNTHETIC CASE CASE-021: Prior authorization intake for patient U. The ordering clinician documented diagnosis codes (G45.9) and requested procedure 70553. The patient is 66 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included aspirin. Treatment failure was documented as false in the assessment narrative. The progress note summary reads: \"Red-flag code present but no prior imaging findings documented.\"\n\nNeurologic deficits are documented as absent in the exam. Prior imaging or focal findings are documented as not present.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 66,
+      "diagnosisCodes": [
+        "G45.9"
+      ],
+      "requestedProcedureCode": "70553",
+      "priorTreatmentsTried": [
+        "aspirin"
+      ],
+      "treatmentFailureDocumented": false,
+      "clinicalNotesSummary": "Red-flag code present but no prior imaging findings documented.",
+      "imagingFindingsPresent": false,
+      "neurologicDeficitsPresent": false
+    }
+  },
+  {
+    "id": "CASE-022",
+    "note": "SYNTHETIC CASE CASE-022: Prior authorization intake for patient V. The ordering clinician documented diagnosis codes (R42) and requested procedure 70553. The patient is 51 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included meclizine. Treatment failure was documented as false in the assessment narrative. The progress note summary reads: \"Neither red-flag diagnosis nor focal neurologic deficits are present.\"\n\nNeurologic deficits are documented as absent in the exam. Prior imaging or focal findings are documented as not present.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 51,
+      "diagnosisCodes": [
+        "R42"
+      ],
+      "requestedProcedureCode": "70553",
+      "priorTreatmentsTried": [
+        "meclizine"
+      ],
+      "treatmentFailureDocumented": false,
+      "clinicalNotesSummary": "Neither red-flag diagnosis nor focal neurologic deficits are present.",
+      "imagingFindingsPresent": false,
+      "neurologicDeficitsPresent": false
+    }
+  },
+  {
+    "id": "CASE-023",
+    "note": "SYNTHETIC CASE CASE-023: Prior authorization intake for patient W. The ordering clinician documented diagnosis codes (R56.9) and requested procedure 70553. The patient is 33 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included levetiracetam. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Seizure red flag documented, but prior imaging documentation is missing.\"\n\nNeurologic deficits are documented as absent in the exam. Outside emergency records mention 'prior scans unavailable at this visit' and do not confirm focal findings.",
+    "expectedOutcome": "insufficient_info",
+    "expectedExtraction": {
+      "patientAge": 33,
+      "diagnosisCodes": [
+        "R56.9"
+      ],
+      "requestedProcedureCode": "70553",
+      "priorTreatmentsTried": [
+        "levetiracetam"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Seizure red flag documented, but prior imaging documentation is missing.",
+      "neurologicDeficitsPresent": false
+    }
+  },
+  {
+    "id": "CASE-024",
+    "note": "SYNTHETIC CASE CASE-024: Prior authorization intake for patient X. The ordering clinician documented diagnosis codes (R51.9) and requested procedure 70553. The patient is 46 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included acetaminophen and propranolol. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Headache workup with imaging concern documented but neurologic exam finding unspecified.\"\n\nPrior imaging or focal findings are documented as present. The neurologic exam is described as 'concerning changes per family report' without explicitly documenting a focal deficit.",
+    "expectedOutcome": "insufficient_info",
+    "expectedExtraction": {
+      "patientAge": 46,
+      "diagnosisCodes": [
+        "R51.9"
+      ],
+      "requestedProcedureCode": "70553",
+      "priorTreatmentsTried": [
+        "acetaminophen",
+        "propranolol"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Headache workup with imaging concern documented but neurologic exam finding unspecified.",
+      "imagingFindingsPresent": true
+    }
+  }
+]
