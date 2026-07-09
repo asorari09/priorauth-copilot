@@ -363,13 +363,14 @@ async function generateReasoningForForcedOutcome(
       "Emit decision confidence and reasoning summary while outcome is fixed by deterministic guardrails.",
     schema: DecisionReasoningOnlySchema,
     systemPrompt:
-      "Provide concise clinical coverage reasoning based only on provided rules and citations.",
+      "Provide concise clinical coverage reasoning based only on provided rules and citations. Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from the extraction (e.g., prescriber specialty), list them explicitly as unverified items requiring confirmation — do not assume compliance.",
     userPrompt: [
       `Outcome is fixed by code as: ${forcedOutcome}`,
       `Constraint reason: ${reason}`,
       `Extraction: ${JSON.stringify(extraction)}`,
       `Rules result: ${JSON.stringify(rulesResult)}`,
       `Validated citations: ${JSON.stringify(citations)}`,
+      "Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from extraction, list them as unverified items requiring confirmation.",
       "Generate confidence and reasoningSummary aligned with the forced outcome.",
     ].join("\n"),
     maxTokens: 700,
@@ -445,13 +446,14 @@ export async function decisionNode(
             "Emit prior-auth decision core fields given deterministic rules and validated policy citations.",
           schema: DecisionCoreSchema,
           systemPrompt:
-            "You are a decision-support assistant. Use only supplied evidence. Never invent citations.",
+            "You are a decision-support assistant. Use only supplied evidence. Never invent citations. Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from the extraction (e.g., prescriber specialty), list them explicitly as unverified items requiring confirmation — do not assume compliance.",
           userPrompt: [
             `Code-determined required outcome: ${constraint.forcedOutcome}`,
             `Constraint reason: ${constraint.reason}`,
             `Extraction: ${JSON.stringify(extraction)}`,
             `Rules result: ${JSON.stringify(rulesResult)}`,
             `Validated citations: ${JSON.stringify(citations)}`,
+            "Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from extraction, list them as unverified items requiring confirmation.",
             "Return only outcome, confidence, and reasoningSummary.",
           ].join("\n"),
           maxTokens: 1200,
