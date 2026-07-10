@@ -6,7 +6,8 @@
 <p align="center">
   <a href="https://priorauth-copilot-swart.vercel.app/"><strong>Live demo</strong></a> ·
   <a href="https://cloud.langfuse.com/project/cmrdrenon00chad0c3bi1gcoe">Langfuse</a> ·
-  <a href="docs/MIGRATIONS.md">Migrations</a>
+  <a href="docs/MIGRATIONS.md">Migrations</a> ·
+  <a href="docs/blueprint.md">Blueprint</a>
 </p>
 
 ---
@@ -18,23 +19,27 @@
 | **Problem** | Prior-auth reviewers need structured facts, payer policy citations, and a defensible approve/deny/insufficient signal — without the LLM inventing outcomes. |
 | **Approach** | LangGraph pipeline: extract → rules + RAG in parallel → **code-forced outcome** → optional appeal draft. LLMs synthesize citations and prose; TypeScript owns the decision. |
 | **Default demo** | [CASE-001 instant replay](https://priorauth-copilot-swart.vercel.app/) — **no API key, no LLM cost**, real CareSource PDF links |
-| **Regression gate** | 26 golden cases · `decisionAccuracy=100` · `falseApproveRate=0` · `citationValidityRate=100` (CI `workflow_dispatch`) |
+| **Regression gate** | CI requires **100 / 0 / 100** on 26 golden cases (`workflow_dispatch`). Last full pass: pre-optimization — [`evals/results/2026-07-09T18-40-22-006Z.json`](evals/results/2026-07-09T18-40-22-006Z.json). Post-Round-2 re-verify pending. |
 | **Stack** | Next.js 15 · LangGraph · OpenAI extract · Claude Haiku citations/appeals · Supabase pgvector · Langfuse |
 
 ---
 
 ## System design
 
-<p align="center">
-  <img src="docs/architecture-diagram.png" alt="PriorAuth Copilot system architecture" width="900"/>
-</p>
-
 ### Live pipeline (LangGraph)
 
 ```mermaid
 flowchart TB
-  subgraph Client["Browser / API client"]
-    UI[Demo UI or curl]
+  subgraph Client["Browser — actual demo UI"]
+    DD[Demo scenario dropdown]
+    TA[Clinical note textarea]
+    BTN[Run button]
+    TR[Agent Trace panel]
+    RS[Result + citations]
+    DD --> BTN
+    TA --> BTN
+    BTN --> TR
+    BTN --> RS
   end
 
   subgraph Vercel["Vercel — Next.js API"]
@@ -59,9 +64,10 @@ flowchart TB
 
   LF[(Langfuse traces)]
 
-  UI -->|SSE| API
+  BTN -->|SSE| API
   API --> Replay
-  Replay -->|no key, $0| UI
+  Replay -->|stored_result event| TR
+  Replay -->|citations + decision| RS
   API --> Graph
   Graph --> E
   E --> R
