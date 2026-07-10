@@ -80,16 +80,19 @@ const EXTRACTION_FIELDS: Array<keyof ClinicalExtraction> = [
 function parseArgs(argv: string[]) {
   let caseFilter: string | null = null;
   let ablation = false;
+  let disableInferenceCache = false;
 
   for (const arg of argv) {
     if (arg.startsWith("--case=")) {
       caseFilter = arg.slice("--case=".length);
     } else if (arg === "--ablation") {
       ablation = true;
+    } else if (arg === "--no-cache") {
+      disableInferenceCache = true;
     }
   }
 
-  return { caseFilter, ablation };
+  return { caseFilter, ablation, disableInferenceCache };
 }
 
 function loadGoldenCases(): GoldenCase[] {
@@ -114,13 +117,14 @@ function toPercent(numerator: number, denominator: number): number {
 
 async function evaluateCase(
   item: GoldenCase,
-  options: { ablation: boolean },
+  options: { ablation: boolean; disableInferenceCache: boolean },
 ): Promise<CaseEvalDetail> {
   const startedAt = Date.now();
   const result = await runPriorAuthGraphCase({
     rawNote: item.note,
     caseId: item.id,
     forceNoRetrieval: options.ablation,
+    disableInferenceCache: options.disableInferenceCache,
   });
   const latencyMs = Date.now() - startedAt;
 
@@ -218,7 +222,10 @@ async function main() {
   const perCase: CaseEvalDetail[] = [];
   for (const item of selected) {
     // Sequential on purpose to keep each run stable and easier to debug.
-    const detail = await evaluateCase(item, { ablation: args.ablation });
+    const detail = await evaluateCase(item, {
+      ablation: args.ablation,
+      disableInferenceCache: args.disableInferenceCache,
+    });
     perCase.push(detail);
     console.log(
       `[${item.id}] expected=${detail.expectedOutcome} actual=${detail.actualOutcome} latencyMs=${detail.latencyMs} citations=${detail.citationsCount} extractionAcc=${detail.extractionFieldAccuracy}%`,

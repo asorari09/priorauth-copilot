@@ -36,6 +36,8 @@ type Decision = {
 
 type DonePayload = {
   caseId: string;
+  cached?: boolean;
+  presetCaseId?: string;
   decision?: Decision;
   appealDraft?: { draftText: string; requiresHumanReview: boolean };
   retrievedChunks?: RetrievedChunk[];
@@ -121,6 +123,7 @@ export default function Home() {
   const [done, setDone] = useState<DonePayload | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [runLive, setRunLive] = useState(false);
 
   const chunkUrlById = useMemo(() => {
     const map = new Map<string, string>();
@@ -142,7 +145,13 @@ export default function Home() {
           "content-type": "application/json",
           "x-demo-key": demoKey,
         },
-        body: JSON.stringify({ note }),
+        body: JSON.stringify({
+          note,
+          presetCaseId: SAMPLE_CASES.some((sampleCase) => sampleCase.id === selectedCaseId)
+            ? selectedCaseId
+            : undefined,
+          runLive,
+        }),
       });
 
       if (!response.ok || !response.body) {
@@ -243,6 +252,15 @@ export default function Home() {
             />
           </label>
 
+          <label className="mt-3 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={runLive}
+              onChange={(e) => setRunLive(e.target.checked)}
+            />
+            Run live (bypass preset cache; uses API credits)
+          </label>
+
           <button
             type="submit"
             disabled={isRunning}
@@ -282,6 +300,12 @@ export default function Home() {
         {(done || error) && (
           <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <h2 className="text-base font-semibold">Result</h2>
+
+            {done?.cached ? (
+              <p className="mt-2 rounded-md border border-blue-200 bg-blue-50 p-2 text-sm text-blue-900">
+                Cached preset demo result ({done.presetCaseId ?? "preset"}). Toggle &quot;Run live&quot; to execute the full graph.
+              </p>
+            ) : null}
 
             {error ? <p className="mt-2 rounded-md bg-red-50 p-2 text-sm text-red-700">{error}</p> : null}
 

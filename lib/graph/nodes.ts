@@ -5,6 +5,16 @@ import {
   safeCaptureLangfuseErrorContext,
   safeStartSpan,
 } from "../langfuse";
+import {
+  buildAppealDraftCacheKey,
+  buildCitationSynthesisCacheKey,
+} from "../cache/cacheKeys";
+import {
+  getCachedAppealDraft,
+  getCachedCitations,
+  setCachedAppealDraft,
+  setCachedCitations,
+} from "../cache/inferenceCache";
 import { callClaudeStructured, resolveClaudeModel } from "../llm/claude";
 import { extractClinicalExtractionFromNote } from "../llm/openai";
 import { runRulesEngine } from "../rulesEngine";
@@ -23,6 +33,10 @@ import {
   selectTopRetrievedChunks,
   truncateApproxTokens,
 } from "./citationPayload";
+import {
+  generateTemplateReasoningSummary,
+  getReasoningMode,
+} from "./templateReasoning";
 
 export type RetrievedChunk = {
   chunk_id: string;
@@ -38,6 +52,7 @@ export type PriorAuthGraphState = {
   traceId?: string;
   caseId?: string;
   forceNoRetrieval?: boolean;
+  disableInferenceCache?: boolean;
   extraction?: ClinicalExtraction;
   rulesResult?: RulesEngineResult;
   citations?: PolicyCitation[];
@@ -277,13 +292,28 @@ async function retrievePolicyChunks(
 async function synthesizeCitationsWithValidation(
   extraction: ClinicalExtraction,
   retrievedChunks: RetrievedChunk[],
-  telemetry?: { traceId?: string | null; parentObservationId?: string | null },
+  options?: {
+    disableCache?: boolean;
+    telemetry?: { traceId?: string | null; parentObservationId?: string | null };
+  },
 ): Promise<PolicyCitation[]> {
+  const synthesisChunks = selectTopRetrievedChunks(retrievedChunks);
+  const allowedIds = new Set(synthesisChunks.map((chunk) => chunk.chunk_id));
+
+  if (!options?.disableCache) {
+    const cacheKey = buildCitationSynthesisCacheKey(
+      extraction.requestedProcedureCode,
+      retrievedChunks.map((chunk) => chunk.chunk_id),
+    );
+    const cached = await getCachedCitations(cacheKey);
+    if (cached) {
+      return cached.filter((citation) => allowedIds.has(citation.sourceChunkId));
+    }
+  }
+
   const CitationToolSchema = z.object({
     citations: z.array(PolicyCitationSchema),
   });
-  const synthesisChunks = selectTopRetrievedChunks(retrievedChunks);
-  const allowedIds = new Set(synthesisChunks.map((chunk) => chunk.chunk_id));
   const retrievedPayload = synthesisChunks.map((chunk) => ({
     chunk_id: chunk.chunk_id,
     payer_name: chunk.payer_name,
@@ -317,8 +347,8 @@ async function synthesizeCitationsWithValidation(
       ].join("\n"),
       maxTokens: 3000,
       telemetry: {
-        traceId: telemetry?.traceId ?? null,
-        parentObservationId: telemetry?.parentObservationId ?? null,
+        traceId: options?.telemetry?.traceId ?? null,
+        parentObservationId: options?.telemetry?.parentObservationId ?? null,
         generationName: "claude.citation_synthesis",
       },
     });
@@ -330,6 +360,14 @@ async function synthesizeCitationsWithValidation(
     }
 
     citations = response.citations.filter((c) => allowedIds.has(c.sourceChunkId));
+  }
+
+  if (!options?.disableCache && citations.length > 0) {
+    const cacheKey = buildCitationSynthesisCacheKey(
+      extraction.requestedProcedureCode,
+      retrievedChunks.map((chunk) => chunk.chunk_id),
+    );
+    await setCachedCitations(cacheKey, citations);
   }
 
   return citations;
@@ -359,7 +397,10 @@ export async function policyRagNode(
         const citations = await synthesizeCitationsWithValidation(
           state.extraction,
           retrievedChunks,
-          { traceId: state.traceId ?? null, parentObservationId: spanId },
+          {
+            disableCache: state.disableInferenceCache,
+            telemetry: { traceId: state.traceId ?? null, parentObservationId: spanId },
+          },
         );
 
         return { citations, retrievedChunks };
@@ -445,14 +486,23 @@ export async function decisionNode(
       const constraint = determineOutcomeConstraint(extraction, rulesResult, citations);
 
       try {
-        const reasoning = await generateReasoningForForcedOutcome(
-          extraction,
-          rulesResult,
-          citations,
-          constraint.forcedOutcome,
-          constraint.reason,
-          { traceId: state.traceId ?? null, parentObservationId: spanId },
-        );
+        const reasoning =
+          getReasoningMode() === "template"
+            ? generateTemplateReasoningSummary({
+                extraction,
+                rulesResult,
+                citations,
+                forcedOutcome: constraint.forcedOutcome,
+                constraintReason: constraint.reason,
+              })
+            : await generateReasoningForForcedOutcome(
+                extraction,
+                rulesResult,
+                citations,
+                constraint.forcedOutcome,
+                constraint.reason,
+                { traceId: state.traceId ?? null, parentObservationId: spanId },
+              );
 
         const decision: Decision = {
           outcome: constraint.forcedOutcome,
@@ -505,16 +555,38 @@ export async function appealDraftNode(
         } satisfies PolicyCitation);
 
       try {
+        const extraction = state.extraction;
+        if (!extraction) {
+          return {};
+        }
+
+        const cacheKey = buildAppealDraftCacheKey({
+          procedureCode: extraction.requestedProcedureCode,
+          diagnosisCodes: extraction.diagnosisCodes,
+          outcome: state.decision.outcome,
+          failedCriteria: state.decision.rulesResult.failedCriteria,
+          citationChunkIds: state.decision.supportingCitations.map(
+            (citation) => citation.sourceChunkId,
+          ),
+        });
+
+        if (!state.disableInferenceCache) {
+          const cachedDraft = await getCachedAppealDraft(cacheKey);
+          if (cachedDraft) {
+            return { appealDraft: cachedDraft };
+          }
+        }
+
         const draft = await callClaudeStructured({
           toolName: "emit_appeal_draft",
           toolDescription:
             "Emit an appeal draft object using the provided decision context and citations.",
           schema: AppealDraftSchema,
           systemPrompt: APPEAL_DRAFT_SYSTEM_PROMPT,
-          model: resolveClaudeModel("appeal"),
+          model: resolveClaudeModel("fast"),
           userPrompt: [
             `Decision: ${JSON.stringify(state.decision)}`,
-            `Extraction: ${JSON.stringify(state.extraction ?? {})}`,
+            `Extraction: ${JSON.stringify(extraction)}`,
             "Use one of the provided citations as citedClause.",
           ].join("\n"),
           maxTokens: 1200,
@@ -524,6 +596,10 @@ export async function appealDraftNode(
             generationName: "claude.appeal_draft",
           },
         });
+
+        if (!state.disableInferenceCache) {
+          await setCachedAppealDraft(cacheKey, draft);
+        }
 
         return { appealDraft: draft };
       } catch (error) {

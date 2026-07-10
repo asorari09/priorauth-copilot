@@ -60,7 +60,8 @@ jobs:
       - changes
     if: >
       (github.event_name == 'workflow_dispatch' || needs.changes.outputs.eval_paths == 'true') &&
-      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false)
+      (github.event_name != 'pull_request' || github.event.pull_request.head.repo.fork == false) &&
+      !contains(github.event.head_commit.message, '[skip-eval]')
     steps:
       - name: Check required secrets
         id: secrets

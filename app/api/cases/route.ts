@@ -8,6 +8,7 @@ import {
   sanitizePriorAuthStateForClient,
   type SanitizedClientError,
 } from "@/lib/clientErrors";
+import { getPresetDemoResult } from "@/lib/cache/presetDemo";
 import { buildPriorAuthGraph } from "@/lib/graph/buildGraph";
 import { type PriorAuthGraphState } from "@/lib/graph/nodes";
 import { safeFlushLangfuse, safeStartTrace, safeUpdateTrace } from "@/lib/langfuse";
@@ -18,6 +19,8 @@ export const maxDuration = 120;
 
 const CreateCaseBodySchema = z.object({
   note: z.string().min(1),
+  presetCaseId: z.string().optional(),
+  runLive: z.boolean().optional(),
 });
 
 function unauthorizedResponse() {
@@ -87,6 +90,15 @@ export async function POST(request: NextRequest) {
   }
 
   const note = parsed.data.note;
+  const presetCaseId = parsed.data.presetCaseId;
+  const runLive = parsed.data.runLive ?? false;
+  const presetResult =
+    presetCaseId && !runLive ? getPresetDemoResult(presetCaseId) : null;
+
+  if (presetCaseId && !runLive && !presetResult) {
+    return invalidRequestResponse("Unknown preset case id");
+  }
+
   const graph = buildPriorAuthGraph();
   const trace = safeStartTrace({
     name: "priorauth-case-run",
@@ -130,6 +142,74 @@ export async function POST(request: NextRequest) {
       send("node", { node: START, summary: { node: START, keys: ["rawNote"] } });
 
       try {
+        if (presetResult) {
+          const cachedNodes = ["extract", "rulesCheck", "policyRag", "decide"];
+          if (presetResult.appealDraft) {
+            cachedNodes.push("draftAppeal");
+          }
+
+          for (const nodeName of cachedNodes) {
+            send("node", {
+              node: nodeName,
+              summary: {
+                node: nodeName,
+                cached: true,
+                presetCaseId: presetResult.presetCaseId,
+              },
+            });
+          }
+
+          const cachedState: PriorAuthGraphState = {
+            rawNote: note,
+            caseId,
+            traceId: trace.traceId ?? undefined,
+            decision: presetResult.decision,
+            appealDraft: presetResult.appealDraft,
+            retrievedChunks:
+              presetResult.retrievedChunks as PriorAuthGraphState["retrievedChunks"],
+            citations: presetResult.decision.supportingCitations,
+            rulesResult: presetResult.decision.rulesResult,
+            overrideLog: [],
+          };
+          finalState = cachedState;
+
+          const clientState = sanitizePriorAuthStateForClient(cachedState);
+
+          await supabaseAdmin
+            .from("cases")
+            .update({
+              status: "done",
+              extraction: null,
+              rules_result: presetResult.decision.rulesResult,
+              citations: presetResult.decision.supportingCitations,
+              decision: presetResult.decision,
+              appeal_draft: presetResult.appealDraft ?? null,
+              error: null,
+            })
+            .eq("id", caseId);
+
+          safeUpdateTrace(trace.traceId, {
+            output: {
+              caseId,
+              cached: true,
+              presetCaseId: presetResult.presetCaseId,
+              decision: presetResult.decision,
+            },
+            metadata: {
+              caseId,
+              cachedPreset: true,
+            },
+          });
+
+          send("done", {
+            caseId,
+            cached: true,
+            presetCaseId: presetResult.presetCaseId,
+            ...clientState,
+          });
+          return;
+        }
+
         const updates = await graph.stream(
           {
             rawNote: note,
