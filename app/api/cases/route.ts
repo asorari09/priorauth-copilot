@@ -114,29 +114,49 @@ export async function POST(request: NextRequest) {
     return invalidRequestResponse("Unknown preset case id");
   }
 
-  const graph = buildPriorAuthGraph();
-  const trace = safeStartTrace({
-    name: "priorauth-case-run",
-    input: { rawNote: note },
-  });
+  const graph = usesCachedPreset ? null : buildPriorAuthGraph();
+  const trace = usesCachedPreset
+    ? safeStartTrace({
+        name: "priorauth-preset-replay",
+        input: {
+          presetCaseId: presetResult!.presetCaseId,
+          sourceCaseId: presetResult!.sourceCaseId ?? null,
+          rawNote: note,
+        },
+        metadata: {
+          replay: true,
+          presetCaseId: presetResult!.presetCaseId,
+          sourceCaseId: presetResult!.sourceCaseId ?? null,
+        },
+      })
+    : safeStartTrace({
+        name: "priorauth-case-run",
+        input: { rawNote: note },
+        metadata: { replay: false },
+      });
 
-  const caseInsert = await supabaseAdmin
-    .from("cases")
-    .insert({
-      status: "processing",
-      raw_note: note,
-    })
-    .select("id")
-    .single();
+  let caseId: string;
+  if (usesCachedPreset) {
+    caseId = presetResult!.sourceCaseId ?? `preset:${presetResult!.presetCaseId}`;
+  } else {
+    const caseInsert = await supabaseAdmin
+      .from("cases")
+      .insert({
+        status: "processing",
+        raw_note: note,
+      })
+      .select("id")
+      .single();
 
-  if (caseInsert.error || !caseInsert.data) {
-    return new Response(JSON.stringify({ error: "Failed to create case" }), {
-      status: 500,
-      headers: { "content-type": "application/json" },
-    });
+    if (caseInsert.error || !caseInsert.data) {
+      return new Response(JSON.stringify({ error: "Failed to create case" }), {
+        status: 500,
+        headers: { "content-type": "application/json" },
+      });
+    }
+
+    caseId = caseInsert.data.id as string;
   }
-
-  const caseId = caseInsert.data.id as string;
   let finalState: PriorAuthGraphState | null = null;
 
   const encoder = new TextEncoder();
@@ -182,30 +202,20 @@ export async function POST(request: NextRequest) {
 
           const clientState = sanitizePriorAuthStateForClient(cachedState);
 
-          await supabaseAdmin
-            .from("cases")
-            .update({
-              status: "done",
-              extraction: null,
-              rules_result: presetResult.decision.rulesResult,
-              citations: presetResult.decision.supportingCitations,
-              decision: presetResult.decision,
-              appeal_draft: presetResult.appealDraft ?? null,
-              error: null,
-            })
-            .eq("id", caseId);
-
           safeUpdateTrace(trace.traceId, {
             output: {
               caseId,
-              cached: true,
+              replay: true,
               presetCaseId: presetResult.presetCaseId,
+              sourceCaseId: presetResult.sourceCaseId ?? null,
               decision: presetResult.decision,
             },
             metadata: {
-              caseId,
-              cachedPreset: true,
+              replay: true,
+              presetCaseId: presetResult.presetCaseId,
+              sourceCaseId: presetResult.sourceCaseId ?? null,
             },
+            tags: ["replay"],
           });
 
           send("done", {
@@ -220,7 +230,7 @@ export async function POST(request: NextRequest) {
 
         send("node", { node: START, summary: { node: START, keys: ["rawNote"] } });
 
-        const updates = await graph.stream(
+        const updates = await graph!.stream(
           {
             rawNote: note,
             caseId,

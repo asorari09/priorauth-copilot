@@ -133,6 +133,12 @@ export default function Home() {
   const selectedIsLiveOnly = isLiveOnlyPreset(selectedCaseId);
   const requiresDemoKey = runLive || selectedIsLiveOnly;
 
+  const pipelineHelperText = selectedIsLiveOnly
+    ? "This scenario has no stored snapshot — a live pipeline run is always required."
+    : runLive
+      ? "Uncheck to replay the stored verified result for this scenario with zero LLM calls."
+      : "Leave unchecked to replay the stored CASE-001 result instantly with zero LLM calls.";
+
   const chunkUrlById = useMemo(() => {
     const map = new Map<string, string>();
     for (const chunk of done?.retrievedChunks ?? []) map.set(chunk.chunk_id, chunk.source_url);
@@ -246,6 +252,9 @@ export default function Home() {
                   const nextCase = SAMPLE_CASES.find((item) => item.id === e.target.value);
                   setSelectedCaseId(e.target.value);
                   if (nextCase) setNote(nextCase.note);
+                  setEvents([]);
+                  setDone(null);
+                  setError(null);
                 }}
               >
                 {SAMPLE_CASES.map((sampleCase) => (
@@ -295,9 +304,7 @@ export default function Home() {
             />
             <span>
               <span className="font-medium">Run full agent pipeline (live LLM calls)</span>
-              <span className="mt-0.5 block text-slate-600">
-                Leave unchecked to replay the stored CASE-001 result instantly with zero LLM calls.
-              </span>
+              <span className="mt-0.5 block text-slate-600">{pipelineHelperText}</span>
             </span>
           </label>
 
@@ -348,7 +355,7 @@ export default function Home() {
           ) : null}
         </section>
 
-        {(done || error) && (
+        {(done || error) && (events.length > 0 || error) ? (
           <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <h2 className="text-base font-semibold">Result</h2>
 
@@ -429,7 +436,7 @@ export default function Home() {
               </div>
             ) : null}
           </section>
-        )}
+        ) : null}
       </main>
     </div>
   );
