@@ -7,7 +7,8 @@
   <a href="https://priorauth-copilot-swart.vercel.app/"><strong>Live demo</strong></a> ·
   <a href="https://cloud.langfuse.com/project/cmrdrenon00chad0c3bi1gcoe">Langfuse</a> ·
   <a href="docs/MIGRATIONS.md">Migrations</a> ·
-  <a href="docs/blueprint.md">Blueprint</a>
+  <a href="docs/blueprint.md">Blueprint</a> ·
+  <a href="docs/PROJECT_DEEP_DIVE.md">Deep dive</a>
 </p>
 
 ---
@@ -22,6 +23,8 @@
 | **Regression gate** | **100 / 0 / 100** verified post-optimization — [`evals/results/2026-07-10T02-38-26-825Z.json`](evals/results/2026-07-10T02-38-26-825Z.json) (`--no-cache`, CI [`workflow_dispatch`](https://github.com/asorari09/priorauth-copilot/actions/runs/29065131002) green) |
 | **Measured cost** | **~$0.003/case** approve · **~$0.006/case** deny (Langfuse, full eval run) · **~90%** vs Sonnet baseline (~$0.041) |
 | **Stack** | Next.js 15 · LangGraph · OpenAI extract · Claude Haiku citations/appeals · Supabase pgvector · Langfuse |
+
+**Full deep dive:** [`docs/PROJECT_DEEP_DIVE.md`](docs/PROJECT_DEEP_DIVE.md)
 
 ---
 
