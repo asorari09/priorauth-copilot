@@ -8,7 +8,11 @@ import {
   sanitizePriorAuthStateForClient,
   type SanitizedClientError,
 } from "@/lib/clientErrors";
-import { getPresetDemoResult } from "@/lib/cache/presetDemo";
+import {
+  canServeCachedPreset,
+  getPresetDemoResult,
+  isLiveOnlyPreset,
+} from "@/lib/cache/presetDemo";
 import { buildPriorAuthGraph } from "@/lib/graph/buildGraph";
 import { type PriorAuthGraphState } from "@/lib/graph/nodes";
 import { safeFlushLangfuse, safeStartTrace, safeUpdateTrace } from "@/lib/langfuse";
@@ -79,10 +83,6 @@ function applyUpdate(
 }
 
 export async function POST(request: NextRequest) {
-  if (!checkDemoKey(request)) {
-    return unauthorizedResponse();
-  }
-
   const json = await request.json().catch(() => null);
   const parsed = CreateCaseBodySchema.safeParse(json);
   if (!parsed.success) {
@@ -92,10 +92,25 @@ export async function POST(request: NextRequest) {
   const note = parsed.data.note;
   const presetCaseId = parsed.data.presetCaseId;
   const runLive = parsed.data.runLive ?? false;
-  const presetResult =
-    presetCaseId && !runLive ? getPresetDemoResult(presetCaseId) : null;
 
-  if (presetCaseId && !runLive && !presetResult) {
+  if (presetCaseId && !runLive && isLiveOnlyPreset(presetCaseId)) {
+    return invalidRequestResponse(
+      "This demo scenario requires a live run. Check 'Run full agent pipeline (live LLM calls)'.",
+    );
+  }
+
+  const presetResult =
+    presetCaseId && !runLive && canServeCachedPreset(presetCaseId)
+      ? getPresetDemoResult(presetCaseId)
+      : null;
+
+  const usesCachedPreset = Boolean(presetResult);
+
+  if (!usesCachedPreset && !checkDemoKey(request)) {
+    return unauthorizedResponse();
+  }
+
+  if (presetCaseId && !runLive && !presetResult && !isLiveOnlyPreset(presetCaseId)) {
     return invalidRequestResponse("Unknown preset case id");
   }
 
@@ -139,25 +154,17 @@ export async function POST(request: NextRequest) {
         overrideLog: [],
       };
 
-      send("node", { node: START, summary: { node: START, keys: ["rawNote"] } });
-
       try {
         if (presetResult) {
-          const cachedNodes = ["extract", "rulesCheck", "policyRag", "decide"];
-          if (presetResult.appealDraft) {
-            cachedNodes.push("draftAppeal");
-          }
-
-          for (const nodeName of cachedNodes) {
-            send("node", {
-              node: nodeName,
-              summary: {
-                node: nodeName,
-                cached: true,
-                presetCaseId: presetResult.presetCaseId,
-              },
-            });
-          }
+          send("node", {
+            node: "stored_result",
+            summary: {
+              replay: true,
+              presetCaseId: presetResult.presetCaseId,
+              sourceCaseId: presetResult.sourceCaseId ?? null,
+              message: "Loaded stored verified result — no LLM calls made",
+            },
+          });
 
           const cachedState: PriorAuthGraphState = {
             rawNote: note,
@@ -204,11 +211,14 @@ export async function POST(request: NextRequest) {
           send("done", {
             caseId,
             cached: true,
+            replay: true,
             presetCaseId: presetResult.presetCaseId,
             ...clientState,
           });
           return;
         }
+
+        send("node", { node: START, summary: { node: START, keys: ["rawNote"] } });
 
         const updates = await graph.stream(
           {

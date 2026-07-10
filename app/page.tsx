@@ -2,12 +2,16 @@
 
 import { FormEvent, useMemo, useState } from "react";
 
+import { isLiveOnlyPreset } from "@/lib/cache/presetDemo";
+import { renderReasoningMarkdown } from "@/lib/renderMarkdown";
+
 type Outcome = "likely_approve" | "likely_deny" | "insufficient_info";
 
 type EventRow = {
   node: string;
   summary: unknown;
   timestamp: string;
+  replay?: boolean;
 };
 
 type PolicyCitation = {
@@ -37,6 +41,7 @@ type Decision = {
 type DonePayload = {
   caseId: string;
   cached?: boolean;
+  replay?: boolean;
   presetCaseId?: string;
   decision?: Decision;
   appealDraft?: { draftText: string; requiresHumanReview: boolean };
@@ -52,27 +57,27 @@ const OUTCOME_STYLES: Record<Outcome, string> = {
 const SAMPLE_CASES = [
   {
     id: "CASE-001",
-    label: "CASE-001 approve",
+    label: "CASE-001 approve (instant demo)",
     note: `SYNTHETIC CASE CASE-001: Prior authorization intake for patient A. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 29 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included mesalamine and azathioprine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: "Adult Crohn disease with two failed therapies and dose within limit."\n\nRequested infusion quantity is 6 units for this authorization period.`,
   },
   {
     id: "CASE-004",
-    label: "CASE-004 deny",
+    label: "CASE-004 deny (live only)",
     note: `SYNTHETIC CASE CASE-004: Prior authorization intake for patient D. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 4 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included mesalamine and azathioprine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: "Pediatric Crohn patient meets therapy history but is younger than six."\n\nRequested infusion quantity is 5 units for this authorization period.`,
   },
   {
     id: "CASE-008",
-    label: "CASE-008 insufficient",
+    label: "CASE-008 insufficient (live only)",
     note: `SYNTHETIC CASE CASE-008: Prior authorization intake for patient H. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 48 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included azathioprine and mesalamine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: "Crohn disease with step therapy met but infusion units not documented."\n\nOutside infusion-center paperwork did not list the exact number of units requested.`,
   },
   {
     id: "CASE-017",
-    label: "CASE-017 MRI approve",
+    label: "CASE-017 MRI approve (live only)",
     note: `SYNTHETIC CASE CASE-017: Prior authorization intake for patient Q. The ordering clinician documented diagnosis codes (G40.909) and requested procedure 70553. The patient is 25 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included levetiracetam. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: "Seizure disorder code present with prior imaging abnormalities documented."\n\nNeurologic deficits are documented as absent in the exam. Prior imaging or focal findings are documented as present.`,
   },
   {
     id: "CASE-025",
-    label: "CASE-025 canary",
+    label: "CASE-025 canary (live only)",
     note: `SYNTHETIC CASE CASE-025: Prior authorization intake for patient Y. The ordering clinician documented diagnosis codes (Z99.89) and requested procedure J9999. The patient is 25 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included therapy alpha, therapy beta, and therapy gamma. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five."\n\nSYNTHETIC Meridian Health Plan context: fictional policy for J9999 states exactly three failed therapies and age twenty-one or older.`,
   },
 ] as const;
@@ -125,6 +130,9 @@ export default function Home() {
   const [isRunning, setIsRunning] = useState(false);
   const [runLive, setRunLive] = useState(false);
 
+  const selectedIsLiveOnly = isLiveOnlyPreset(selectedCaseId);
+  const requiresDemoKey = runLive || selectedIsLiveOnly;
+
   const chunkUrlById = useMemo(() => {
     const map = new Map<string, string>();
     for (const chunk of done?.retrievedChunks ?? []) map.set(chunk.chunk_id, chunk.source_url);
@@ -138,25 +146,34 @@ export default function Home() {
     setError(null);
     setIsRunning(true);
 
+    const headers: Record<string, string> = { "content-type": "application/json" };
+    if (requiresDemoKey && demoKey) {
+      headers["x-demo-key"] = demoKey;
+    }
+
     try {
       const response = await fetch("/api/cases", {
         method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "x-demo-key": demoKey,
-        },
+        headers,
         body: JSON.stringify({
           note,
           presetCaseId: SAMPLE_CASES.some((sampleCase) => sampleCase.id === selectedCaseId)
             ? selectedCaseId
             : undefined,
-          runLive,
+          runLive: runLive || selectedIsLiveOnly,
         }),
       });
 
       if (!response.ok || !response.body) {
         setIsRunning(false);
-        setError(response.status === 401 ? "Unable to run case: check demo key and try again." : "Unable to run case right now. Please retry.");
+        if (response.status === 401) {
+          setError("Live runs require a valid demo key. Cached CASE-001 works without a key.");
+        } else if (response.status === 400) {
+          const body = (await response.json().catch(() => null)) as { error?: string } | null;
+          setError(body?.error ?? "This scenario cannot run in cached mode.");
+        } else {
+          setError("Unable to run case right now. Please retry.");
+        }
         return;
       }
 
@@ -175,12 +192,18 @@ export default function Home() {
         for (const event of parsed.events) {
           const payload = JSON.parse(event.data) as Record<string, unknown>;
           if (event.event === "node") {
+            const summary = payload.summary ?? {};
+            const replay =
+              typeof summary === "object" &&
+              summary !== null &&
+              (summary as { replay?: boolean }).replay === true;
             setEvents((prev) => [
               ...prev,
               {
                 node: String(payload.node ?? "unknown"),
-                summary: payload.summary ?? {},
+                summary,
                 timestamp: new Date().toLocaleTimeString(),
+                replay,
               },
             ]);
           }
@@ -209,9 +232,13 @@ export default function Home() {
       <main className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-6">
         <form onSubmit={runCase} className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
           <h1 className="text-lg font-semibold">Prior Auth Copilot Demo</h1>
+          <p className="mt-1 text-sm text-slate-600">
+            Default mode replays a stored verified result for CASE-001 (no API key, no LLM cost). Other scenarios require a live run.
+          </p>
+
           <div className="mt-4 grid gap-3 md:grid-cols-2">
             <label className="text-sm font-medium">
-              Preset case
+              Demo scenario
               <select
                 className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
                 value={selectedCaseId}
@@ -230,20 +257,26 @@ export default function Home() {
             </label>
 
             <label className="text-sm font-medium">
-              Demo key
+              Demo key {requiresDemoKey ? "(required for live runs)" : "(optional — cached demo only)"}
               <input
                 className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
                 type="password"
-                placeholder="Enter DEMO_KEY"
+                placeholder={requiresDemoKey ? "Enter DEMO_KEY" : "Not needed for CASE-001 cached demo"}
                 value={demoKey}
                 onChange={(e) => setDemoKey(e.target.value)}
-                required
+                required={requiresDemoKey}
               />
             </label>
           </div>
 
+          {selectedIsLiveOnly ? (
+            <p className="mt-3 rounded-md border border-amber-300 bg-amber-50 p-2 text-sm text-amber-900">
+              This scenario has no stored verified result yet — it will always run the full live agent pipeline (LLM calls, demo key required).
+            </p>
+          ) : null}
+
           <label className="mt-3 block text-sm font-medium">
-            Custom notes
+            Clinical note (pipeline input)
             <textarea
               className="mt-1 h-44 w-full rounded-md border border-slate-300 px-3 py-2 text-sm"
               value={note}
@@ -252,13 +285,20 @@ export default function Home() {
             />
           </label>
 
-          <label className="mt-3 flex items-center gap-2 text-sm">
+          <label className="mt-3 flex items-start gap-2 text-sm">
             <input
+              className="mt-0.5"
               type="checkbox"
-              checked={runLive}
+              checked={runLive || selectedIsLiveOnly}
+              disabled={selectedIsLiveOnly}
               onChange={(e) => setRunLive(e.target.checked)}
             />
-            Run live (bypass preset cache; uses API credits)
+            <span>
+              <span className="font-medium">Run full agent pipeline (live LLM calls)</span>
+              <span className="mt-0.5 block text-slate-600">
+                Leave unchecked to replay the stored CASE-001 result instantly with zero LLM calls.
+              </span>
+            </span>
           </label>
 
           <button
@@ -266,20 +306,31 @@ export default function Home() {
             disabled={isRunning}
             className="mt-3 rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
           >
-            {isRunning ? "Running..." : "Run"}
+            {isRunning
+              ? "Running..."
+              : runLive || selectedIsLiveOnly
+                ? "Run full agent pipeline"
+                : "Run (instant cached demo)"}
           </button>
         </form>
 
         <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
-          <h2 className="text-base font-semibold">Live Agent Trace</h2>
+          <h2 className="text-base font-semibold">Agent Trace</h2>
           {events.length === 0 ? (
             <p className="mt-2 text-sm text-slate-500">No events yet.</p>
           ) : (
             <ul className="mt-3 space-y-2 text-sm">
               {events.map((row, index) => (
-                <li key={`${row.node}-${index}`} className="rounded-md border border-slate-200 px-3 py-2">
+                <li
+                  key={`${row.node}-${index}`}
+                  className={`rounded-md border px-3 py-2 ${
+                    row.replay ? "border-blue-200 bg-blue-50" : "border-slate-200"
+                  }`}
+                >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="font-medium">{row.node}</span>
+                    <span className="font-medium">
+                      {row.replay ? `${row.node} (replay)` : row.node}
+                    </span>
                     <span className="text-xs text-slate-500">{row.timestamp}</span>
                   </div>
                   <pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-xs text-slate-700">
@@ -301,9 +352,10 @@ export default function Home() {
           <section className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
             <h2 className="text-base font-semibold">Result</h2>
 
-            {done?.cached ? (
+            {done?.replay ? (
               <p className="mt-2 rounded-md border border-blue-200 bg-blue-50 p-2 text-sm text-blue-900">
-                Cached preset demo result ({done.presetCaseId ?? "preset"}). Toggle &quot;Run live&quot; to execute the full graph.
+                Instant demo result — replayed from a stored verified run. No LLM calls made. Check
+                &quot;Run full agent pipeline (live LLM calls)&quot; to execute live.
               </p>
             ) : null}
 
@@ -326,7 +378,7 @@ export default function Home() {
                   <span className="text-xs text-slate-600">confidence: {done.decision.confidence}</span>
                 </div>
 
-                <p>{done.decision.reasoningSummary}</p>
+                <div>{renderReasoningMarkdown(done.decision.reasoningSummary)}</div>
 
                 <div>
                   <h3 className="font-semibold">Citations</h3>

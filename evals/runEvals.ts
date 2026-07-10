@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { runPriorAuthGraphCase } from "../lib/graph/buildGraph";
+import { evalSummaryPassesGate, formatEvalGateFailure } from "../lib/evalGate";
 import { safeShutdownLangfuse } from "../lib/langfuse";
 import { ClinicalExtractionSchema, type ClinicalExtraction } from "../lib/schemas";
 
@@ -265,6 +266,15 @@ async function main() {
   writeFileSync(outputPath, `${JSON.stringify(output, null, 2)}\n`, "utf8");
   console.log(`\nWrote eval results: ${outputPath}`);
   console.log(`Summary: ${JSON.stringify(summary)}`);
+
+  if (!args.caseFilter && !args.ablation) {
+    if (!evalSummaryPassesGate(summary)) {
+      console.error(`Eval regression gate failed: ${formatEvalGateFailure(summary)}`);
+      process.exitCode = 1;
+    } else {
+      console.log("Eval regression gate passed (100% decision accuracy, 0 false-approves, 100% citation validity).");
+    }
+  }
 }
 
 main()

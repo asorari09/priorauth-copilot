@@ -1,338 +1,66 @@
 [
   {
     "presetCaseId": "CASE-001",
+    "sourceCaseId": "480a7b03-a1db-4b60-835d-672b58270567",
     "decision": {
       "outcome": "likely_approve",
-      "confidence": "high",
-      "reasoningSummary": "All deterministic rules passed for this 29-year-old patient with Crohn's disease (K50.90) requesting infliximab IV (J1745, 6 units). Per CareSource's Infliximab Intravenous Products UM Medical Policy, the following criteria are met:\n\n1. **Age Requirement (RULE: AGE_MINIMUM_001):** Patient is 29 years old, satisfying the ≥6 years of age threshold (Citation: caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1).\n\n2. **Step Therapy (RULE: STEP_THERAPY_001):** Patient has a documented trial and failure of azathioprine, which is a qualifying conventional systemic therapy for Crohn's disease. The mesalamine trial does not count toward the step therapy requirement per policy, but azathioprine alone satisfies the criterion (Citations: p5-1, p8-1). Treatment failure is documented.\n\n3. **Diagnosis Match (RULE: DIAGNOSIS_MATCH_001):** Diagnosis code K50.90 (Crohn's disease, unspecified) aligns with the covered indication for infliximab under the policy.\n\n4. **Quantity Limit (RULE: QUANTITY_LIMIT_001):** The requested 6 units (mg/kg) is within the approved dosing range referenced in the CareSource infliximab policy (Citation: caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1).\n\n**Outstanding Item to Confirm:** The policy requires that the medication be prescribed by or in consultation with a gastroenterologist. This was not explicitly confirmed in the extracted data. If prescriber specialty documentation is on file, approval is fully supported. This is the only remaining verification point that could affect the final determination.",
-      "supportingCitations": [
-        {
-          "payerName": "Blue",
-          "documentTitle": "Shield Of California Infliximab Medicare Part B Step Therapy Policy Inflixi",
-          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
-          "clauseTextParaphrased": "Primary medical necessity requirement referenced for this authorization request.",
-          "requirementSummary": "Primary medical necessity requirement referenced for this authorization request."
-        },
-        {
-          "payerName": "Caresource",
-          "documentTitle": "Infliximab Intravenous Products Um Medical Policy Medicare Multi Poli",
-          "sourceChunkId": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        },
-        {
-          "payerName": "Blue",
-          "documentTitle": "Shield Of California Infliximab Medicare Part B Step Therapy Policy Inflixi",
-          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        }
-      ],
-      "rulesResult": {
-        "eligibleByRules": true,
-        "failedCriteria": [],
-        "ruleIdsApplied": [
-          "STEP_THERAPY_001",
-          "AGE_MINIMUM_001",
-          "DIAGNOSIS_MATCH_001",
-          "QUANTITY_LIMIT_001"
-        ]
-      }
-    },
-    "retrievedChunks": [
-      {
-        "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
-        "source_url": "https://example.com/policy/blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1"
-      },
-      {
-        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
-        "source_url": "https://example.com/policy/caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1"
-      },
-      {
-        "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
-        "source_url": "https://example.com/policy/blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1"
-      },
-      {
-        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
-        "source_url": "https://example.com/policy/caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1"
-      },
-      {
-        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1",
-        "source_url": "https://example.com/policy/caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1"
-      }
-    ]
-  },
-  {
-    "presetCaseId": "CASE-004",
-    "decision": {
-      "outcome": "likely_deny",
-      "confidence": "high",
-      "reasoningSummary": "The prior authorization request for infliximab IV (J1745) for a 4-year-old patient with Crohn's disease (K50.90) is likely to be denied based on multiple failed criteria supported by validated policy citations:\n\n1. **Age Minimum Not Met (Primary Failure):** CareSource's Infliximab Intravenous Products UM Medical Policy explicitly requires patients to be ≥ 6 years of age for Crohn's Disease initial therapy coverage (AGE_MINIMUM_001). This patient is 4 years old, falling below the minimum threshold by 2 years. This requirement is consistently applied across CareSource GI indications. Additionally, Blue Shield of California's Infliximab Medicare Part B Step Therapy Policy requires age to be consistent with the FDA-approved indication; the FDA-approved minimum age for infliximab in pediatric Crohn's disease is 6 years, further confirming this patient does not qualify.\n\n2. **Mesalamine Does Not Count as Qualifying Systemic Therapy:** Per CareSource policy, a trial of mesalamine does not count as a qualifying conventional systemic therapy for Crohn's disease. While the patient has tried azathioprine (which does qualify), the documented treatment history partially relies on mesalamine, which is explicitly excluded from step therapy credit under this policy.\n\n3. **Step Therapy Otherwise Partially Met:** The patient has tried azathioprine, which is a recognized qualifying systemic agent. However, this does not overcome the disqualifying age criterion.\n\nThe age failure alone (AGE_MINIMUM_001) is a hard stop under the cited policies and is sufficient to support a likely denial. No supplied evidence provides an exception pathway for patients under age 6.",
-      "supportingCitations": [
-        {
-          "payerName": "Blue",
-          "documentTitle": "Shield Of California Infliximab Medicare Part B Step Therapy Policy Inflixi",
-          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
-          "clauseTextParaphrased": "Primary medical necessity requirement referenced for this authorization request.",
-          "requirementSummary": "Primary medical necessity requirement referenced for this authorization request."
-        },
-        {
-          "payerName": "Caresource",
-          "documentTitle": "Infliximab Intravenous Products Um Medical Policy Medicare Multi Poli",
-          "sourceChunkId": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        },
-        {
-          "payerName": "Blue",
-          "documentTitle": "Shield Of California Infliximab Medicare Part B Step Therapy Policy Inflixi",
-          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        }
-      ],
-      "rulesResult": {
-        "eligibleByRules": false,
-        "failedCriteria": [
-          "AGE_MINIMUM_001: Patient must be 6 or older per Crohn's disease initial therapy criteria"
-        ],
-        "ruleIdsApplied": [
-          "STEP_THERAPY_001",
-          "AGE_MINIMUM_001",
-          "DIAGNOSIS_MATCH_001",
-          "QUANTITY_LIMIT_001"
-        ]
-      }
-    },
-    "retrievedChunks": [
-      {
-        "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
-        "source_url": "https://example.com/policy/blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1"
-      },
-      {
-        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
-        "source_url": "https://example.com/policy/caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1"
-      },
-      {
-        "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
-        "source_url": "https://example.com/policy/blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1"
-      },
-      {
-        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
-        "source_url": "https://example.com/policy/caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1"
-      },
-      {
-        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1",
-        "source_url": "https://example.com/policy/caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1"
-      }
-    ],
-    "appealDraft": {
-      "draftText": "To Whom It May Concern:\n\nWe are requesting reconsideration of the prior authorization denial.\nThe submitted documentation demonstrates medical necessity based on the cited policy clause.\nPlease review the attached clinical record and policy references.\n\nSincerely,\nClinical Prior Authorization Team",
-      "citedClause": {
-        "payerName": "Blue",
-        "documentTitle": "Shield Of California Infliximab Medicare Part B Step Therapy Policy Inflixi",
-        "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
-        "clauseTextParaphrased": "Primary medical necessity requirement referenced for this authorization request.",
-        "requirementSummary": "Primary medical necessity requirement referenced for this authorization request."
-      },
-      "requiresHumanReview": true
-    }
-  },
-  {
-    "presetCaseId": "CASE-008",
-    "decision": {
-      "outcome": "insufficient_info",
       "confidence": "medium",
-      "reasoningSummary": "The extraction and rules engine confirm that the sole failed criterion is QUANTITY_LIMIT_001, which depends on infusion units — an optional field that is entirely absent from the submitted documentation. The clinical notes explicitly acknowledge this gap (\"infusion units not documented\"). All validated policy citations (CareSource Infliximab UM Medical Policy, clauses p8-1 and p12-1; Blue Shield of California Infliximab Medicare Part B Step Therapy Policy, clause p2-1) uniformly require that the requested dose and units be explicitly specified as up to 5 mg/kg IV per infusion on the standard induction/maintenance schedule (weeks 0, 2, 6, then every 6–8 weeks). Without this documentation, the quantity limit rule cannot be evaluated, and authorization cannot be granted or denied on the merits. Notably, the step therapy criteria appear otherwise met — azathioprine qualifies as a systemic agent per CareSource policy (mesalamine alone would not suffice, but azathioprine is present), and the patient's age and diagnosis (K50.90, Crohn's disease) satisfy the remaining rules. The request is therefore blocked solely by the missing infusion unit documentation, making the outcome insufficient_info rather than a substantive denial.",
-      "supportingCitations": [
-        {
-          "payerName": "Blue",
-          "documentTitle": "Shield Of California Infliximab Medicare Part B Step Therapy Policy Inflixi",
-          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
-          "clauseTextParaphrased": "Primary medical necessity requirement referenced for this authorization request.",
-          "requirementSummary": "Primary medical necessity requirement referenced for this authorization request."
-        },
-        {
-          "payerName": "Caresource",
-          "documentTitle": "Infliximab Intravenous Products Um Medical Policy Medicare Multi Poli",
-          "sourceChunkId": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        },
-        {
-          "payerName": "Blue",
-          "documentTitle": "Shield Of California Infliximab Medicare Part B Step Therapy Policy Inflixi",
-          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        }
-      ],
       "rulesResult": {
-        "eligibleByRules": false,
-        "failedCriteria": [
-          "QUANTITY_LIMIT_001: Requested units may not exceed 8 per authorization period"
-        ],
+        "failedCriteria": [],
         "ruleIdsApplied": [
           "STEP_THERAPY_001",
           "AGE_MINIMUM_001",
           "DIAGNOSIS_MATCH_001",
           "QUANTITY_LIMIT_001"
-        ]
-      }
+        ],
+        "eligibleByRules": true
+      },
+      "reasoningSummary": "The request for infliximab IV (J1745) for a 29-year-old patient with Crohn's disease (K50.90) meets several key policy criteria per the CareSource Infliximab Intravenous Products UM Medical Policy:\n\n**Criteria Met (Verified):**\n1. **Age Requirement (AGE_MINIMUM_001):** Patient is 29 years old, satisfying the ≥ 6 years requirement.\n2. **Diagnosis Match (DIAGNOSIS_MATCH_001):** K50.90 (Crohn's disease, unspecified) is a covered indication.\n3. **Step Therapy (STEP_THERAPY_001):** Patient has a documented trial and failure of azathioprine, which is explicitly cited as a qualifying conventional systemic therapy. Mesalamine was also tried but, per policy, does NOT count as a qualifying systemic therapy for Crohn's disease — however, azathioprine alone is sufficient to satisfy the step-therapy requirement.\n4. **Treatment Failure Documented:** Confirmed per extraction.\n5. **Quantity Limit (QUANTITY_LIMIT_001):** 6 units of J1745 requested; rules engine flagged this as within limit.\n\n**Unverified Items Requiring Confirmation Before Final Approval:**\n1. **Prescriber Specialty:** Policy explicitly requires that infliximab be prescribed by or in consultation with a **gastroenterologist**. No prescriber specialty information was provided in the extraction. This must be confirmed prior to final approval.\n2. **Weight-Based Dose Verification:** Policy caps dosing at **5 mg/kg per infusion**. The requested 6 units of J1745 must be cross-referenced against the patient's actual body weight to confirm the per-dose quantity does not exceed this cap. Patient weight was not provided in the extraction.\n\n**Conclusion:** The case is likely approvable given that all deterministic rules passed and the core clinical criteria are met. However, confidence is rated **medium** rather than high due to two unverified policy requirements — prescriber specialty (gastroenterologist) and weight-based dose confirmation — that cannot be presumed satisfied from the available data and must be explicitly confirmed.",
+      "supportingCitations": [
+        {
+          "payerName": "CareSource",
+          "documentTitle": "Infliximab Intravenous Products UM Medical Policy",
+          "sourceChunkId": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1",
+          "requirementSummary": "Patient meets age requirement (29 years old, ≥ 6 years), has documented trial of azathioprine (a qualifying conventional systemic therapy), and treatment failure is documented. Note: mesalamine trial does not count as a qualifying systemic therapy for Crohn's disease under this policy, but azathioprine does. Prescriber must be or consult with a gastroenterologist.",
+          "clauseTextParaphrased": "For Crohn's Disease initial therapy, approve for 6 months if the patient is ≥ 6 years of age AND has tried one other conventional systemic therapy for Crohn's disease (e.g., azathioprine, 6-mercaptopurine, or methotrexate). A trial of mesalamine does not count as a systemic therapy for Crohn's disease. The medication must be prescribed by or in consultation with a gastroenterologist."
+        },
+        {
+          "payerName": "CareSource",
+          "documentTitle": "Infliximab Intravenous Products UM Medical Policy",
+          "sourceChunkId": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+          "requirementSummary": "Reinforces that mesalamine is explicitly excluded as a qualifying prior systemic therapy, while azathioprine is a valid qualifying agent. The patient's documented azathioprine failure satisfies the step-therapy requirement; mesalamine alone would not.",
+          "clauseTextParaphrased": "For Ulcerative Colitis initial therapy, a trial of mesalamine does not count as a systemic therapy. A trial of azathioprine does count as a qualifying systemic agent."
+        },
+        {
+          "payerName": "CareSource",
+          "documentTitle": "Infliximab Intravenous Products UM Medical Policy",
+          "sourceChunkId": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1",
+          "requirementSummary": "The requested 6 units of J1745 (infliximab) must align with the approved dosing of up to 5 mg/kg IV per infusion. The requested unit quantity should be verified against the patient's weight to confirm it does not exceed the 5 mg/kg per-dose cap for initial therapy.",
+          "clauseTextParaphrased": "For Crohn's Disease initial therapy dosing: approve up to 5 mg/kg as an intravenous infusion followed by additional similar doses at 2 and 6 weeks after the first infusion, and then no more frequently than once every 8 weeks thereafter."
+        }
+      ]
     },
     "retrievedChunks": [
       {
         "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
-        "source_url": "https://example.com/policy/blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1"
+        "source_url": "https://www.blueshieldca.com/content/dam/bsca/en/medicare/docs/infliximab-MCARE-PartB-provider.pdf"
       },
       {
         "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
-        "source_url": "https://example.com/policy/caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1"
+        "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
       },
       {
         "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
-        "source_url": "https://example.com/policy/blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1"
+        "source_url": "https://www.blueshieldca.com/content/dam/bsca/en/medicare/docs/infliximab-MCARE-PartB-provider.pdf"
       },
       {
         "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
-        "source_url": "https://example.com/policy/caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1"
+        "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
       },
       {
-        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p12-1",
-        "source_url": "https://example.com/policy/caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p12-1"
+        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1",
+        "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
       }
     ]
-  },
-  {
-    "presetCaseId": "CASE-017",
-    "decision": {
-      "outcome": "likely_approve",
-      "confidence": "high",
-      "reasoningSummary": "All deterministic rules passed (RED_FLAG_001, PRIOR_IMAGING_001) with no failed criteria. The request is for CPT 70553 (MRI brain with and without contrast) for a 25-year-old patient with seizure disorder (G40.909), documented prior imaging abnormalities, and a documented treatment failure with levetiracetam.\n\nCoverage is supported by CMS NCD 220.2 (Magnetic Resonance Imaging) on three grounds:\n1. NCD 220.2 establishes MRI of the head/CNS as a nationally covered indication for neuroradiology purposes, provided the service is reasonable and necessary for the specific patient — a standard clearly met here given the active seizure disorder diagnosis and prior imaging abnormalities (sourceChunkId: cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1).\n2. NCD 220.2 explicitly recognizes the use of FDA-approved paramagnetic contrast agents (directly relevant to CPT 70553, the with-and-without contrast variant), supporting the appropriateness of the specific procedure requested (sourceChunkId: cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1).\n3. None of the NCD 220.2 national non-coverage contraindications apply to this patient (no viable pregnancy, no ferromagnetic life support, no claustrophobia, no metallic aneurysm clips, not a cortical bone/calcification study), removing any national-level coverage bar (sourceChunkId: cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1).\n\nThe combination of a validated seizure disorder diagnosis, prior imaging abnormalities, documented first-line antiepileptic treatment and failure, and the absence of any applicable contraindication or non-coverage criterion strongly supports approval.",
-      "supportingCitations": [
-        {
-          "payerName": "Cms",
-          "documentTitle": "Via Radmd Ncd 220 2 Magnetic Resonance Imaging Ncd 20220 2 20for 20magnetic",
-          "sourceChunkId": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
-          "clauseTextParaphrased": "Primary medical necessity requirement referenced for this authorization request.",
-          "requirementSummary": "Primary medical necessity requirement referenced for this authorization request."
-        },
-        {
-          "payerName": "Cms",
-          "documentTitle": "Via Radmd Ncd 220 2 Magnetic Resonance Imaging Ncd 20220 2 20for 20magnetic",
-          "sourceChunkId": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        },
-        {
-          "payerName": "Cms",
-          "documentTitle": "Via Radmd Ncd 220 2 Magnetic Resonance Imaging Ncd 20220 2 20for 20magnetic",
-          "sourceChunkId": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        }
-      ],
-      "rulesResult": {
-        "eligibleByRules": true,
-        "failedCriteria": [],
-        "ruleIdsApplied": [
-          "RED_FLAG_001",
-          "PRIOR_IMAGING_001"
-        ]
-      }
-    },
-    "retrievedChunks": [
-      {
-        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
-        "source_url": "https://example.com/policy/cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1"
-      },
-      {
-        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
-        "source_url": "https://example.com/policy/cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1"
-      },
-      {
-        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
-        "source_url": "https://example.com/policy/cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1"
-      },
-      {
-        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
-        "source_url": "https://example.com/policy/cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1"
-      },
-      {
-        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1",
-        "source_url": "https://example.com/policy/cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1"
-      }
-    ]
-  },
-  {
-    "presetCaseId": "CASE-025",
-    "decision": {
-      "outcome": "likely_deny",
-      "confidence": "high",
-      "reasoningSummary": "The rules engine returned eligibleByRules=false with a failed criterion of NO_APPLICABLE_RULES, meaning no recognized policy rules could be matched and applied to this request — a procedural disqualifier that mandates a likely_deny outcome per the code-determined constraint. However, confidence is rated LOW because the validated policy citation (Meridian J9999 Prior Authorization Policy, SYNTHETIC CANARY, chunk meridian-health-plan-j9999-synthetic-canary-p1-1) actually indicates that the clinical data on its face satisfies both stated coverage criteria: (1) exactly three documented prior therapy failures (therapy alpha, beta, gamma) as required, and (2) patient age of 25, which meets the minimum age-21 requirement. The denial is therefore driven entirely by the absence of applicable rules in the rules engine — not by any substantive clinical or policy deficiency in the submitted data. A human reviewer should verify whether the correct policy rules are loaded and applicable before a final determination is issued.",
-      "supportingCitations": [
-        {
-          "payerName": "Providence",
-          "documentTitle": "Health Plan Medicare Medical Policy Total Knee Arthroplasty Mp419",
-          "sourceChunkId": "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1",
-          "clauseTextParaphrased": "Primary medical necessity requirement referenced for this authorization request.",
-          "requirementSummary": "Primary medical necessity requirement referenced for this authorization request."
-        },
-        {
-          "payerName": "Meridian",
-          "documentTitle": "Health Plan J9999 Synthetic Canary",
-          "sourceChunkId": "meridian-health-plan-j9999-synthetic-canary-p1-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        },
-        {
-          "payerName": "Providence",
-          "documentTitle": "Health Plan Medicare Medical Policy Total Knee Arthroplasty Mp419",
-          "sourceChunkId": "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p3-1",
-          "clauseTextParaphrased": "Supporting coverage criterion from retrieved payer policy text.",
-          "requirementSummary": "Supporting coverage criterion from retrieved payer policy text."
-        }
-      ],
-      "rulesResult": {
-        "eligibleByRules": false,
-        "failedCriteria": [
-          "NO_APPLICABLE_RULES"
-        ],
-        "ruleIdsApplied": []
-      }
-    },
-    "retrievedChunks": [
-      {
-        "chunk_id": "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1",
-        "source_url": "https://example.com/policy/providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1"
-      },
-      {
-        "chunk_id": "meridian-health-plan-j9999-synthetic-canary-p1-1",
-        "source_url": "https://example.com/policy/meridian-health-plan-j9999-synthetic-canary-p1-1"
-      },
-      {
-        "chunk_id": "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p3-1",
-        "source_url": "https://example.com/policy/providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p3-1"
-      },
-      {
-        "chunk_id": "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p1-1",
-        "source_url": "https://example.com/policy/kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p1-1"
-      },
-      {
-        "chunk_id": "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p4-1",
-        "source_url": "https://example.com/policy/kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p4-1"
-      }
-    ],
-    "appealDraft": {
-      "draftText": "To Whom It May Concern:\n\nWe are requesting reconsideration of the prior authorization denial.\nThe submitted documentation demonstrates medical necessity based on the cited policy clause.\nPlease review the attached clinical record and policy references.\n\nSincerely,\nClinical Prior Authorization Team",
-      "citedClause": {
-        "payerName": "Providence",
-        "documentTitle": "Health Plan Medicare Medical Policy Total Knee Arthroplasty Mp419",
-        "sourceChunkId": "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1",
-        "clauseTextParaphrased": "Primary medical necessity requirement referenced for this authorization request.",
-        "requirementSummary": "Primary medical necessity requirement referenced for this authorization request."
-      },
-      "requiresHumanReview": true
-    }
   }
 ]

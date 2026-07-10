@@ -12,7 +12,8 @@
     "ingest": "tsx scripts/ingest.ts",
     "test:graph": "tsx scripts/testGraph.ts",
     "eval": "tsx evals/runEvals.ts",
-    "eval:ablation": "tsx evals/runEvals.ts --ablation"
+    "eval:ablation": "tsx evals/runEvals.ts --ablation",
+    "rebuild:presets": "tsx scripts/rebuildPresetDemoResults.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.110.0",
