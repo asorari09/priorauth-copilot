@@ -266,9 +266,11 @@ Source: Langfuse `priorauth-case-run` traces from [`2026-07-10T02-38-26-825Z.jso
 
 Representative trace: [`88046535-fa61-47e5-bdf3-5ecb9e9aa476`](https://cloud.langfuse.com/project/cmrdrenon00chad0c3bi1gcoe/traces/88046535-fa61-47e5-bdf3-5ecb9e9aa476) (CASE-001, $0.0032).
 
-<!-- TODO: add docs/langfuse-post-optimization.png screenshot here -->
+<p align="center">
+  <img src="docs/langfuse-post-optimization.png" alt="Langfuse dashboard — trace volume, cost by model, and observation breakdown for priorauth-case-run" width="900"/>
+</p>
 
-<p align="center"><sub>Langfuse screenshot: <code>docs/langfuse-post-optimization.png</code> (capture from project traces view)</sub></p>
+<p align="center"><sub>Langfuse project dashboard — cumulative traces across development; per-case costs above are from the isolated post-optimization eval window.</sub></p>
 
 ### Key files
 
@@ -292,7 +294,7 @@ npm run lint && npx tsc --noEmit && npm test
 
 ### Observability
 
-[Langfuse project](https://cloud.langfuse.com/project/cmrdrenon00chad0c3bi1gcoe) — filter live runs vs replays via trace name or `replay` metadata/tag.
+[Langfuse project](https://cloud.langfuse.com/project/cmrdrenon00chad0c3bi1gcoe) — filter live runs vs replays via trace name or `replay` metadata/tag. Dashboard snapshot: [`docs/langfuse-post-optimization.png`](docs/langfuse-post-optimization.png).
 
 </details>
 
