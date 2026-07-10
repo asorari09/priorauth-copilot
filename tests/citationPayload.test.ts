@@ -3,8 +3,16 @@ import { describe, expect, it } from "vitest";
 import {
   selectTopRetrievedChunks,
   truncateApproxTokens,
-  type RetrievedChunk,
-} from "../lib/graph/nodes";
+} from "../lib/graph/citationPayload";
+
+type RetrievedChunk = {
+  chunk_id: string;
+  payer_name: string;
+  document_title: string;
+  source_url: string;
+  content: string;
+  similarity: number;
+};
 
 describe("citation payload trimming", () => {
   it("keeps the highest-similarity chunks only", () => {
