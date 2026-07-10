@@ -1,6 +1,7 @@
 <p align="center">
   <strong>PriorAuth Copilot</strong><br/>
-  LangGraph prior-authorization decision support — rules-first outcomes, policy-grounded citations, eval-gated quality.
+  LangGraph prior-authorization decision support — rules-first outcomes, policy-grounded citations, eval-gated quality.<br/>
+  <strong>✅ Project 1 — CLOSED &amp; COMPLETE</strong> · <a href="docs/PROJECT_STATUS.md">Status</a>
 </p>
 
 <p align="center">

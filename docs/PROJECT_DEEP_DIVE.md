@@ -1,5 +1,7 @@
 # PriorAuth Copilot — Complete Project Deep Dive
 
+**Status: Project 1 CLOSED · July 9, 2026** · [Closure record](PROJECT_STATUS.md)
+
 **Live demo:** https://priorauth-copilot-swart.vercel.app · **Repo:** https://github.com/asorari09/priorauth-copilot
 
 *Author: Abhi Sorari · July 2026 · All clinical data synthetic. Not a coverage decision system.*
