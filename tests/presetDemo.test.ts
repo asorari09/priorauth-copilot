@@ -3,41 +3,52 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+  CACHED_PRESET_CASE_IDS,
   canServeCachedPreset,
   getPresetDemoResult,
   isLiveOnlyPreset,
 } from "../lib/cache/presetDemo";
 import { evalSummaryPassesGate, formatEvalGateFailure } from "../lib/evalGate";
 
+const EXPECTED_PRESETS = ["CASE-001", "CASE-004", "CASE-008", "CASE-017", "CASE-025"];
+
 describe("preset demo data", () => {
-  it("serves CASE-001 from verified persisted citations", () => {
-    const preset = getPresetDemoResult("CASE-001");
-    expect(preset).not.toBeNull();
-    expect(preset?.sourceCaseId).toBeTruthy();
-    expect(preset?.decision.supportingCitations.length).toBeGreaterThan(0);
-    for (const citation of preset?.decision.supportingCitations ?? []) {
-      expect(citation.payerName).not.toBe("Blue");
-      expect(citation.requirementSummary).not.toContain("referenced for this authorization request");
-    }
-    for (const chunk of preset?.retrievedChunks ?? []) {
-      expect(chunk.source_url).not.toContain("example.com");
-      expect(chunk.source_url.length).toBeGreaterThan(0);
+  it("serves all five presets from verified persisted citations", () => {
+    expect(CACHED_PRESET_CASE_IDS.sort()).toEqual(EXPECTED_PRESETS.sort());
+    for (const presetId of EXPECTED_PRESETS) {
+      const preset = getPresetDemoResult(presetId);
+      expect(preset).not.toBeNull();
+      expect(preset?.sourceCaseId).toBeTruthy();
+      expect(preset?.decision.supportingCitations.length).toBeGreaterThan(0);
+      for (const citation of preset?.decision.supportingCitations ?? []) {
+        expect(citation.payerName).not.toBe("Blue");
+        expect(citation.requirementSummary).not.toContain(
+          "referenced for this authorization request",
+        );
+      }
+      for (const chunk of preset?.retrievedChunks ?? []) {
+        expect(chunk.source_url).not.toContain("example.com");
+        expect(chunk.source_url.length).toBeGreaterThan(0);
+      }
     }
   });
 
-  it("marks scenarios without stored results as live-only", () => {
-    expect(isLiveOnlyPreset("CASE-004")).toBe(true);
-    expect(isLiveOnlyPreset("CASE-025")).toBe(true);
-    expect(canServeCachedPreset("CASE-004")).toBe(false);
-    expect(canServeCachedPreset("CASE-001")).toBe(true);
-    expect(getPresetDemoResult("CASE-004")).toBeNull();
+  it("CASE-004 preset includes a real appeal draft", () => {
+    const preset = getPresetDemoResult("CASE-004");
+    expect(preset?.appealDraft?.draftText.length).toBeGreaterThan(100);
+    expect(preset?.appealDraft?.requiresHumanReview).toBe(true);
+    expect(preset?.appealDraft?.citedClause.sourceChunkId).toBeTruthy();
   });
 
-  it("live-only manifest matches golden preset ids", () => {
+  it("has no live-only presets after rebuild", () => {
+    for (const presetId of EXPECTED_PRESETS) {
+      expect(isLiveOnlyPreset(presetId)).toBe(false);
+      expect(canServeCachedPreset(presetId)).toBe(true);
+    }
     const liveOnly = JSON.parse(
       readFileSync(join(process.cwd(), "data", "liveOnlyPresets.json"), "utf8"),
     ) as string[];
-    expect(liveOnly).toEqual(["CASE-004", "CASE-008", "CASE-017", "CASE-025"]);
+    expect(liveOnly).toEqual([]);
   });
 });
 

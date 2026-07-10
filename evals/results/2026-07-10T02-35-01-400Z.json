@@ -1,0 +1,137 @@
+{
+  "timestamp": "2026-07-10T02:35:01.400Z",
+  "mode": "default",
+  "caseFilter": "CASE-008",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 100,
+    "extractionFieldAccuracy": 100,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 5543,
+    "mismatchedCaseIds": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 1,
+    "extractionFieldsCorrect": 10,
+    "extractionFieldsTotal": 10,
+    "validCitations": 2,
+    "totalCitations": 2,
+    "falseApproves": 0,
+    "expectedDenies": 0,
+    "totalLatencyMs": 5543
+  },
+  "perCase": [
+    {
+      "id": "CASE-008",
+      "expectedOutcome": "insufficient_info",
+      "actualOutcome": "insufficient_info",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 48,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "azathioprine",
+          "mesalamine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Crohn disease with step therapy met but infusion units not documented."
+      },
+      "actualExtraction": {
+        "patientAge": 48,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "azathioprine",
+          "mesalamine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Crohn disease with step therapy met but infusion units not documented."
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 48,
+          "actual": 48,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K50.90"
+          ],
+          "actual": [
+            "K50.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "azathioprine",
+            "mesalamine"
+          ],
+          "actual": [
+            "azathioprine",
+            "mesalamine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Crohn disease with step therapy met but infusion units not documented.",
+          "actual": "Crohn disease with step therapy met but infusion units not documented.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 2,
+      "validCitationCount": 2,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p12-1"
+      ],
+      "latencyMs": 5543,
+      "decisionReasoning": "Outcome insufficient_info was determined by deterministic guardrails (All failed rules depend on optional fields that are absent in extraction.).\n\nClinical context: patient age 48; diagnosis K50.90; requested procedure J1745.\n\nRules applied (4): STEP_THERAPY_001, AGE_MINIMUM_001, DIAGNOSIS_MATCH_001, QUANTITY_LIMIT_001.\n\nFailed criteria:\n- QUANTITY_LIMIT_001: Requested units may not exceed 8 per authorization period\n\nValidated policy citations:\n- Blue Shield of California: Step therapy requirement: Both Avsola and Inflectra must be tried before coverage of Renflexis, Remicade, or other infliximab products for new therapy initiation\n- CareSource: Prior biologic trials must be of different medications; biosimilars do not satisfy trial requirements",
+      "overrideLog": []
+    }
+  ]
+}

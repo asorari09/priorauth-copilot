@@ -19,7 +19,8 @@
 | **Problem** | Prior-auth reviewers need structured facts, payer policy citations, and a defensible approve/deny/insufficient signal — without the LLM inventing outcomes. |
 | **Approach** | LangGraph pipeline: extract → rules + RAG in parallel → **code-forced outcome** → optional appeal draft. LLMs synthesize citations and prose; TypeScript owns the decision. |
 | **Default demo** | [CASE-001 instant replay](https://priorauth-copilot-swart.vercel.app/) — **no API key, no LLM cost**, real CareSource PDF links |
-| **Regression gate** | CI requires **100 / 0 / 100** on 26 golden cases (`workflow_dispatch`). Last full pass: pre-optimization — [`evals/results/2026-07-09T18-40-22-006Z.json`](evals/results/2026-07-09T18-40-22-006Z.json). Post-Round-2 re-verify pending. |
+| **Regression gate** | **100 / 0 / 100** verified post-optimization — [`evals/results/2026-07-10T02-38-26-825Z.json`](evals/results/2026-07-10T02-38-26-825Z.json) (`--no-cache`, CI [`workflow_dispatch`](https://github.com/asorari09/priorauth-copilot/actions/runs/29065131002) green) |
+| **Measured cost** | **~$0.003/case** approve · **~$0.006/case** deny (Langfuse, full eval run) · **~90%** vs Sonnet baseline (~$0.041) |
 | **Stack** | Next.js 15 · LangGraph · OpenAI extract · Claude Haiku citations/appeals · Supabase pgvector · Langfuse |
 
 ---
@@ -102,7 +103,7 @@ sequenceDiagram
   participant G as LangGraph
   participant LF as Langfuse
 
-  alt CASE-001 cached (default)
+  alt Any preset cached (default)
     U->>API: presetCaseId, no demo key
     API->>LF: trace preset-replay (replay: true)
     Note over API,DB: No cases row inserted
@@ -154,8 +155,7 @@ erDiagram
 
 | Scenario | Demo key | LLM | What you see |
 |----------|----------|-----|--------------|
-| **CASE-001** (default) | Not required | None | Stored verified run — CareSource citations, payer PDF URLs, honest `stored_result (replay)` trace |
-| **CASE-004 / 008 / 017 / 025** | Required | Yes | Full live graph (deny + appeal on CASE-004 after credits + preset rebuild) |
+| **All five demo scenarios** | Not required | None | Instant replay from verified production runs (incl. CASE-004 deny + appeal draft) |
 | **Custom note + live** | Required | Yes | Real-time SSE node trace |
 
 Open the [live app](https://priorauth-copilot-swart.vercel.app/) → keep **CASE-001** → click **Run (instant cached demo)**. Click any **source document** link — it resolves to a real payer PDF, not a placeholder.
@@ -249,18 +249,26 @@ npm run rebuild:presets           # rebuild demo JSON from Supabase (no LLM)
 
 **CI:** every push → lint, tsc, vitest. **Eval** → manual `workflow_dispatch` only; exits non-zero unless **100 / 0 / 100**.
 
-### Cost model (projections — verify with Langfuse after eval)
+### Cost model (measured — post-optimization full eval, `--no-cache`)
 
-| Scenario | ~$/case | Billed |
-|----------|---------|--------|
-| Preset replay | **$0** | Nothing |
-| Warm cache hit | ~$0.0001 | OpenAI extract only |
-| First live approve | ~$0.004 | Extract + Haiku citations |
-| First live deny | ~$0.007 | Above + Haiku appeal |
+Source: Langfuse `priorauth-case-run` traces from [`2026-07-10T02-38-26-825Z.json`](evals/results/2026-07-10T02-38-26-825Z.json) (26 cases, 100/0/100 gate).
 
-Baseline pre-optimization ~$0.045/case (Sonnet on citations + reasoning). Round 2 removes the decision LLM call and caches synthesis.
+| Scenario | Measured $/case | Billed |
+|----------|-----------------|--------|
+| **Preset replay** | **$0** | Nothing |
+| **Live approve** (n=10) | **$0.0033** | gpt-4o-mini extract + Haiku citation synthesis |
+| **Live deny** (n=12) | **$0.0057** | Above + Haiku appeal draft |
+| **Insufficient info** (n=4) | **$0.0029** | Extract + citations (no appeal) |
+| **All cases avg** (n=26) | **$0.0043** | — |
+| **Sonnet baseline** (pre-opt) | ~$0.041 | citation + decision + appeal on Sonnet 4.6 |
 
-> **Resume / public claims:** treat cost and accuracy numbers as verified only after a passing `--no-cache` full eval and CI dispatch.
+**Reduction vs baseline:** ~**92%** approve path · ~**86%** deny path · ~**89%** blended.
+
+Representative trace: [`88046535-fa61-47e5-bdf3-5ecb9e9aa476`](https://cloud.langfuse.com/project/cmrdrenon00chad0c3bi1gcoe/traces/88046535-fa61-47e5-bdf3-5ecb9e9aa476) (CASE-001, $0.0032).
+
+<!-- TODO: add docs/langfuse-post-optimization.png screenshot here -->
+
+<p align="center"><sub>Langfuse screenshot: <code>docs/langfuse-post-optimization.png</code> (capture from project traces view)</sub></p>
 
 ### Key files
 
@@ -271,7 +279,8 @@ Baseline pre-optimization ~$0.045/case (Sonnet on citations + reasoning). Round 
 | `lib/graph/nodes.ts` | Extract, RAG, decide, appeal nodes |
 | `lib/rulesEngine.ts` | Deterministic rules |
 | `lib/cache/presetDemo.ts` | Preset + live-only manifest |
-| `data/presetDemoResults.json` | Verified CASE-001 snapshot |
+| `data/presetDemoResults.json` | Verified cached results for all 5 demo scenarios |
+| `data/liveOnlyPresets.json` | Empty when all presets have stored snapshots |
 | `evals/runEvals.ts` | Eval runner + regression gate |
 | `.github/workflows/ci.yml` | Quality + dispatch eval |
 

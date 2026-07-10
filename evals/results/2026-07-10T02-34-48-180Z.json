@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-07-10T02:34:48.180Z",
+  "mode": "default",
+  "caseFilter": "CASE-004",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 100,
+    "extractionFieldAccuracy": 100,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 11555,
+    "mismatchedCaseIds": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 1,
+    "extractionFieldsCorrect": 10,
+    "extractionFieldsTotal": 10,
+    "validCitations": 3,
+    "totalCitations": 3,
+    "falseApproves": 0,
+    "expectedDenies": 1,
+    "totalLatencyMs": 11555
+  },
+  "perCase": [
+    {
+      "id": "CASE-004",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 4,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Pediatric Crohn patient meets therapy history but is younger than six.",
+        "requestedUnits": 5
+      },
+      "actualExtraction": {
+        "patientAge": 4,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Pediatric Crohn patient meets therapy history but is younger than six.",
+        "requestedUnits": 5
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 4,
+          "actual": 4,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K50.90"
+          ],
+          "actual": [
+            "K50.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "actual": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Pediatric Crohn patient meets therapy history but is younger than six.",
+          "actual": "Pediatric Crohn patient meets therapy history but is younger than six.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 5,
+          "actual": 5,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1"
+      ],
+      "latencyMs": 11555,
+      "decisionReasoning": "Outcome likely_deny was determined by deterministic guardrails (At least one failed rule is based on present data, so likely_deny is permitted.).\n\nClinical context: patient age 4; diagnosis K50.90; requested procedure J1745.\n\nRules applied (4): STEP_THERAPY_001, AGE_MINIMUM_001, DIAGNOSIS_MATCH_001, QUANTITY_LIMIT_001.\n\nFailed criteria:\n- AGE_MINIMUM_001: Patient must be 6 or older per Crohn's disease initial therapy criteria\n\nValidated policy citations:\n- Blue Shield of California: Step therapy requirement mandates trial of preferred infliximab biosimilars (Avsola and Inflectra) prior to coverage of Remicade, Renflexis, or other infliximab formulations.\n- CareSource: Prior biologic therapy trials are credited toward coverage requirements, but biosimilars of the same biologic do not count as separate medication trials.\n- Blue Shield of California: Infliximab coverage is limited to 5 mg/kg IV dosing at weeks 0, 2, and 6, with maximum of 3 doses covered.",
+      "overrideLog": []
+    }
+  ]
+}

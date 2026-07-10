@@ -1,7 +1,7 @@
 [
   {
     "presetCaseId": "CASE-001",
-    "sourceCaseId": "480a7b03-a1db-4b60-835d-672b58270567",
+    "sourceCaseId": "c4bb25e5-4ed9-446b-a12e-4b2a76e3b480",
     "decision": {
       "outcome": "likely_approve",
       "confidence": "medium",
@@ -62,5 +62,261 @@
         "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
       }
     ]
+  },
+  {
+    "presetCaseId": "CASE-004",
+    "sourceCaseId": "c0511fd1-fcdb-4be1-9066-6345d2c12092",
+    "decision": {
+      "outcome": "likely_deny",
+      "confidence": "high",
+      "rulesResult": {
+        "failedCriteria": [
+          "AGE_MINIMUM_001: Patient must be 6 or older per Crohn's disease initial therapy criteria"
+        ],
+        "ruleIdsApplied": [
+          "STEP_THERAPY_001",
+          "AGE_MINIMUM_001",
+          "DIAGNOSIS_MATCH_001",
+          "QUANTITY_LIMIT_001"
+        ],
+        "eligibleByRules": false
+      },
+      "reasoningSummary": "Outcome likely_deny was determined by deterministic guardrails (At least one failed rule is based on present data, so likely_deny is permitted.).\n\nClinical context: patient age 4; diagnosis K50.90; requested procedure J1745.\n\nRules applied (4): STEP_THERAPY_001, AGE_MINIMUM_001, DIAGNOSIS_MATCH_001, QUANTITY_LIMIT_001.\n\nFailed criteria:\n- AGE_MINIMUM_001: Patient must be 6 or older per Crohn's disease initial therapy criteria\n\nValidated policy citations:\n- Blue Shield of California: Step therapy requirement mandates prior trial of Avsola and Inflectra before coverage of requested infliximab product; patient has documented prior treatment trials with mesalamine and azathioprine but not the required preferred infliximab biosimilars.\n- CareSource: Policy requires documentation of prior biologic trial; however, biosimilars do not count separately, which may impact coverage determination for this pediatric Crohn's patient with prior conventional therapy but no documented biologic trials.\n- Blue Shield of California: Requested 5 units aligns with dosing guidelines of up to 5 mg/kg; however, coverage is limited to 3 doses during the initial coverage period, which may restrict the requested treatment duration.",
+      "supportingCitations": [
+        {
+          "payerName": "Blue Shield of California",
+          "documentTitle": "Infliximab Medicare Part B Step Therapy Policy",
+          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+          "requirementSummary": "Step therapy requirement mandates prior trial of Avsola and Inflectra before coverage of requested infliximab product; patient has documented prior treatment trials with mesalamine and azathioprine but not the required preferred infliximab biosimilars.",
+          "clauseTextParaphrased": "For PPO members newly initiating Renflexis, Remicade, or infliximab therapy, step therapy requires trial of preferred drugs Avsola and Inflectra first before coverage of other infliximab products."
+        },
+        {
+          "payerName": "CareSource",
+          "documentTitle": "Infliximab Intravenous Products UM Medical Policy",
+          "sourceChunkId": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+          "requirementSummary": "Policy requires documentation of prior biologic trial; however, biosimilars do not count separately, which may impact coverage determination for this pediatric Crohn's patient with prior conventional therapy but no documented biologic trials.",
+          "clauseTextParaphrased": "For initial therapy approval, patient must have a previous trial of one biologic other than the requested medication, and a biosimilar of the requested biologic does not count as a separate trial."
+        },
+        {
+          "payerName": "Blue Shield of California",
+          "documentTitle": "Infliximab Medicare Part B Step Therapy Policy",
+          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+          "requirementSummary": "Requested 5 units aligns with dosing guidelines of up to 5 mg/kg; however, coverage is limited to 3 doses during the initial coverage period, which may restrict the requested treatment duration.",
+          "clauseTextParaphrased": "Covered doses for infliximab are up to 5 mg/kg IV at weeks 0, 2, and 6, with coverage period limited to up to 3 doses."
+        }
+      ]
+    },
+    "retrievedChunks": [
+      {
+        "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "source_url": "https://www.blueshieldca.com/content/dam/bsca/en/medicare/docs/infliximab-MCARE-PartB-provider.pdf"
+      },
+      {
+        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
+      },
+      {
+        "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "source_url": "https://www.blueshieldca.com/content/dam/bsca/en/medicare/docs/infliximab-MCARE-PartB-provider.pdf"
+      },
+      {
+        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
+      },
+      {
+        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1",
+        "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
+      }
+    ],
+    "appealDraft": {
+      "draftText": "This appeal addresses the denial of infliximab (J1745) for a 4-year-old patient with Crohn's disease (K50.90). While the patient does not meet the age minimum requirement of 6 years per the applied criteria, we respectfully request reconsideration based on clinical necessity and the patient's documented treatment history.\n\nThe patient has already undergone appropriate conventional therapy trials with mesalamine and azathioprine, demonstrating treatment failure and clinical progression warranting biologic intervention. The requested dose of 5 units aligns with established pediatric dosing guidelines of up to 5 mg/kg for Crohn's disease management.\n\nWe acknowledge the step therapy requirement for preferred infliximab biosimilars (Avsola and Inflectra); however, given the patient's young age and documented conventional therapy failure, we request an exception to the age minimum criterion or expedited review of whether alternative biologic pathways may be appropriate for this pediatric patient with active disease.\n\nWe welcome the opportunity to provide additional clinical documentation supporting the medical necessity of treatment at this time.",
+      "citedClause": {
+        "payerName": "Blue Shield of California",
+        "documentTitle": "Infliximab Medicare Part B Step Therapy Policy",
+        "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "requirementSummary": "Step therapy requirement mandates prior trial of Avsola and Inflectra before coverage of requested infliximab product; patient has documented prior treatment trials with mesalamine and azathioprine but not the required preferred infliximab biosimilars.",
+        "clauseTextParaphrased": "For PPO members newly initiating Renflexis, Remicade, or infliximab therapy, step therapy requires trial of preferred drugs Avsola and Inflectra first before coverage of other infliximab products."
+      },
+      "requiresHumanReview": true
+    }
+  },
+  {
+    "presetCaseId": "CASE-008",
+    "sourceCaseId": "c53f42cf-4664-48cd-aabc-bd118119e382",
+    "decision": {
+      "outcome": "insufficient_info",
+      "confidence": "medium",
+      "rulesResult": {
+        "failedCriteria": [
+          "QUANTITY_LIMIT_001: Requested units may not exceed 8 per authorization period"
+        ],
+        "ruleIdsApplied": [
+          "STEP_THERAPY_001",
+          "AGE_MINIMUM_001",
+          "DIAGNOSIS_MATCH_001",
+          "QUANTITY_LIMIT_001"
+        ],
+        "eligibleByRules": false
+      },
+      "reasoningSummary": "Outcome insufficient_info was determined by deterministic guardrails (All failed rules depend on optional fields that are absent in extraction.).\n\nClinical context: patient age 48; diagnosis K50.90; requested procedure J1745.\n\nRules applied (4): STEP_THERAPY_001, AGE_MINIMUM_001, DIAGNOSIS_MATCH_001, QUANTITY_LIMIT_001.\n\nFailed criteria:\n- QUANTITY_LIMIT_001: Requested units may not exceed 8 per authorization period\n\nValidated policy citations:\n- Blue Shield of California: Step therapy requirement: Both Avsola and Inflectra must be tried before coverage of Renflexis, Remicade, or infliximab for new therapy initiation\n- CareSource: Prior biologic trials must be documented; biosimilars do not count toward trial requirements for initial therapy approval\n- Blue Shield of California: Dosing requirement: Up to 5 mg/kg IV at weeks 0, 2, and 6 (maximum 3 doses) for covered treatment",
+      "supportingCitations": [
+        {
+          "payerName": "Blue Shield of California",
+          "documentTitle": "Infliximab Medicare Part B Step Therapy Policy",
+          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+          "requirementSummary": "Step therapy requirement: Both Avsola and Inflectra must be tried before coverage of Renflexis, Remicade, or infliximab for new therapy initiation",
+          "clauseTextParaphrased": "For PPO members newly initiating Renflexis, Remicade, or infliximab therapy, step therapy requires that both preferred step drugs Avsola and Inflectra must be tried first before coverage of the requested medication."
+        },
+        {
+          "payerName": "CareSource",
+          "documentTitle": "Infliximab Intravenous Products UM Medical Policy",
+          "sourceChunkId": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+          "requirementSummary": "Prior biologic trials must be documented; biosimilars do not count toward trial requirements for initial therapy approval",
+          "clauseTextParaphrased": "A previous trial of one biologic other than the requested medication counts as a trial of one medication, and a biosimilar of the requested biologic does not count toward trial requirements."
+        },
+        {
+          "payerName": "Blue Shield of California",
+          "documentTitle": "Infliximab Medicare Part B Step Therapy Policy",
+          "sourceChunkId": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+          "requirementSummary": "Dosing requirement: Up to 5 mg/kg IV at weeks 0, 2, and 6 (maximum 3 doses) for covered treatment",
+          "clauseTextParaphrased": "Covered doses for infliximab are up to 5 mg/kg IV at weeks 0, 2, and 6, with a coverage period of up to 3 doses."
+        }
+      ]
+    },
+    "retrievedChunks": [
+      {
+        "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "source_url": "https://www.blueshieldca.com/content/dam/bsca/en/medicare/docs/infliximab-MCARE-PartB-provider.pdf"
+      },
+      {
+        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
+      },
+      {
+        "chunk_id": "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "source_url": "https://www.blueshieldca.com/content/dam/bsca/en/medicare/docs/infliximab-MCARE-PartB-provider.pdf"
+      },
+      {
+        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
+      },
+      {
+        "chunk_id": "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p12-1",
+        "source_url": "https://www.caresource.com/documents/medicare-multi-policy-pharmacy-infliximab-20250326.pdf"
+      }
+    ]
+  },
+  {
+    "presetCaseId": "CASE-017",
+    "sourceCaseId": "d239bd8d-c2f6-4133-b8da-c09151073b68",
+    "decision": {
+      "outcome": "likely_approve",
+      "confidence": "high",
+      "rulesResult": {
+        "failedCriteria": [],
+        "ruleIdsApplied": [
+          "RED_FLAG_001",
+          "PRIOR_IMAGING_001"
+        ],
+        "eligibleByRules": true
+      },
+      "reasoningSummary": "Outcome likely_approve was determined by deterministic guardrails (All deterministic rules passed.).\n\nClinical context: patient age 25; diagnosis G40.909; requested procedure 70553.\n\nRules applied (2): RED_FLAG_001, PRIOR_IMAGING_001.\n\nAll applied deterministic rules passed.\n\nValidated policy citations:\n- CMS (via RadMD): MRI is covered for evaluation of soft tissue lesions and abnormalities when clinically indicated, supporting use in seizure disorder evaluation with documented imaging findings.\n- CMS (via RadMD): MRI coverage is available for Medicare beneficiaries when medically necessary conditions are met, applicable to this patient's seizure disorder evaluation.",
+      "supportingCitations": [
+        {
+          "payerName": "CMS (via RadMD)",
+          "documentTitle": "NCD 220.2 Magnetic Resonance Imaging",
+          "sourceChunkId": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+          "requirementSummary": "MRI is covered for evaluation of soft tissue lesions and abnormalities when clinically indicated, supporting use in seizure disorder evaluation with documented imaging findings.",
+          "clauseTextParaphrased": "MRI has become established in medical practice for detecting disruptive, neoplastic, degenerative, or inflammatory lesions in soft tissue structures, with advantages over other modalities in visualizing certain lesions and body regions with greater certainty than CT."
+        },
+        {
+          "payerName": "CMS (via RadMD)",
+          "documentTitle": "NCD 220.2 Magnetic Resonance Imaging",
+          "sourceChunkId": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+          "requirementSummary": "MRI coverage is available for Medicare beneficiaries when medically necessary conditions are met, applicable to this patient's seizure disorder evaluation.",
+          "clauseTextParaphrased": "Effective April 10, 2018, Medicare allows coverage of MRI for beneficiaries under certain conditions, with implementation date of December 10, 2018."
+        }
+      ]
+    },
+    "retrievedChunks": [
+      {
+        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "source_url": "https://www1.radmd.com/sites/default/files/2023-09/NCD%20220.2%20for%20Magnetic%20Resonance%20Imaging.pdf"
+      },
+      {
+        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "source_url": "https://www1.radmd.com/sites/default/files/2023-09/NCD%20220.2%20for%20Magnetic%20Resonance%20Imaging.pdf"
+      },
+      {
+        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+        "source_url": "https://www1.radmd.com/sites/default/files/2023-09/NCD%20220.2%20for%20Magnetic%20Resonance%20Imaging.pdf"
+      },
+      {
+        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
+        "source_url": "https://www1.radmd.com/sites/default/files/2023-09/NCD%20220.2%20for%20Magnetic%20Resonance%20Imaging.pdf"
+      },
+      {
+        "chunk_id": "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1",
+        "source_url": "https://www1.radmd.com/sites/default/files/2023-09/NCD%20220.2%20for%20Magnetic%20Resonance%20Imaging.pdf"
+      }
+    ]
+  },
+  {
+    "presetCaseId": "CASE-025",
+    "sourceCaseId": "ac060ecb-4b20-474d-a380-9005b58aa5c2",
+    "decision": {
+      "outcome": "likely_deny",
+      "confidence": "high",
+      "rulesResult": {
+        "failedCriteria": [
+          "NO_APPLICABLE_RULES"
+        ],
+        "ruleIdsApplied": [],
+        "eligibleByRules": false
+      },
+      "reasoningSummary": "Outcome likely_deny was determined by deterministic guardrails (At least one failed rule is based on present data, so likely_deny is permitted.).\n\nClinical context: patient age 25; diagnosis Z99.89; requested procedure J9999.\n\nRules applied (0): none.\n\nFailed criteria:\n- NO_APPLICABLE_RULES\n\nValidated policy citations:\n- Meridian Health Plan (SYNTHETIC CANARY): Patient meets the synthetic canary criteria: documented failure of exactly three prior therapies (therapy alpha, therapy beta, therapy gamma) and patient age of 25 years satisfies the minimum age requirement of 21 years or older.",
+      "supportingCitations": [
+        {
+          "payerName": "Meridian Health Plan (SYNTHETIC CANARY)",
+          "documentTitle": "Meridian J9999 Prior Authorization Policy (SYNTHETIC)",
+          "sourceChunkId": "meridian-health-plan-j9999-synthetic-canary-p1-1",
+          "requirementSummary": "Patient meets the synthetic canary criteria: documented failure of exactly three prior therapies (therapy alpha, therapy beta, therapy gamma) and patient age of 25 years satisfies the minimum age requirement of 21 years or older.",
+          "clauseTextParaphrased": "Coverage for J9999 requires documented failure of exactly 3 prior therapies before initiation. The patient must be age 21 years or older at the time of request."
+        }
+      ]
+    },
+    "retrievedChunks": [
+      {
+        "chunk_id": "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1",
+        "source_url": "https://www.providencehealthplan.com/-/media/providence/website/pdfs/providers/medical-policy-and-provider-information/medical-policies/mp419.pdf?rev=79a4b369734642d1bb4cf27a009af23d&hash=A241DB405B839A99F354B7866B5A3571"
+      },
+      {
+        "chunk_id": "meridian-health-plan-j9999-synthetic-canary-p1-1",
+        "source_url": "local://data/canary/meridian-policy.md"
+      },
+      {
+        "chunk_id": "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p3-1",
+        "source_url": "https://www.providencehealthplan.com/-/media/providence/website/pdfs/providers/medical-policy-and-provider-information/medical-policies/mp419.pdf?rev=79a4b369734642d1bb4cf27a009af23d&hash=A241DB405B839A99F354B7866B5A3571"
+      },
+      {
+        "chunk_id": "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p1-1",
+        "source_url": "https://wa-provider.kaiserpermanente.org/static/pdf/hosting/clinical/criteria/pdf/tka.pdf"
+      },
+      {
+        "chunk_id": "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p4-1",
+        "source_url": "https://wa-provider.kaiserpermanente.org/static/pdf/hosting/clinical/criteria/pdf/tka.pdf"
+      }
+    ],
+    "appealDraft": {
+      "draftText": "We respectfully appeal the denial of prior authorization for procedure J9999 for our 25-year-old patient with diagnosis Z99.89. \n\nThe patient meets all documented clinical criteria for coverage under Meridian Health Plan's policy. Specifically, the patient has demonstrated documented failure of exactly three prior therapies (therapy alpha, therapy beta, and therapy gamma) and is 25 years of age, which satisfies the minimum age requirement of 21 years or older as outlined in the policy.\n\nThe clinical evidence supports that the patient has exhausted the required prior treatment attempts and meets the age-related eligibility criteria. We request reconsideration of this denial and approval of the requested procedure J9999.\n\nWe appreciate your prompt review of this appeal.",
+      "citedClause": {
+        "payerName": "Meridian Health Plan (SYNTHETIC CANARY)",
+        "documentTitle": "Meridian J9999 Prior Authorization Policy (SYNTHETIC)",
+        "sourceChunkId": "meridian-health-plan-j9999-synthetic-canary-p1-1",
+        "requirementSummary": "Patient meets the synthetic canary criteria: documented failure of exactly three prior therapies (therapy alpha, therapy beta, therapy gamma) and patient age of 25 years satisfies the minimum age requirement of 21 years or older.",
+        "clauseTextParaphrased": "Coverage for J9999 requires documented failure of exactly 3 prior therapies before initiation. The patient must be age 21 years or older at the time of request."
+      },
+      "requiresHumanReview": true
+    }
   }
 ]
