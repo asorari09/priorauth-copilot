@@ -2,6 +2,12 @@ import { START } from "@langchain/langgraph";
 import { NextRequest } from "next/server";
 import { z } from "zod";
 
+import {
+  classifyGraphExecutionError,
+  sanitizeClientError,
+  sanitizePriorAuthStateForClient,
+  type SanitizedClientError,
+} from "@/lib/clientErrors";
 import { buildPriorAuthGraph } from "@/lib/graph/buildGraph";
 import { type PriorAuthGraphState } from "@/lib/graph/nodes";
 import { safeFlushLangfuse, safeStartTrace, safeUpdateTrace } from "@/lib/langfuse";
@@ -40,6 +46,11 @@ function formatSseEvent(event: string, data: unknown): string {
 
 function summarizeNodeUpdate(node: string, update: unknown) {
   const payload = update as Record<string, unknown>;
+  let error: SanitizedClientError | undefined;
+  if (typeof payload.error === "string" && payload.error.length > 0) {
+    error = sanitizeClientError(payload.error);
+  }
+
   return {
     node,
     keys: Object.keys(payload),
@@ -50,10 +61,7 @@ function summarizeNodeUpdate(node: string, update: unknown) {
     citationsCount:
       Array.isArray(payload.citations) ? payload.citations.length : undefined,
     hasAppealDraft: Boolean(payload.appealDraft),
-    error:
-      typeof payload.error === "string" && payload.error.length > 0
-        ? payload.error
-        : undefined,
+    error,
   };
 }
 
@@ -144,17 +152,18 @@ export async function POST(request: NextRequest) {
         }
 
         finalState = state;
+        const clientState = sanitizePriorAuthStateForClient(finalState);
 
         await supabaseAdmin
           .from("cases")
           .update({
             status: "done",
-            extraction: finalState.extraction ?? null,
-            rules_result: finalState.rulesResult ?? null,
-            citations: finalState.citations ?? null,
-            decision: finalState.decision ?? null,
-            appeal_draft: finalState.appealDraft ?? null,
-            error: finalState.error ?? null,
+            extraction: clientState.extraction ?? null,
+            rules_result: clientState.rulesResult ?? null,
+            citations: clientState.citations ?? null,
+            decision: clientState.decision ?? null,
+            appeal_draft: clientState.appealDraft ?? null,
+            error: clientState.error ?? null,
           })
           .eq("id", caseId);
 
@@ -170,33 +179,49 @@ export async function POST(request: NextRequest) {
           },
         });
 
-        send("done", { caseId, ...finalState });
+        send("done", { caseId, ...clientState });
       } catch (error) {
-        const message =
-          error instanceof Error
-            ? error.message
-            : "Unknown processing error during graph execution";
+        const { rawMessage, client } = classifyGraphExecutionError(error);
+        console.error("[case-processing] graph execution failed", {
+          caseId,
+          error: rawMessage,
+          errorCode: client.code,
+        });
+
+        const persistedState = sanitizePriorAuthStateForClient(finalState ?? {
+          rawNote: note,
+          caseId,
+          overrideLog: [],
+        });
 
         await supabaseAdmin
           .from("cases")
           .update({
             status: "error",
-            error: message,
-            extraction: finalState?.extraction ?? null,
-            rules_result: finalState?.rulesResult ?? null,
-            citations: finalState?.citations ?? null,
-            decision: finalState?.decision ?? null,
-            appeal_draft: finalState?.appealDraft ?? null,
+            error: client.message,
+            extraction: persistedState.extraction ?? null,
+            rules_result: persistedState.rulesResult ?? null,
+            citations: persistedState.citations ?? null,
+            decision: persistedState.decision ?? null,
+            appeal_draft: persistedState.appealDraft ?? null,
           })
           .eq("id", caseId);
 
         safeUpdateTrace(trace.traceId, {
           level: "ERROR",
-          statusMessage: message,
-          metadata: { caseId, overrideLog: finalState?.overrideLog ?? [] },
+          statusMessage: rawMessage,
+          metadata: {
+            caseId,
+            errorCode: client.code,
+            overrideLog: finalState?.overrideLog ?? [],
+          },
         });
 
-        send("error", { caseId, message: "Case processing failed" });
+        send("error", {
+          caseId,
+          message: client.message,
+          code: client.code,
+        });
       } finally {
         await safeFlushLangfuse();
         controller.close();
