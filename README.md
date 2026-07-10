@@ -26,6 +26,12 @@
 
 ## System design
 
+<p align="center">
+  <img src="docs/architecture-diagram.png" alt="PriorAuth Copilot system architecture — actual demo UI, LangGraph pipeline, Supabase, and Langfuse" width="960"/>
+</p>
+
+<p align="center"><sub>Diagram reflects the shipped system only — single-page demo, code-forced outcomes, honest preset replay path.</sub></p>
+
 ### Live pipeline (LangGraph)
 
 ```mermaid
