@@ -4,14 +4,12 @@ import { z } from "zod";
 import {
   safeCaptureLangfuseErrorContext,
   safeStartSpan,
-  safeUpdateTrace,
 } from "../langfuse";
-import { callClaudeStructured } from "../llm/claude";
+import { callClaudeStructured, resolveClaudeModel } from "../llm/claude";
 import { extractClinicalExtractionFromNote } from "../llm/openai";
 import { runRulesEngine } from "../rulesEngine";
 import {
   AppealDraftSchema,
-  DecisionCoreSchema,
   PolicyCitationSchema,
   type AppealDraft,
   type ClinicalExtraction,
@@ -46,6 +44,44 @@ export type PriorAuthGraphState = {
 };
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
+const RETRIEVAL_MATCH_COUNT = 5;
+const CITATION_SYNTHESIS_CHUNK_COUNT = 3;
+const CHUNK_CONTENT_MAX_TOKENS = 300;
+const APPROX_CHARS_PER_TOKEN = 4;
+
+const CITATION_SYNTHESIS_SYSTEM_PROMPT =
+  "You produce policy citations strictly from supplied retrieval chunks. Never cite outside chunks.";
+
+const DECISION_REASONING_SYSTEM_PROMPT =
+  "Provide concise clinical coverage reasoning based only on provided rules and citations. Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from the extraction (e.g., prescriber specialty), list them explicitly as unverified items requiring confirmation — do not assume compliance.";
+
+const APPEAL_DRAFT_SYSTEM_PROMPT =
+  "Draft concise prior-authorization appeals grounded only in provided citations.";
+
+export function truncateApproxTokens(text: string, maxTokens: number): string {
+  const maxChars = maxTokens * APPROX_CHARS_PER_TOKEN;
+  if (text.length <= maxChars) {
+    return text;
+  }
+  return `${text.slice(0, maxChars).trimEnd()}…`;
+}
+
+export function selectTopRetrievedChunks(
+  chunks: RetrievedChunk[],
+  maxChunks = CITATION_SYNTHESIS_CHUNK_COUNT,
+): RetrievedChunk[] {
+  return [...chunks].sort((a, b) => b.similarity - a.similarity).slice(0, maxChunks);
+}
+
+function toCitationSummaries(citations: PolicyCitation[]): Array<{
+  payerName: string;
+  requirementSummary: string;
+}> {
+  return citations.map((citation) => ({
+    payerName: citation.payerName,
+    requirementSummary: citation.requirementSummary,
+  }));
+}
 
 const OPTIONAL_RULE_DEPENDENCIES: Record<string, Array<keyof ClinicalExtraction>> = {
   QUANTITY_LIMIT_001: ["requestedUnits"],
@@ -242,7 +278,7 @@ async function retrievePolicyChunks(
 
   const { data, error } = await supabaseAdmin.rpc("match_policy_chunks", {
     query_embedding: queryVector,
-    match_count: 5,
+    match_count: RETRIEVAL_MATCH_COUNT,
   });
   if (error) {
     throw new Error(`match_policy_chunks failed: ${error.message}`);
@@ -259,13 +295,14 @@ async function synthesizeCitationsWithValidation(
   const CitationToolSchema = z.object({
     citations: z.array(PolicyCitationSchema),
   });
-  const allowedIds = new Set(retrievedChunks.map((chunk) => chunk.chunk_id));
-  const retrievedPayload = retrievedChunks.map((chunk) => ({
+  const synthesisChunks = selectTopRetrievedChunks(retrievedChunks);
+  const allowedIds = new Set(synthesisChunks.map((chunk) => chunk.chunk_id));
+  const retrievedPayload = synthesisChunks.map((chunk) => ({
     chunk_id: chunk.chunk_id,
     payer_name: chunk.payer_name,
     document_title: chunk.document_title,
     source_url: chunk.source_url,
-    content: chunk.content,
+    content: truncateApproxTokens(chunk.content, CHUNK_CONTENT_MAX_TOKENS),
     similarity: chunk.similarity,
   }));
 
@@ -275,8 +312,8 @@ async function synthesizeCitationsWithValidation(
       toolName: "emit_policy_citations",
       toolDescription: "Emit policy citation objects from provided chunk text only.",
       schema: CitationToolSchema,
-      systemPrompt:
-        "You produce policy citations strictly from supplied retrieval chunks. Never cite outside chunks.",
+      systemPrompt: CITATION_SYNTHESIS_SYSTEM_PROMPT,
+      model: resolveClaudeModel("fast"),
       userPrompt: [
         "Clinical extraction JSON:",
         JSON.stringify(extraction),
@@ -362,14 +399,14 @@ async function generateReasoningForForcedOutcome(
     toolDescription:
       "Emit decision confidence and reasoning summary while outcome is fixed by deterministic guardrails.",
     schema: DecisionReasoningOnlySchema,
-    systemPrompt:
-      "Provide concise clinical coverage reasoning based only on provided rules and citations. Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from the extraction (e.g., prescriber specialty), list them explicitly as unverified items requiring confirmation — do not assume compliance.",
+    systemPrompt: DECISION_REASONING_SYSTEM_PROMPT,
+    model: resolveClaudeModel("reasoning"),
     userPrompt: [
       `Outcome is fixed by code as: ${forcedOutcome}`,
       `Constraint reason: ${reason}`,
       `Extraction: ${JSON.stringify(extraction)}`,
       `Rules result: ${JSON.stringify(rulesResult)}`,
-      `Validated citations: ${JSON.stringify(citations)}`,
+      `Validated citation summaries: ${JSON.stringify(toCitationSummaries(citations))}`,
       "Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from extraction, list them as unverified items requiring confirmation.",
       "Generate confidence and reasoningSummary aligned with the forced outcome.",
     ].join("\n"),
@@ -421,69 +458,22 @@ export async function decisionNode(
       const constraint = determineOutcomeConstraint(extraction, rulesResult, citations);
 
       try {
-        if (citations.length === 0) {
-          const reasoning = await generateReasoningForForcedOutcome(
-            extraction,
-            rulesResult,
-            citations,
-            "insufficient_info",
-            constraint.reason,
-            { traceId: state.traceId ?? null, parentObservationId: spanId },
-          );
-          const decision: Decision = {
-            outcome: "insufficient_info",
-            confidence: reasoning.confidence,
-            reasoningSummary: reasoning.reasoningSummary,
-            supportingCitations: [],
-            rulesResult,
-          };
-          return { decision, overrideLog };
-        }
-
-        const claudeDecision = await callClaudeStructured({
-          toolName: "emit_decision",
-          toolDescription:
-            "Emit prior-auth decision core fields given deterministic rules and validated policy citations.",
-          schema: DecisionCoreSchema,
-          systemPrompt:
-            "You are a decision-support assistant. Use only supplied evidence. Never invent citations. Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from the extraction (e.g., prescriber specialty), list them explicitly as unverified items requiring confirmation — do not assume compliance.",
-          userPrompt: [
-            `Code-determined required outcome: ${constraint.forcedOutcome}`,
-            `Constraint reason: ${constraint.reason}`,
-            `Extraction: ${JSON.stringify(extraction)}`,
-            `Rules result: ${JSON.stringify(rulesResult)}`,
-            `Validated citations: ${JSON.stringify(citations)}`,
-            "Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from extraction, list them as unverified items requiring confirmation.",
-            "Return only outcome, confidence, and reasoningSummary.",
-          ].join("\n"),
-          maxTokens: 1200,
-          telemetry: {
-            traceId: state.traceId ?? null,
-            parentObservationId: spanId,
-            generationName: "claude.decision",
-          },
-        });
+        const reasoning = await generateReasoningForForcedOutcome(
+          extraction,
+          rulesResult,
+          citations,
+          constraint.forcedOutcome,
+          constraint.reason,
+          { traceId: state.traceId ?? null, parentObservationId: spanId },
+        );
 
         const decision: Decision = {
-          ...claudeDecision,
+          outcome: constraint.forcedOutcome,
+          confidence: reasoning.confidence,
+          reasoningSummary: reasoning.reasoningSummary,
           supportingCitations: citations,
           rulesResult,
         };
-
-        if (decision.outcome !== constraint.forcedOutcome) {
-          overrideLog.push(
-            `Overrode Claude outcome ${decision.outcome} -> ${constraint.forcedOutcome} (${constraint.reason})`,
-          );
-          decision.outcome = constraint.forcedOutcome;
-        }
-
-        if (state.traceId) {
-          safeUpdateTrace(state.traceId, {
-            metadata: {
-              overrideLog,
-            },
-          });
-        }
 
         return { decision, overrideLog };
       } catch (error) {
@@ -533,8 +523,8 @@ export async function appealDraftNode(
           toolDescription:
             "Emit an appeal draft object using the provided decision context and citations.",
           schema: AppealDraftSchema,
-          systemPrompt:
-            "Draft concise prior-authorization appeals grounded only in provided citations.",
+          systemPrompt: APPEAL_DRAFT_SYSTEM_PROMPT,
+          model: resolveClaudeModel("appeal"),
           userPrompt: [
             `Decision: ${JSON.stringify(state.decision)}`,
             `Extraction: ${JSON.stringify(state.extraction ?? {})}`,

@@ -3,7 +3,27 @@ import { z, type ZodTypeAny } from "zod";
 
 import { safeStartGeneration } from "../langfuse";
 
-const DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-6";
+export const DEFAULT_CLAUDE_MODEL = "claude-sonnet-4-6";
+export const DEFAULT_CLAUDE_FAST_MODEL = "claude-haiku-4-5-20251001";
+
+export type ClaudeModelRole = "default" | "fast" | "reasoning" | "appeal";
+
+export function resolveClaudeModel(role: ClaudeModelRole = "default"): string {
+  switch (role) {
+    case "fast":
+      return process.env.ANTHROPIC_MODEL_FAST ?? DEFAULT_CLAUDE_FAST_MODEL;
+    case "reasoning":
+      return (
+        process.env.ANTHROPIC_MODEL_REASONING ??
+        process.env.ANTHROPIC_MODEL_FAST ??
+        DEFAULT_CLAUDE_FAST_MODEL
+      );
+    case "appeal":
+      return process.env.ANTHROPIC_MODEL ?? DEFAULT_CLAUDE_MODEL;
+    default:
+      return process.env.ANTHROPIC_MODEL ?? DEFAULT_CLAUDE_MODEL;
+  }
+}
 
 export class ClaudeStructuredOutputError extends Error {
   public readonly cause?: unknown;
@@ -23,6 +43,7 @@ type ClaudeStructuredCallArgs<TSchema extends ZodTypeAny> = {
   toolDescription: string;
   maxTokens?: number;
   model?: string;
+  cacheSystemPrompt?: boolean;
   telemetry?: {
     traceId?: string | null;
     parentObservationId?: string | null;
@@ -42,7 +63,7 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function isRetryable(error: unknown): boolean {
+export function isRetryableClaudeApiError(error: unknown): boolean {
   if (!error || typeof error !== "object") {
     return false;
   }
@@ -57,6 +78,24 @@ function isRetryable(error: unknown): boolean {
 
   const message = String((error as { message?: unknown }).message ?? "").toLowerCase();
   return message.includes("timeout") || message.includes("temporar");
+}
+
+export function isSuccessfulResponseParseFailure(error: unknown): boolean {
+  if (error instanceof z.ZodError) {
+    return true;
+  }
+
+  return (
+    error instanceof Error &&
+    error.message.includes("did not return the required tool_use block")
+  );
+}
+
+export function shouldRetryClaudeStructuredCall(error: unknown, attempt: number): boolean {
+  if (attempt >= 2) {
+    return false;
+  }
+  return isRetryableClaudeApiError(error) || isSuccessfulResponseParseFailure(error);
 }
 
 function formatError(error: unknown): string {
@@ -77,12 +116,32 @@ function formatError(error: unknown): string {
   return String(error);
 }
 
+function buildCachedSystemPrompt(
+  systemPrompt: string,
+  cacheSystemPrompt: boolean,
+): string | Anthropic.Messages.TextBlockParam[] {
+  if (!cacheSystemPrompt) {
+    return systemPrompt;
+  }
+
+  // Below Anthropic's minimum cacheable prefix at current one-line system prompts;
+  // kept as a pattern for when prompts grow large enough to benefit.
+  return [
+    {
+      type: "text",
+      text: systemPrompt,
+      cache_control: { type: "ephemeral" },
+    },
+  ];
+}
+
 export async function callClaudeStructured<TSchema extends ZodTypeAny>(
   args: ClaudeStructuredCallArgs<TSchema>,
 ): Promise<z.infer<TSchema>> {
   const client = getClient();
-  const model = args.model ?? process.env.ANTHROPIC_MODEL ?? DEFAULT_CLAUDE_MODEL;
+  const model = args.model ?? resolveClaudeModel("default");
   const schemaJson = z.toJSONSchema(args.schema);
+  const cacheSystemPrompt = args.cacheSystemPrompt ?? true;
 
   let lastError: unknown;
   for (let attempt = 1; attempt <= 2; attempt += 1) {
@@ -97,6 +156,7 @@ export async function callClaudeStructured<TSchema extends ZodTypeAny>(
         userPrompt: args.userPrompt,
         toolName: args.toolName,
         toolDescription: args.toolDescription,
+        cacheSystemPrompt,
       },
       metadata: {
         provider: "anthropic",
@@ -109,7 +169,7 @@ export async function callClaudeStructured<TSchema extends ZodTypeAny>(
         model,
         max_tokens: args.maxTokens ?? 1200,
         temperature: 0,
-        system: args.systemPrompt,
+        system: buildCachedSystemPrompt(args.systemPrompt, cacheSystemPrompt),
         messages: [{ role: "user", content: args.userPrompt }],
         tools: [
           {
@@ -141,29 +201,31 @@ export async function callClaudeStructured<TSchema extends ZodTypeAny>(
       });
       return parsed;
     } catch (error) {
-      const retryable = isRetryable(error);
+      const retryable = isRetryableClaudeApiError(error);
+      const parseFailure = isSuccessfulResponseParseFailure(error);
       generation.end({
         level: "ERROR",
         statusMessage: `claude structured attempt ${attempt} failed`,
         metadata: {
           error: formatError(error),
           retryable,
+          parseFailure,
         },
       });
       lastError = error;
-      if (attempt < 2 && retryable) {
-        await sleep(300 * attempt);
-        continue;
+
+      if (!shouldRetryClaudeStructuredCall(error, attempt)) {
+        break;
       }
 
-      if (attempt < 2 && !retryable) {
-        continue;
+      if (retryable) {
+        await sleep(300 * attempt);
       }
     }
   }
 
   throw new ClaudeStructuredOutputError(
-    `Claude structured output failed after 1 retry. Last error: ${formatError(lastError)}`,
+    `Claude structured output failed after 2 attempts. Last error: ${formatError(lastError)}`,
     lastError,
   );
 }
