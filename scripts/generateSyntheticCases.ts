@@ -337,7 +337,7 @@ const seeds: CaseSeed[] = [
     patientAge: 25,
     priorTreatmentsTried: ["therapy alpha", "therapy beta", "therapy gamma"],
     treatmentFailureDocumented: true,
-    expectedOutcome: "likely_deny",
+    expectedOutcome: "insufficient_info",
     clinicalNotesSummary:
       "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five.",
     specialContext:
@@ -351,11 +351,67 @@ const seeds: CaseSeed[] = [
     patientAge: 19,
     priorTreatmentsTried: ["therapy alpha", "therapy beta"],
     treatmentFailureDocumented: true,
-    expectedOutcome: "likely_deny",
+    expectedOutcome: "insufficient_info",
     clinicalNotesSummary:
       "Meridian synthetic canary request has only two prior therapies and patient age nineteen.",
     specialContext:
       "SYNTHETIC Meridian Health Plan context: fictional policy for J9999 appears in retrieval corpus only, but deterministic rules have no J9999 rule mapping.",
+  },
+];
+
+/** Messy-prose twins of clean seeds — same facts/outcomes, clinician-note style. */
+const messySeeds: Array<CaseSeed & { messyNote: string }> = [
+  {
+    id: "CASE-027",
+    patientLabel: "A",
+    requestedProcedureCode: "J1745",
+    diagnosisCodes: ["K50.90"],
+    patientAge: 29,
+    priorTreatmentsTried: ["mesalamine", "azathioprine"],
+    treatmentFailureDocumented: true,
+    requestedUnits: 6,
+    expectedOutcome: "likely_approve",
+    clinicalNotesSummary: "Adult Crohn disease with two failed therapies and dose within limit.",
+    messyNote:
+      "SYNTHETIC CASE CASE-027\n\n" +
+      "pt is a 29yo M w/ Crohn's (K50.90). here for PA on infliximab IV — J1745.\n\n" +
+      "Vitals today: BP 122/78, HR 72, afebrile. Weight not rechecked in clinic.\n\n" +
+      "Tried mesalamine x months — no help. Then AZA (azathioprine), also failed. Tx failure documented. Asking for 6 units this auth period. Adult Crohn, two failed therapies, dose looks in range.",
+  },
+  {
+    id: "CASE-028",
+    patientLabel: "M",
+    requestedProcedureCode: "27447",
+    diagnosisCodes: ["M17.12"],
+    patientAge: 63,
+    priorTreatmentsTried: ["acetaminophen", "home exercise"],
+    treatmentFailureDocumented: true,
+    symptomDurationWeeks: 30,
+    expectedOutcome: "likely_deny",
+    clinicalNotesSummary: "No PT and no NSAID despite prolonged knee symptoms.",
+    messyNote:
+      "SYNTHETIC CASE CASE-028\n\n" +
+      "63yo F, left knee OA (M17.12). Req for TKA 27447.\n\n" +
+      "Vitals: 136/84, BMI 31.2 — otherwise routine visit.\n\n" +
+      "Sx ~30 wks. Has done acetaminophen + home exercise. No PT. No NSAIDs (GI intolerance per pt). Still painful, failure of current regimen documented. No formal PT/NSAID trial on chart.",
+  },
+  {
+    id: "CASE-029",
+    patientLabel: "Q",
+    requestedProcedureCode: "70553",
+    diagnosisCodes: ["G40.909"],
+    patientAge: 25,
+    priorTreatmentsTried: ["levetiracetam"],
+    treatmentFailureDocumented: true,
+    imagingFindingsPresent: true,
+    neurologicDeficitsPresent: false,
+    expectedOutcome: "likely_approve",
+    clinicalNotesSummary: "Seizure disorder code present with prior imaging abnormalities documented.",
+    messyNote:
+      "SYNTHETIC CASE CASE-029\n\n" +
+      "25yo with epilepsy / seizure d/o G40.909. Requesting brain MRI w/ and w/o contrast 70553.\n\n" +
+      "Vitals unremarkable. On levetiracetam, still breakthrough events — failure documented.\n\n" +
+      "Neuro exam today: no focal deficit. Prior imaging / focal findings already on file per outside records.",
   },
 ];
 
@@ -431,8 +487,8 @@ function toExpectedExtraction(seed: CaseSeed): ClinicalExtraction {
 }
 
 function validate(cases: GoldenCase[]): void {
-  if (cases.length !== 26) {
-    throw new Error(`Expected 26 cases, found ${cases.length}`);
+  if (cases.length !== 29) {
+    throw new Error(`Expected 29 cases, found ${cases.length}`);
   }
 
   const outcomes = cases.reduce<Record<ExpectedOutcome, number>>(
@@ -443,10 +499,12 @@ function validate(cases: GoldenCase[]): void {
     { likely_approve: 0, likely_deny: 0, insufficient_info: 0 },
   );
 
+  // Base 26: 10 approve / 10 deny / 6 insufficient after NO_APPLICABLE_RULES → insufficient_info
+  // + messy twins: +2 approve (027, 029), +1 deny (028) → 12 / 11 / 6
   if (
-    outcomes.likely_approve !== 10 ||
-    outcomes.likely_deny !== 12 ||
-    outcomes.insufficient_info !== 4
+    outcomes.likely_approve !== 12 ||
+    outcomes.likely_deny !== 11 ||
+    outcomes.insufficient_info !== 6
   ) {
     throw new Error(`Unexpected outcome distribution: ${JSON.stringify(outcomes)}`);
   }
@@ -458,8 +516,8 @@ function validate(cases: GoldenCase[]): void {
   }, {});
 
   for (const cpt of ["J1745", "27447", "70553"]) {
-    if (cptCounts[cpt] !== 8) {
-      throw new Error(`Expected 8 cases for ${cpt}, found ${cptCounts[cpt] ?? 0}`);
+    if (cptCounts[cpt] !== 9) {
+      throw new Error(`Expected 9 cases for ${cpt}, found ${cptCounts[cpt] ?? 0}`);
     }
   }
   if (cptCounts.J9999 !== 2) {
@@ -472,19 +530,27 @@ function validate(cases: GoldenCase[]): void {
       throw new Error(`${item.id} is missing SYNTHETIC header`);
     }
     const paragraphs = item.note.split("\n\n");
-    if (paragraphs.length < 3 || paragraphs.length > 5) {
-      throw new Error(`${item.id} must have header + 2-4 paragraphs`);
+    if (paragraphs.length < 3 || paragraphs.length > 6) {
+      throw new Error(`${item.id} must have header + 2-5 body paragraphs`);
     }
   }
 }
 
 function main() {
-  const cases: GoldenCase[] = seeds.map((seed) => ({
-    id: seed.id,
-    note: buildNote(seed),
-    expectedOutcome: seed.expectedOutcome,
-    expectedExtraction: toExpectedExtraction(seed),
-  }));
+  const cases: GoldenCase[] = [
+    ...seeds.map((seed) => ({
+      id: seed.id,
+      note: buildNote(seed),
+      expectedOutcome: seed.expectedOutcome,
+      expectedExtraction: toExpectedExtraction(seed),
+    })),
+    ...messySeeds.map((seed) => ({
+      id: seed.id,
+      note: seed.messyNote,
+      expectedOutcome: seed.expectedOutcome,
+      expectedExtraction: toExpectedExtraction(seed),
+    })),
+  ];
 
   validate(cases);
 

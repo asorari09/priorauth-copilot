@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-07-16T23:54:41.463Z",
+  "mode": "default",
+  "caseFilter": "CASE-025",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 100,
+    "extractionFieldAccuracy": 100,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 7326,
+    "mismatchedCaseIds": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 1,
+    "extractionFieldsCorrect": 10,
+    "extractionFieldsTotal": 10,
+    "validCitations": 1,
+    "totalCitations": 1,
+    "falseApproves": 0,
+    "expectedDenies": 0,
+    "totalLatencyMs": 7326
+  },
+  "perCase": [
+    {
+      "id": "CASE-025",
+      "expectedOutcome": "insufficient_info",
+      "actualOutcome": "insufficient_info",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 25,
+        "diagnosisCodes": [
+          "Z99.89"
+        ],
+        "requestedProcedureCode": "J9999",
+        "priorTreatmentsTried": [
+          "therapy alpha",
+          "therapy beta",
+          "therapy gamma"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five."
+      },
+      "actualExtraction": {
+        "patientAge": 25,
+        "diagnosisCodes": [
+          "Z99.89"
+        ],
+        "requestedProcedureCode": "J9999",
+        "priorTreatmentsTried": [
+          "therapy alpha",
+          "therapy beta",
+          "therapy gamma"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five."
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 25,
+          "actual": 25,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "Z99.89"
+          ],
+          "actual": [
+            "Z99.89"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J9999",
+          "actual": "J9999",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "therapy alpha",
+            "therapy beta",
+            "therapy gamma"
+          ],
+          "actual": [
+            "therapy alpha",
+            "therapy beta",
+            "therapy gamma"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five.",
+          "actual": "Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 1,
+      "validCitationCount": 1,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1",
+        "meridian-health-plan-j9999-synthetic-canary-p1-1",
+        "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p3-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p1-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p4-1"
+      ],
+      "latencyMs": 7326,
+      "decisionReasoning": "Outcome insufficient_info was determined by deterministic guardrails (Procedure code J9999 is not in the encoded criteria set (J1745, 27447, 70553) — no deterministic evaluation possible; route to manual review.).\n\nClinical context: patient age 25; diagnosis Z99.89; requested procedure J9999.\n\nRules applied (0): none.\n\nFailed criteria:\n- NO_APPLICABLE_RULES\n\nValidated policy citations:\n- Meridian Health Plan (SYNTHETIC CANARY): Patient meets the synthetic canary criteria: age 25 (≥21 years) and documented failure of exactly 3 prior therapies (therapy alpha, therapy beta, therapy gamma) for J9999 coverage consideration.",
+      "overrideLog": []
+    }
+  ]
+}

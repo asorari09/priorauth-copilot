@@ -459,7 +459,7 @@
   {
     "id": "CASE-025",
     "note": "SYNTHETIC CASE CASE-025: Prior authorization intake for patient Y. The ordering clinician documented diagnosis codes (Z99.89) and requested procedure J9999. The patient is 25 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included therapy alpha, therapy beta, and therapy gamma. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Meridian synthetic canary request documents exactly three failed prior therapies and age twenty-five.\"\n\nSYNTHETIC Meridian Health Plan context: fictional policy for J9999 states exactly three failed therapies and age twenty-one or older.",
-    "expectedOutcome": "likely_deny",
+    "expectedOutcome": "insufficient_info",
     "expectedExtraction": {
       "patientAge": 25,
       "diagnosisCodes": [
@@ -478,7 +478,7 @@
   {
     "id": "CASE-026",
     "note": "SYNTHETIC CASE CASE-026: Prior authorization intake for patient Z. The ordering clinician documented diagnosis codes (Z99.89) and requested procedure J9999. The patient is 19 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included therapy alpha and therapy beta. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Meridian synthetic canary request has only two prior therapies and patient age nineteen.\"\n\nSYNTHETIC Meridian Health Plan context: fictional policy for J9999 appears in retrieval corpus only, but deterministic rules have no J9999 rule mapping.",
-    "expectedOutcome": "likely_deny",
+    "expectedOutcome": "insufficient_info",
     "expectedExtraction": {
       "patientAge": 19,
       "diagnosisCodes": [
@@ -491,6 +491,63 @@
       ],
       "treatmentFailureDocumented": true,
       "clinicalNotesSummary": "Meridian synthetic canary request has only two prior therapies and patient age nineteen."
+    }
+  },
+  {
+    "id": "CASE-027",
+    "note": "SYNTHETIC CASE CASE-027\n\npt is a 29yo M w/ Crohn's (K50.90). here for PA on infliximab IV — J1745.\n\nVitals today: BP 122/78, HR 72, afebrile. Weight not rechecked in clinic.\n\nTried mesalamine x months — no help. Then AZA (azathioprine), also failed. Tx failure documented. Asking for 6 units this auth period. Adult Crohn, two failed therapies, dose looks in range.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 29,
+      "diagnosisCodes": [
+        "K50.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "mesalamine",
+        "azathioprine"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Adult Crohn disease with two failed therapies and dose within limit.",
+      "requestedUnits": 6
+    }
+  },
+  {
+    "id": "CASE-028",
+    "note": "SYNTHETIC CASE CASE-028\n\n63yo F, left knee OA (M17.12). Req for TKA 27447.\n\nVitals: 136/84, BMI 31.2 — otherwise routine visit.\n\nSx ~30 wks. Has done acetaminophen + home exercise. No PT. No NSAIDs (GI intolerance per pt). Still painful, failure of current regimen documented. No formal PT/NSAID trial on chart.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 63,
+      "diagnosisCodes": [
+        "M17.12"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "acetaminophen",
+        "home exercise"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "No PT and no NSAID despite prolonged knee symptoms.",
+      "symptomDurationWeeks": 30
+    }
+  },
+  {
+    "id": "CASE-029",
+    "note": "SYNTHETIC CASE CASE-029\n\n25yo with epilepsy / seizure d/o G40.909. Requesting brain MRI w/ and w/o contrast 70553.\n\nVitals unremarkable. On levetiracetam, still breakthrough events — failure documented.\n\nNeuro exam today: no focal deficit. Prior imaging / focal findings already on file per outside records.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 25,
+      "diagnosisCodes": [
+        "G40.909"
+      ],
+      "requestedProcedureCode": "70553",
+      "priorTreatmentsTried": [
+        "levetiracetam"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Seizure disorder code present with prior imaging abnormalities documented.",
+      "imagingFindingsPresent": true,
+      "neurologicDeficitsPresent": false
     }
   }
 ]

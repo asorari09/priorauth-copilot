@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-07-16T23:55:14.410Z",
+  "mode": "default",
+  "caseFilter": "CASE-028",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 100,
+    "extractionFieldAccuracy": 90,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 10088,
+    "mismatchedCaseIds": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 1,
+    "extractionFieldsCorrect": 9,
+    "extractionFieldsTotal": 10,
+    "validCitations": 2,
+    "totalCitations": 2,
+    "falseApproves": 0,
+    "expectedDenies": 1,
+    "totalLatencyMs": 10088
+  },
+  "perCase": [
+    {
+      "id": "CASE-028",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 63,
+        "diagnosisCodes": [
+          "M17.12"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "acetaminophen",
+          "home exercise"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "No PT and no NSAID despite prolonged knee symptoms.",
+        "symptomDurationWeeks": 30
+      },
+      "actualExtraction": {
+        "patientAge": 63,
+        "diagnosisCodes": [
+          "M17.12"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "acetaminophen",
+          "home exercise"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Patient has left knee osteoarthritis and has been experiencing pain for approximately 30 weeks. Current treatment regimen of acetaminophen and home exercise has failed. No physical therapy or nsaid trial has been documented due to GI intolerance.",
+        "symptomDurationWeeks": 30
+      },
+      "extractionFieldAccuracy": 90,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 63,
+          "actual": 63,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.12"
+          ],
+          "actual": [
+            "M17.12"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "acetaminophen",
+            "home exercise"
+          ],
+          "actual": [
+            "acetaminophen",
+            "home exercise"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "No PT and no NSAID despite prolonged knee symptoms.",
+          "actual": "Patient has left knee osteoarthritis and has been experiencing pain for approximately 30 weeks. Current treatment regimen of acetaminophen and home exercise has failed. No physical therapy or nsaid trial has been documented due to GI intolerance.",
+          "match": false
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "expected": 30,
+          "actual": 30,
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 2,
+      "validCitationCount": 2,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "providence-health-plan-medicare-medical-policy-total-knee-arthroplasty-mp419-p4-1"
+      ],
+      "latencyMs": 10088,
+      "decisionReasoning": "Outcome likely_deny was determined by deterministic guardrails (At least one failed rule is based on present data, so likely_deny is permitted.).\n\nClinical context: patient age 63; diagnosis M17.12; requested procedure 27447.\n\nRules applied (2): AGE_MINIMUM_002, CONSERVATIVE_CARE_001.\n\nFailed criteria:\n- CONSERVATIVE_CARE_001: Requires >= 12 weeks of failed conservative care including PT and NSAID use\n\nValidated policy citations:\n- Premera Blue Cross: The requested procedure code 27447 (knee arthroplasty) is recognized as a covered CPT code under Premera Blue Cross medical policy for knee arthroplasty in adults.\n- Kaiser Permanente WA: The patient's diagnosis of left knee osteoarthritis (M17.12) with 30 weeks of pain and functional limitation aligns with the clinical indication for knee arthroplasty as the most common reason for total knee replacement surgery.",
+      "overrideLog": []
+    }
+  ]
+}

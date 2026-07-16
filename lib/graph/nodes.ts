@@ -37,6 +37,7 @@ import {
   generateTemplateReasoningSummary,
   getReasoningMode,
 } from "./templateReasoning";
+import { determineOutcomeConstraint } from "./outcomeConstraint";
 
 export type RetrievedChunk = {
   chunk_id: string;
@@ -85,13 +86,6 @@ function toCitationSummaries(citations: PolicyCitation[]): Array<{
   }));
 }
 
-const OPTIONAL_RULE_DEPENDENCIES: Record<string, Array<keyof ClinicalExtraction>> = {
-  QUANTITY_LIMIT_001: ["requestedUnits"],
-  CONSERVATIVE_CARE_001: ["symptomDurationWeeks"],
-  RED_FLAG_001: ["neurologicDeficitsPresent"],
-  PRIOR_IMAGING_001: ["imagingFindingsPresent"],
-};
-
 const DecisionReasoningOnlySchema = z.object({
   confidence: z.enum(["high", "medium", "low"]),
   reasoningSummary: z.string().min(1),
@@ -138,64 +132,6 @@ function buildPolicyQuery(extraction: ClinicalExtraction): string {
     "medical necessity criteria",
   ];
   return `${base.join(" | ")} | ${criteriaTerms.join(" | ")}`;
-}
-
-function isMissingFieldDrivenRuleFailure(
-  rulesResult: RulesEngineResult,
-  extraction: ClinicalExtraction,
-): boolean {
-  if (rulesResult.failedCriteria.length === 0) {
-    return false;
-  }
-
-  return rulesResult.failedCriteria.every((criterion) => {
-    const ruleId = criterion.split(":")[0]?.trim();
-    const deps = OPTIONAL_RULE_DEPENDENCIES[ruleId];
-    if (!deps || deps.length === 0) {
-      return false;
-    }
-
-    return deps.every((field) => extraction[field] === undefined);
-  });
-}
-
-type OutcomeConstraint = {
-  forcedOutcome: Decision["outcome"];
-  reason: string;
-};
-
-function determineOutcomeConstraint(
-  extraction: ClinicalExtraction,
-  rulesResult: RulesEngineResult,
-  citations: PolicyCitation[],
-): OutcomeConstraint {
-  if (citations.length === 0) {
-    return {
-      forcedOutcome: "insufficient_info",
-      reason: "No validated citations available from retrieval.",
-    };
-  }
-
-  if (rulesResult.eligibleByRules) {
-    return {
-      forcedOutcome: "likely_approve",
-      reason: "All deterministic rules passed.",
-    };
-  }
-
-  if (isMissingFieldDrivenRuleFailure(rulesResult, extraction)) {
-    return {
-      forcedOutcome: "insufficient_info",
-      reason:
-        "All failed rules depend on optional fields that are absent in extraction.",
-    };
-  }
-
-  return {
-    forcedOutcome: "likely_deny",
-    reason:
-      "At least one failed rule is based on present data, so likely_deny is permitted.",
-  };
 }
 
 async function withNodeSpan(

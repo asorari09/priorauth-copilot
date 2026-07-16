@@ -49,6 +49,7 @@ type DonePayload = {
 };
 
 const GITHUB_REPO = "https://github.com/asorari09/priorauth-copilot";
+const CUSTOM_CASE_ID = "CUSTOM";
 
 const SAMPLE_CASES = [
   {
@@ -230,15 +231,18 @@ export default function Home() {
   const [isRunning, setIsRunning] = useState(false);
   const [runLive, setRunLive] = useState(false);
 
-  const selectedIsLiveOnly = isLiveOnlyPreset(selectedCaseId);
+  const isCustomNote = selectedCaseId === CUSTOM_CASE_ID;
+  const selectedIsLiveOnly = isLiveOnlyPreset(selectedCaseId) || isCustomNote;
   const requiresDemoKey = runLive || selectedIsLiveOnly;
   const fullPipelineSelected = runLive || selectedIsLiveOnly;
 
-  const pipelineHelperText = selectedIsLiveOnly
-    ? "This scenario has no stored snapshot — a live pipeline run is always required."
-    : runLive
-      ? "Switch to Instant Replay to load the stored verified result with zero LLM calls."
-      : "Instant Replay loads a stored verified result. Full Pipeline executes live LLM calls.";
+  const pipelineHelperText = isCustomNote
+    ? "Custom notes always run the full live pipeline (demo key + LLM calls)."
+    : selectedIsLiveOnly
+      ? "This scenario has no stored snapshot — a live pipeline run is always required."
+      : runLive
+        ? "Switch to Instant Replay to load the stored verified result with zero LLM calls."
+        : "Instant Replay loads a stored verified result. Full Pipeline executes live LLM calls.";
 
   const chunkUrlById = useMemo(() => {
     const map = new Map<string, string>();
@@ -267,7 +271,7 @@ export default function Home() {
           presetCaseId: SAMPLE_CASES.some((sampleCase) => sampleCase.id === selectedCaseId)
             ? selectedCaseId
             : undefined,
-          runLive: runLive || selectedIsLiveOnly,
+          runLive: runLive || selectedIsLiveOnly || isCustomNote,
         }),
       });
 
@@ -401,20 +405,31 @@ export default function Home() {
                 className="w-full cursor-pointer appearance-none rounded border border-surface-border bg-surface px-3 py-2 text-[13px] text-foreground transition-colors focus:border-black focus:outline-none"
                 value={selectedCaseId}
                 onChange={(e) => {
-                  const nextCase = SAMPLE_CASES.find((item) => item.id === e.target.value);
-                  setSelectedCaseId(e.target.value);
-                  if (nextCase) setNote(nextCase.note);
+                  const nextId = e.target.value;
+                  setSelectedCaseId(nextId);
                   setEvents([]);
                   setDone(null);
                   setError(null);
+                  if (nextId === CUSTOM_CASE_ID) {
+                    setNote("");
+                    setRunLive(true);
+                    return;
+                  }
+                  const nextCase = SAMPLE_CASES.find((item) => item.id === nextId);
+                  if (nextCase) setNote(nextCase.note);
                 }}
               >
+                <option value={CUSTOM_CASE_ID}>Custom note (live only)</option>
                 {SAMPLE_CASES.map((sampleCase) => (
                   <option key={sampleCase.id} value={sampleCase.id}>
                     {sampleCase.label}
                   </option>
                 ))}
               </select>
+              <p className="mt-2 text-[12px] leading-[16px] text-on-surface-variant">
+                Encoded criteria cover J1745, 27447, 70553; other procedures return insufficient_info and
+                route to manual review.
+              </p>
             </label>
 
             <label className="block">
@@ -425,6 +440,7 @@ export default function Home() {
                 className="font-data-mono h-40 w-full resize-none rounded border border-surface-border bg-surface p-3 text-[13px] leading-4 text-foreground transition-colors focus:border-black focus:outline-none"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
+                placeholder={isCustomNote ? "Paste any clinical note..." : undefined}
                 required
               />
             </label>

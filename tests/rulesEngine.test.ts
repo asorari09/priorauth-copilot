@@ -22,7 +22,7 @@ function buildExtraction(
 }
 
 describe("runRulesEngine", () => {
-  it("returns failure when no CPT-specific rules exist", () => {
+  it("returns NO_APPLICABLE_RULES when no CPT-specific rules exist (maps to insufficient_info upstream)", () => {
     const result = runRulesEngine(
       buildExtraction({ requestedProcedureCode: "99999" }),
     );
@@ -32,6 +32,20 @@ describe("runRulesEngine", () => {
       failedCriteria: ["NO_APPLICABLE_RULES"],
       ruleIdsApplied: [],
     });
+  });
+
+  it("returns NO_APPLICABLE_RULES for canary CPT J9999", () => {
+    const result = runRulesEngine(
+      buildExtraction({
+        requestedProcedureCode: "J9999",
+        diagnosisCodes: ["Z99.89"],
+        priorTreatmentsTried: ["therapy alpha", "therapy beta", "therapy gamma"],
+      }),
+    );
+
+    expect(result.failedCriteria).toEqual(["NO_APPLICABLE_RULES"]);
+    expect(result.ruleIdsApplied).toEqual([]);
+    expect(result.eligibleByRules).toBe(false);
   });
 
   it("passes all J1745 rules for a qualifying synthetic case", () => {
