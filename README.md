@@ -31,6 +31,28 @@
 
 ## System design
 
+### Live UI (production)
+
+<p align="center">
+  <img src="docs/ui-case001-approve.png" alt="PriorAuth Copilot — CASE-001 approve replay on desktop" width="960"/>
+</p>
+
+<p align="center"><sub>Desktop — CASE-001 Instant Replay: honest <code>stored_result</code> timeline, <code>likely_approve</code>, CareSource citations with real PDF links.</sub></p>
+
+<p align="center">
+  <img src="docs/ui-case004-deny-appeal.png" alt="PriorAuth Copilot — CASE-004 deny with appeal draft" width="960"/>
+</p>
+
+<p align="center"><sub>Desktop — CASE-004 Instant Replay: <code>likely_deny</code>, purple-bordered citations, amber appeal draft with human-review badge.</sub></p>
+
+<p align="center">
+  <img src="docs/ui-mobile-case001.png" alt="PriorAuth Copilot mobile stacked layout" width="390"/>
+</p>
+
+<p align="center"><sub>Mobile (390px) — three columns stack: input → trace → outcome.</sub></p>
+
+### Architecture
+
 <p align="center">
   <img src="docs/architecture-diagram.png" alt="PriorAuth Copilot system architecture — actual demo UI, LangGraph pipeline, Supabase, and Langfuse" width="960"/>
 </p>
