@@ -46,6 +46,7 @@ Normalization rules:
 - Use "physical therapy" (never "PT", "physiotherapy", or similar abbreviations).
 - Use "nsaid" for any NSAID mention (never "NSAIDs", ibuprofen, naproxen, etc.).
 - Keep other treatment names concise and lowercase.
+- priorTreatmentsTried includes only therapies actually initiated or completed. Do not include therapies that were declined, never started, only discussed, or planned.
 
 Data completeness rules:
 - Use only information explicitly present in the note.

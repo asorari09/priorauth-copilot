@@ -12,7 +12,7 @@
 |-----------|--------|----------|
 | Live deployed demo | ✅ | [priorauth-copilot-swart.vercel.app](https://priorauth-copilot-swart.vercel.app/) |
 | Honest preset replays (real citations, no fake traces) | ✅ | 5 scenarios keyless; `data/presetDemoResults.json` from verified Supabase runs |
-| Golden eval suite | ✅ | 31 cases in `data/goldenCases.json` (26 clean + 3 messy-prose + 1 prefixed-code + 1 vial-units) |
+| Golden eval suite | ✅ | 32 cases in `data/goldenCases.json` (26 clean + 3 messy-prose + regressions) |
 | Post-optimization regression gate | ✅ | **100 / 0 / 100** — [`evals/results/2026-07-10T02-38-26-825Z.json`](../evals/results/2026-07-10T02-38-26-825Z.json) |
 | CI eval gate green | ✅ | [workflow_dispatch run 29065131002](https://github.com/asorari09/priorauth-copilot/actions/runs/29065131002) |
 | Measured cost reduction | ✅ | ~$0.041 → ~$0.003 approve / ~$0.006 deny (~90%); Langfuse trace `88046535-fa61-47e5-bdf3-5ecb9e9aa476` |

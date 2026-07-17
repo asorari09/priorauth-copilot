@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-07-17T00:52:27.226Z",
+  "mode": "default",
+  "caseFilter": "CASE-032",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 100,
+    "extractionFieldAccuracy": 100,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 14148,
+    "mismatchedCaseIds": [],
+    "appealGroundingFailures": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 1,
+    "extractionFieldsCorrect": 10,
+    "extractionFieldsTotal": 10,
+    "validCitations": 3,
+    "totalCitations": 3,
+    "falseApproves": 0,
+    "expectedDenies": 1,
+    "totalLatencyMs": 14148
+  },
+  "perCase": [
+    {
+      "id": "CASE-032",
+      "expectedOutcome": "likely_deny",
+      "actualOutcome": "likely_deny",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 44,
+        "diagnosisCodes": [
+          "K51.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "UC with partial mesalamine response; budesonide declined and never started.",
+        "requestedUnits": 4
+      },
+      "actualExtraction": {
+        "patientAge": 44,
+        "diagnosisCodes": [
+          "K51.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine"
+        ],
+        "treatmentFailureDocumented": false,
+        "clinicalNotesSummary": "UC with partial mesalamine response; budesonide declined and never started.",
+        "requestedUnits": 4
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 44,
+          "actual": 44,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K51.90"
+          ],
+          "actual": [
+            "K51.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "mesalamine"
+          ],
+          "actual": [
+            "mesalamine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": false,
+          "actual": false,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "UC with partial mesalamine response; budesonide declined and never started.",
+          "actual": "UC with partial mesalamine response; budesonide declined and never started.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 4,
+          "actual": 4,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1"
+      ],
+      "latencyMs": 14148,
+      "decisionReasoning": "Outcome likely_deny was determined by deterministic guardrails (At least one failed rule is based on present data, so likely_deny is permitted.).\n\nClinical context: patient age 44; diagnosis K51.90; requested procedure J1745.\n\nRules applied (4): STEP_THERAPY_001, AGE_MINIMUM_001, DIAGNOSIS_MATCH_001, QUANTITY_LIMIT_001.\n\nFailed criteria:\n- STEP_THERAPY_001: Requires at least 2 failed conventional therapies\n\nValidated policy citations:\n- Blue Shield of California: Step therapy requirement: preferred agents Avsola and Inflectra must be tried first before coverage of Renflexis, Remicade, or infliximab\n- CareSource: Dosing requirement: initial therapy approved at up to 3 mg/kg IV at weeks 0, 2, and 6, then no more frequently than every 8 weeks\n- Blue Shield of California: Exception to step therapy: coverage of non-preferred agents allowed if intolerable side effect with preferred agents or contraindication to both preferred agents",
+      "overrideLog": [],
+      "appealDraftText": "PRIOR AUTHORIZATION APPEAL\n\nPatient: 44-year-old with ulcerative colitis (K51.90)\nRequested Treatment: Infliximab (J1745), 4 units\n\nCLINICAL SUMMARY\nThe patient has been treated with mesalamine for ulcerative colitis. While the patient has demonstrated a partial response to mesalamine, the current request seeks coverage for infliximab therapy.\n\nAPPEAL RATIONALE\nThe patient's claim was denied under step therapy criteria requiring at least two failed conventional therapies prior to infliximab initiation. Currently, only mesalamine has been documented in the treatment history, and treatment failure has not been formally documented for this agent.\n\nWe acknowledge that the step therapy requirement has not been fully met under standard criteria. However, we respectfully request that the plan consider the following:\n\n1. The patient has demonstrated only partial response to mesalamine, suggesting inadequate disease control with current conventional therapy.\n2. We request guidance on what additional documentation or clinical evidence would support an exception to the step therapy requirement, or clarification on whether the partial response to mesalamine may qualify as treatment failure for purposes of this policy.\n3. Alternatively, we request review of whether there are documented contraindications or intolerable side effects with preferred infliximab agents (Avsola or Inflectra) that would support an exception under the plan's step therapy policy.\n\nWe are prepared to provide additional clinical documentation as needed to support this request.\n\nRespectfully submitted,\n[Provider Name]",
+      "appealGroundingPass": true,
+      "appealGroundingFailure": null
+    }
+  ]
+}

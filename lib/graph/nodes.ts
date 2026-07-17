@@ -37,6 +37,11 @@ import {
   generateTemplateReasoningSummary,
   getReasoningMode,
 } from "./templateReasoning";
+import {
+  buildTemplateAppealDraft,
+  buildAppealUserPrompt,
+  claimedTreatmentsAreAllowed,
+} from "./appealValidation";
 import { determineOutcomeConstraint } from "./outcomeConstraint";
 
 export type RetrievedChunk = {
@@ -74,7 +79,11 @@ const DECISION_REASONING_SYSTEM_PROMPT =
   "Provide concise clinical coverage reasoning based only on provided rules and citations. Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from the extraction (e.g., prescriber specialty), list them explicitly as unverified items requiring confirmation — do not assume compliance.";
 
 const APPEAL_DRAFT_SYSTEM_PROMPT =
-  "Draft concise prior-authorization appeals grounded only in provided citations.";
+  "Draft concise prior-authorization appeals grounded only in the structured extraction, rules result, and validated citations provided. Never use a raw clinical note. State ONLY treatments listed in priorTreatmentsTried and ONLY failures where treatmentFailureDocumented is true. Never assert a therapy was tried, failed, or completed unless it appears in the structured extraction. If the denial criteria are genuinely unmet, the appeal may request an exception or additional review — it may NOT invent qualifying history. Frame gaps honestly (e.g., 'we request guidance on qualifying documentation').";
+
+const AppealDraftWireSchema = AppealDraftSchema.extend({
+  claimedTreatments: z.array(z.string().min(1)),
+});
 
 function toCitationSummaries(citations: PolicyCitation[]): Array<{
   payerName: string;
@@ -495,18 +504,20 @@ export async function appealDraftNode(
 
       try {
         const extraction = state.extraction;
+        const rulesResult = state.rulesResult ?? state.decision.rulesResult;
         if (!extraction) {
           return {};
         }
 
+        const citations = state.decision.supportingCitations;
         const cacheKey = buildAppealDraftCacheKey({
           procedureCode: extraction.requestedProcedureCode,
           diagnosisCodes: extraction.diagnosisCodes,
           outcome: state.decision.outcome,
-          failedCriteria: state.decision.rulesResult.failedCriteria,
-          citationChunkIds: state.decision.supportingCitations.map(
-            (citation) => citation.sourceChunkId,
-          ),
+          failedCriteria: rulesResult.failedCriteria,
+          citationChunkIds: citations.map((citation) => citation.sourceChunkId),
+          priorTreatmentsTried: extraction.priorTreatmentsTried,
+          treatmentFailureDocumented: extraction.treatmentFailureDocumented,
         });
 
         if (!state.disableInferenceCache) {
@@ -516,25 +527,55 @@ export async function appealDraftNode(
           }
         }
 
-        const draft = await callClaudeStructured({
-          toolName: "emit_appeal_draft",
-          toolDescription:
-            "Emit an appeal draft object using the provided decision context and citations.",
-          schema: AppealDraftSchema,
-          systemPrompt: APPEAL_DRAFT_SYSTEM_PROMPT,
-          model: resolveClaudeModel("fast"),
-          userPrompt: [
-            `Decision: ${JSON.stringify(state.decision)}`,
-            `Extraction: ${JSON.stringify(extraction)}`,
-            "Use one of the provided citations as citedClause.",
-          ].join("\n"),
-          maxTokens: 1200,
-          telemetry: {
-            traceId: state.traceId ?? null,
-            parentObservationId: spanId,
-            generationName: "claude.appeal_draft",
-          },
-        });
+        let draft: AppealDraft | null = null;
+        let lastDisallowed: string[] = [];
+
+        for (let attempt = 1; attempt <= 2; attempt += 1) {
+          const correction =
+            attempt === 2
+              ? `Retry correction: claimedTreatments contained therapies not in priorTreatmentsTried (${lastDisallowed.join(", ")}). Re-draft using ONLY allowed treatments; do not invent qualifying history.`
+              : undefined;
+
+          const response = await callClaudeStructured({
+            toolName: "emit_appeal_draft",
+            toolDescription:
+              "Emit an appeal draft grounded only in structured extraction, rules, and validated citations.",
+            schema: AppealDraftWireSchema,
+            systemPrompt: APPEAL_DRAFT_SYSTEM_PROMPT,
+            model: resolveClaudeModel("fast"),
+            userPrompt: buildAppealUserPrompt({
+              extraction,
+              rulesResult,
+              citations,
+              correction,
+            }),
+            maxTokens: 1200,
+            telemetry: {
+              traceId: state.traceId ?? null,
+              parentObservationId: spanId,
+              generationName: "claude.appeal_draft",
+            },
+          });
+
+          const validation = claimedTreatmentsAreAllowed(
+            response.claimedTreatments,
+            extraction.priorTreatmentsTried,
+          );
+          if (validation.ok) {
+            draft = AppealDraftSchema.parse({
+              draftText: response.draftText,
+              citedClause: response.citedClause,
+              requiresHumanReview: true,
+            });
+            break;
+          }
+
+          lastDisallowed = validation.disallowed;
+        }
+
+        if (!draft) {
+          draft = buildTemplateAppealDraft(fallbackCitation);
+        }
 
         if (!state.disableInferenceCache) {
           await setCachedAppealDraft(cacheKey, draft);
@@ -542,14 +583,13 @@ export async function appealDraftNode(
 
         return { appealDraft: draft };
       } catch (error) {
-        const fallback: AppealDraft = {
-          draftText:
-            "Appeal draft unavailable due to model failure. Human review required before submission.",
-          citedClause: fallbackCitation,
-          requiresHumanReview: true,
-        };
+        const fallback = buildTemplateAppealDraft(fallbackCitation);
         return {
-          appealDraft: fallback,
+          appealDraft: {
+            ...fallback,
+            draftText:
+              "Appeal draft unavailable due to model failure. Human review required before submission.",
+          },
           error: `appealDraft node failed: ${error instanceof Error ? error.message : String(error)}`,
         };
       }

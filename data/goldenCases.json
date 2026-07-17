@@ -591,5 +591,27 @@
       "requestedUnits": 4
     },
     "comment": "Regression lock: requestedUnits must be vial/unit count (4), not milligrams (400)."
+  },
+  {
+    "id": "CASE-032",
+    "note": "SYNTHETIC CASE CASE-032: Prior authorization intake for patient E. The ordering clinician documented diagnosis codes (K51.90) and requested procedure J1745. The patient is 44 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included mesalamine 4.8g daily. Treatment failure was documented as false in the assessment narrative — partial response only. The progress note summary reads: \"UC with partial mesalamine response; budesonide declined and never started.\"\n\nBudesonide was discussed at the last visit but the patient declined due to steroid concerns and it was never started. Requesting Remicade (infliximab) J1745, 4 units for this authorization period.",
+    "expectedOutcome": "likely_deny",
+    "expectedExtraction": {
+      "patientAge": 44,
+      "diagnosisCodes": [
+        "K51.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "mesalamine"
+      ],
+      "treatmentFailureDocumented": false,
+      "clinicalNotesSummary": "UC with partial mesalamine response; budesonide declined and never started.",
+      "requestedUnits": 4
+    },
+    "appealMustNotClaimTried": [
+      "budesonide"
+    ],
+    "comment": "Regression lock: budesonide discussed/declined must not appear as tried in the appeal draft."
   }
 ]

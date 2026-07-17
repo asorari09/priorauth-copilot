@@ -18,6 +18,8 @@ export function buildAppealDraftCacheKey(params: {
   outcome: string;
   failedCriteria: string[];
   citationChunkIds: string[];
+  priorTreatmentsTried: string[];
+  treatmentFailureDocumented: boolean;
 }): string {
   const payload = {
     kind: "appeal_draft",
@@ -26,6 +28,10 @@ export function buildAppealDraftCacheKey(params: {
     outcome: params.outcome,
     failedCriteria: [...params.failedCriteria].sort(),
     citationChunkIds: [...params.citationChunkIds].sort(),
+    priorTreatmentsTried: [...params.priorTreatmentsTried]
+      .map((t) => t.trim().toLowerCase())
+      .sort(),
+    treatmentFailureDocumented: params.treatmentFailureDocumented,
   };
   return hashCacheInput(JSON.stringify(payload));
 }

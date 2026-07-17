@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { runPriorAuthGraphCase } from "../lib/graph/buildGraph";
 import { evalSummaryPassesGate, formatEvalGateFailure } from "../lib/evalGate";
 import { safeShutdownLangfuse } from "../lib/langfuse";
+import { draftClaimsForbiddenTherapyTried } from "../lib/graph/appealValidation";
 import { ClinicalExtractionSchema, type ClinicalExtraction } from "../lib/schemas";
 
 type ExpectedOutcome = "likely_approve" | "likely_deny" | "insufficient_info";
@@ -13,6 +14,7 @@ type GoldenCase = {
   note: string;
   expectedOutcome: ExpectedOutcome;
   expectedExtraction: ClinicalExtraction;
+  appealMustNotClaimTried?: string[];
 };
 
 type CaseEvalDetail = {
@@ -37,6 +39,9 @@ type CaseEvalDetail = {
   latencyMs: number;
   decisionReasoning: string | null;
   overrideLog: string[];
+  appealDraftText: string | null;
+  appealGroundingPass: boolean | null;
+  appealGroundingFailure: string | null;
 };
 
 type EvalResults = {
@@ -51,6 +56,7 @@ type EvalResults = {
     falseApproveRate: number;
     meanLatencyMs: number;
     mismatchedCaseIds: string[];
+    appealGroundingFailures: string[];
   };
   metricsNumerators: {
     decisionMatches: number;
@@ -175,6 +181,25 @@ async function evaluateCase(
       ? 100
       : Number(((validCitationCount / citations.length) * 100).toFixed(2));
 
+  const appealDraftText = result.appealDraft?.draftText ?? null;
+  let appealGroundingPass: boolean | null = null;
+  let appealGroundingFailure: string | null = null;
+  if (item.appealMustNotClaimTried && item.appealMustNotClaimTried.length > 0) {
+    if (!appealDraftText) {
+      appealGroundingPass = false;
+      appealGroundingFailure = "Appeal draft missing for case that requires grounding check";
+    } else {
+      const claimed = draftClaimsForbiddenTherapyTried(
+        appealDraftText,
+        item.appealMustNotClaimTried,
+      );
+      appealGroundingPass = claimed === null;
+      appealGroundingFailure = claimed
+        ? `Appeal draft claimed forbidden therapy was tried: ${claimed}`
+        : null;
+    }
+  }
+
   return {
     id: item.id,
     expectedOutcome: item.expectedOutcome,
@@ -192,6 +217,9 @@ async function evaluateCase(
     latencyMs,
     decisionReasoning: result.decision?.reasoningSummary ?? null,
     overrideLog: result.overrideLog ?? [],
+    appealDraftText,
+    appealGroundingPass,
+    appealGroundingFailure,
   };
 }
 
@@ -218,6 +246,9 @@ function summarize(details: CaseEvalDetail[]): EvalResults["summary"] {
     falseApproveRate: toPercent(falseApproves, expectedDenies || 1),
     meanLatencyMs: Number((totalLatencyMs / Math.max(totalCases, 1)).toFixed(2)),
     mismatchedCaseIds: details.filter((d) => !d.outcomeMatch).map((d) => d.id),
+    appealGroundingFailures: details
+      .filter((d) => d.appealGroundingPass === false)
+      .map((d) => d.id),
   };
 }
 
@@ -241,8 +272,14 @@ async function main() {
     });
     perCase.push(detail);
     console.log(
-      `[${item.id}] expected=${detail.expectedOutcome} actual=${detail.actualOutcome} latencyMs=${detail.latencyMs} citations=${detail.citationsCount} extractionAcc=${detail.extractionFieldAccuracy}%`,
+      `[${item.id}] expected=${detail.expectedOutcome} actual=${detail.actualOutcome} latencyMs=${detail.latencyMs} citations=${detail.citationsCount} extractionAcc=${detail.extractionFieldAccuracy}%` +
+        (detail.appealGroundingPass === null
+          ? ""
+          : ` appealGrounding=${detail.appealGroundingPass ? "pass" : "FAIL"}`),
     );
+    if (detail.appealGroundingFailure) {
+      console.error(`  ${detail.appealGroundingFailure}`);
+    }
   }
 
   const summary = summarize(perCase);
@@ -278,6 +315,13 @@ async function main() {
   writeFileSync(outputPath, `${JSON.stringify(output, null, 2)}\n`, "utf8");
   console.log(`\nWrote eval results: ${outputPath}`);
   console.log(`Summary: ${JSON.stringify(summary)}`);
+
+  if (summary.appealGroundingFailures.length > 0) {
+    console.error(
+      `Appeal grounding failures: ${summary.appealGroundingFailures.join(", ")}`,
+    );
+    process.exitCode = 1;
+  }
 
   if (!args.caseFilter && !args.ablation) {
     if (!evalSummaryPassesGate(summary)) {

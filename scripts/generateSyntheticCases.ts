@@ -11,6 +11,7 @@ type GoldenCase = {
   expectedOutcome: ExpectedOutcome;
   expectedExtraction: ClinicalExtraction;
   comment?: string;
+  appealMustNotClaimTried?: string[];
 };
 
 type CaseSeed = {
@@ -464,6 +465,31 @@ const unitsSeeds: Array<CaseSeed & { unitsNote: string }> = [
   },
 ];
 
+/** Declined-therapy regression — budesonide discussed but never started; appeal must not claim it was tried. */
+const declinedTherapySeeds: Array<
+  CaseSeed & { declinedNote: string; appealMustNotClaimTried: string[] }
+> = [
+  {
+    id: "CASE-032",
+    patientLabel: "E",
+    requestedProcedureCode: "J1745",
+    diagnosisCodes: ["K51.90"],
+    patientAge: 44,
+    priorTreatmentsTried: ["mesalamine"],
+    treatmentFailureDocumented: false,
+    requestedUnits: 4,
+    expectedOutcome: "likely_deny",
+    clinicalNotesSummary: "UC with partial mesalamine response; budesonide declined and never started.",
+    comment:
+      "Regression lock: budesonide discussed/declined must not appear as tried in the appeal draft.",
+    appealMustNotClaimTried: ["budesonide"],
+    declinedNote:
+      "SYNTHETIC CASE CASE-032: Prior authorization intake for patient E. The ordering clinician documented diagnosis codes (K51.90) and requested procedure J1745. The patient is 44 years old and presented for coverage review in a routine outpatient workflow.\n\n" +
+      "Chart review states prior management included mesalamine 4.8g daily. Treatment failure was documented as false in the assessment narrative — partial response only. The progress note summary reads: \"UC with partial mesalamine response; budesonide declined and never started.\"\n\n" +
+      "Budesonide was discussed at the last visit but the patient declined due to steroid concerns and it was never started. Requesting Remicade (infliximab) J1745, 4 units for this authorization period.",
+  },
+];
+
 function sentenceList(items: string[]): string {
   if (items.length === 0) return "";
   if (items.length === 1) return items[0];
@@ -536,8 +562,8 @@ function toExpectedExtraction(seed: CaseSeed): ClinicalExtraction {
 }
 
 function validate(cases: GoldenCase[]): void {
-  if (cases.length !== 31) {
-    throw new Error(`Expected 31 cases, found ${cases.length}`);
+  if (cases.length !== 32) {
+    throw new Error(`Expected 32 cases, found ${cases.length}`);
   }
 
   const outcomes = cases.reduce<Record<ExpectedOutcome, number>>(
@@ -548,10 +574,10 @@ function validate(cases: GoldenCase[]): void {
     { likely_approve: 0, likely_deny: 0, insufficient_info: 0 },
   );
 
-  // + CASE-030 approve + CASE-031 approve → 13 / 11 / 7
+  // + CASE-032 deny → 13 / 12 / 7
   if (
     outcomes.likely_approve !== 13 ||
-    outcomes.likely_deny !== 11 ||
+    outcomes.likely_deny !== 12 ||
     outcomes.insufficient_info !== 7
   ) {
     throw new Error(`Unexpected outcome distribution: ${JSON.stringify(outcomes)}`);
@@ -563,9 +589,9 @@ function validate(cases: GoldenCase[]): void {
     return acc;
   }, {});
 
-  if (cptCounts.J1745 !== 10 || cptCounts["70553"] !== 9 || cptCounts["27447"] !== 10) {
+  if (cptCounts.J1745 !== 11 || cptCounts["70553"] !== 9 || cptCounts["27447"] !== 10) {
     throw new Error(
-      `Expected CPT counts J1745=10, 27447=10, 70553=9; found ${JSON.stringify(cptCounts)}`,
+      `Expected CPT counts J1745=11, 27447=10, 70553=9; found ${JSON.stringify(cptCounts)}`,
     );
   }
   if (cptCounts.J9999 !== 2) {
@@ -611,6 +637,14 @@ function main() {
       note: seed.unitsNote,
       expectedOutcome: seed.expectedOutcome,
       expectedExtraction: toExpectedExtraction(seed),
+      ...(seed.comment ? { comment: seed.comment } : {}),
+    })),
+    ...declinedTherapySeeds.map((seed) => ({
+      id: seed.id,
+      note: seed.declinedNote,
+      expectedOutcome: seed.expectedOutcome,
+      expectedExtraction: toExpectedExtraction(seed),
+      appealMustNotClaimTried: seed.appealMustNotClaimTried,
       ...(seed.comment ? { comment: seed.comment } : {}),
     })),
   ];

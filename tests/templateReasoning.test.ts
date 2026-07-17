@@ -48,8 +48,30 @@ describe("cache keys", () => {
       outcome: "likely_deny",
       failedCriteria: ["AGE_MINIMUM_001: patient age 4 < 6"],
       citationChunkIds: ["chunk-a"],
+      priorTreatmentsTried: ["mesalamine", "azathioprine"],
+      treatmentFailureDocumented: true,
     });
     expect(key).toHaveLength(64);
+  });
+
+  it("changes appeal cache key when prior treatments change", () => {
+    const base = {
+      procedureCode: "J1745",
+      diagnosisCodes: ["K51.90"],
+      outcome: "likely_deny" as const,
+      failedCriteria: ["STEP_THERAPY_001"],
+      citationChunkIds: ["chunk-a"],
+      treatmentFailureDocumented: false,
+    };
+    const a = buildAppealDraftCacheKey({
+      ...base,
+      priorTreatmentsTried: ["mesalamine"],
+    });
+    const b = buildAppealDraftCacheKey({
+      ...base,
+      priorTreatmentsTried: ["mesalamine", "budesonide"],
+    });
+    expect(a).not.toBe(b);
   });
 });
 
