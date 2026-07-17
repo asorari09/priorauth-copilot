@@ -735,7 +735,7 @@ export default function Home() {
               rel="noreferrer"
               className="font-data-mono rounded border border-surface-border bg-surface-high px-2 py-1 text-[11px] text-on-surface-variant transition-colors hover:text-black"
             >
-              30/30 eval accuracy · 0% false-approve
+              31/31 eval accuracy · 0% false-approve
             </a>
             <a
               href={GITHUB_REPO}

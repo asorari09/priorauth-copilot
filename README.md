@@ -264,7 +264,7 @@ curl -N -X POST https://priorauth-copilot-swart.vercel.app/api/cases \
 
 ### Eval suite
 
-30 synthetic golden cases in `data/goldenCases.json` (26 clean + 3 messy-prose twins + 1 prefixed-code regression). Extraction verified at 100% structured-field accuracy on both clean and realistic clinician-shorthand prose; summary fields scored for presence, not wording; out-of-scope procedures and thin-evidence cases fail closed to insufficient_info.
+31 synthetic golden cases in `data/goldenCases.json` (26 clean + 3 messy-prose + 1 prefixed-code + 1 vial-units regression). Extraction verified at 100% structured-field accuracy on both clean and realistic clinician-shorthand prose; summary fields scored for presence, not wording; out-of-scope procedures and thin-evidence cases fail closed to insufficient_info.
 
 ```bash
 npm run eval                      # uses inference cache

@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-07-17T00:38:44.703Z",
+  "mode": "default",
+  "caseFilter": "CASE-031",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 100,
+    "extractionFieldAccuracy": 100,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 7822,
+    "mismatchedCaseIds": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 1,
+    "extractionFieldsCorrect": 10,
+    "extractionFieldsTotal": 10,
+    "validCitations": 3,
+    "totalCitations": 3,
+    "falseApproves": 0,
+    "expectedDenies": 0,
+    "totalLatencyMs": 7822
+  },
+  "perCase": [
+    {
+      "id": "CASE-031",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "likely_approve",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "patientAge": 29,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Adult Crohn disease with two failed therapies and dose within limit.",
+        "requestedUnits": 4
+      },
+      "actualExtraction": {
+        "patientAge": 29,
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Adult Crohn disease with two failed therapies and dose within limit.",
+        "requestedUnits": 4
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 29,
+          "actual": 29,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K50.90"
+          ],
+          "actual": [
+            "K50.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "actual": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Adult Crohn disease with two failed therapies and dose within limit.",
+          "actual": "Adult Crohn disease with two failed therapies and dose within limit.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 4,
+          "actual": 4,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1"
+      ],
+      "latencyMs": 7822,
+      "decisionReasoning": "Outcome likely_approve was determined by deterministic guardrails (All deterministic rules passed.).\n\nClinical context: patient age 29; diagnosis K50.90; requested procedure J1745.\n\nRules applied (4): STEP_THERAPY_001, AGE_MINIMUM_001, DIAGNOSIS_MATCH_001, QUANTITY_LIMIT_001.\n\nAll applied deterministic rules passed.\n\nValidated policy citations:\n- Blue Shield of California: Step therapy with NSAIDs required before infliximab coverage; rheumatologist involvement required\n- Blue Shield of California: PPO coverage requires documented intolerable side effect or contraindication to preferred agents; dosing limited to 5 mg/kg IV at specified intervals\n- CareSource: Continuation coverage requires minimum 6 months of established therapy and documented clinical benefit\n\nUnverified items requiring confirmation (not presumed satisfied):\n- prescriber specialty documentation",
+      "overrideLog": []
+    }
+  ]
+}

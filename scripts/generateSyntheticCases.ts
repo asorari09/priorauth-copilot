@@ -442,6 +442,28 @@ const prefixedCodeSeeds: Array<CaseSeed & { prefixedNote: string }> = [
   },
 ];
 
+/** Vial/mg units regression — mg dose stated alongside vial count; requestedUnits must be vials. */
+const unitsSeeds: Array<CaseSeed & { unitsNote: string }> = [
+  {
+    id: "CASE-031",
+    patientLabel: "A",
+    requestedProcedureCode: "J1745",
+    diagnosisCodes: ["K50.90"],
+    patientAge: 29,
+    priorTreatmentsTried: ["mesalamine", "azathioprine"],
+    treatmentFailureDocumented: true,
+    requestedUnits: 4,
+    expectedOutcome: "likely_approve",
+    clinicalNotesSummary: "Adult Crohn disease with two failed therapies and dose within limit.",
+    comment:
+      "Regression lock: requestedUnits must be vial/unit count (4), not milligrams (400).",
+    unitsNote:
+      "SYNTHETIC CASE CASE-031: Prior authorization intake for patient A. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 29 years old and presented for coverage review in a routine outpatient workflow.\n\n" +
+      "Chart review states prior management included mesalamine and azathioprine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Adult Crohn disease with two failed therapies and dose within limit.\"\n\n" +
+      "Requesting Remicade (infliximab) infusion. Dosing 5mg/kg; pt weighs 80kg = 400mg = 4 vials of 100mg per infusion for this authorization period.",
+  },
+];
+
 function sentenceList(items: string[]): string {
   if (items.length === 0) return "";
   if (items.length === 1) return items[0];
@@ -514,8 +536,8 @@ function toExpectedExtraction(seed: CaseSeed): ClinicalExtraction {
 }
 
 function validate(cases: GoldenCase[]): void {
-  if (cases.length !== 30) {
-    throw new Error(`Expected 30 cases, found ${cases.length}`);
+  if (cases.length !== 31) {
+    throw new Error(`Expected 31 cases, found ${cases.length}`);
   }
 
   const outcomes = cases.reduce<Record<ExpectedOutcome, number>>(
@@ -526,9 +548,9 @@ function validate(cases: GoldenCase[]): void {
     { likely_approve: 0, likely_deny: 0, insufficient_info: 0 },
   );
 
-  // Base 26 + messy (027 approve, 028 deny, 029 insufficient) + CASE-030 approve → 12 / 11 / 7
+  // + CASE-030 approve + CASE-031 approve → 13 / 11 / 7
   if (
-    outcomes.likely_approve !== 12 ||
+    outcomes.likely_approve !== 13 ||
     outcomes.likely_deny !== 11 ||
     outcomes.insufficient_info !== 7
   ) {
@@ -541,9 +563,9 @@ function validate(cases: GoldenCase[]): void {
     return acc;
   }, {});
 
-  if (cptCounts.J1745 !== 9 || cptCounts["70553"] !== 9 || cptCounts["27447"] !== 10) {
+  if (cptCounts.J1745 !== 10 || cptCounts["70553"] !== 9 || cptCounts["27447"] !== 10) {
     throw new Error(
-      `Expected CPT counts J1745=9, 27447=10, 70553=9; found ${JSON.stringify(cptCounts)}`,
+      `Expected CPT counts J1745=10, 27447=10, 70553=9; found ${JSON.stringify(cptCounts)}`,
     );
   }
   if (cptCounts.J9999 !== 2) {
@@ -580,6 +602,13 @@ function main() {
     ...prefixedCodeSeeds.map((seed) => ({
       id: seed.id,
       note: seed.prefixedNote,
+      expectedOutcome: seed.expectedOutcome,
+      expectedExtraction: toExpectedExtraction(seed),
+      ...(seed.comment ? { comment: seed.comment } : {}),
+    })),
+    ...unitsSeeds.map((seed) => ({
+      id: seed.id,
+      note: seed.unitsNote,
       expectedOutcome: seed.expectedOutcome,
       expectedExtraction: toExpectedExtraction(seed),
       ...(seed.comment ? { comment: seed.comment } : {}),

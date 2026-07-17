@@ -52,6 +52,7 @@ Data completeness rules:
 - Never guess, infer, or default missing facts.
 - Infer boolean clinical flags from explicit clinical evidence (e.g., a described prior imaging finding means imagingFindingsPresent: true); never infer from absence — omit when not stated.
 - For optional fields (requestedUnits, symptomDurationWeeks, imagingFindingsPresent, neurologicDeficitsPresent), set the field to null if the note does not explicitly state it.
+- requestedUnits = the count of units/vials/syringes requested, not milligrams.
 - Return bare procedure/diagnosis codes only (27447, J1745, K50.90) — never include prefixes like CPT, HCPCS, or ICD-10.`;
 
 function createClient(): OpenAI {

@@ -68,7 +68,7 @@ const EMBEDDING_MODEL = "text-embedding-3-small";
 const RETRIEVAL_MATCH_COUNT = 5;
 
 const CITATION_SYNTHESIS_SYSTEM_PROMPT =
-  "You produce policy citations strictly from supplied retrieval chunks. Never cite outside chunks.";
+  "You produce policy citations strictly from supplied retrieval chunks. Never cite outside chunks. Paraphrase POLICY REQUIREMENTS ONLY. Never reference the specific patient, their age, their treatments, or their requested quantities in citation text — citations describe what the policy requires, not whether this patient meets it. Patient-vs-policy assessment belongs to the decision layer, not citations.";
 
 const DECISION_REASONING_SYSTEM_PROMPT =
   "Provide concise clinical coverage reasoning based only on provided rules and citations. Never presume an unverified policy requirement is satisfied. If citations mention requirements that cannot be confirmed from the extraction (e.g., prescriber specialty), list them explicitly as unverified items requiring confirmation — do not assume compliance.";
@@ -268,8 +268,10 @@ async function synthesizeCitationsWithValidation(
       systemPrompt: CITATION_SYNTHESIS_SYSTEM_PROMPT,
       model: resolveClaudeModel("fast"),
       userPrompt: [
-        "Clinical extraction JSON:",
-        JSON.stringify(extraction),
+        "Procedure code for retrieval context only:",
+        extraction.requestedProcedureCode,
+        "Diagnosis codes for retrieval context only:",
+        extraction.diagnosisCodes.join(", "),
         "",
         "Retrieved chunks JSON (only valid evidence):",
         JSON.stringify(retrievedPayload),
@@ -277,6 +279,7 @@ async function synthesizeCitationsWithValidation(
         `Allowed sourceChunkId values: ${JSON.stringify(Array.from(allowedIds))}`,
         "Emit at most 3 citations and choose the most relevant supporting evidence.",
         "Return only citations supported by these chunks. If none are supportable, return [].",
+        "Citation text must state policy requirements only — do not mention this patient's age, therapies, or quantities.",
         attempt === 2
           ? "Retry correction: any sourceChunkId not in allowed list is invalid."
           : "",

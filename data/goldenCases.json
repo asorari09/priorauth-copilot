@@ -571,5 +571,25 @@
       "symptomDurationWeeks": 20
     },
     "comment": "Regression lock: note uses CPT/ICD-10 prefixes; normalizer must strip them before rules."
+  },
+  {
+    "id": "CASE-031",
+    "note": "SYNTHETIC CASE CASE-031: Prior authorization intake for patient A. The ordering clinician documented diagnosis codes (K50.90) and requested procedure J1745. The patient is 29 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included mesalamine and azathioprine. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Adult Crohn disease with two failed therapies and dose within limit.\"\n\nRequesting Remicade (infliximab) infusion. Dosing 5mg/kg; pt weighs 80kg = 400mg = 4 vials of 100mg per infusion for this authorization period.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 29,
+      "diagnosisCodes": [
+        "K50.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "mesalamine",
+        "azathioprine"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Adult Crohn disease with two failed therapies and dose within limit.",
+      "requestedUnits": 4
+    },
+    "comment": "Regression lock: requestedUnits must be vial/unit count (4), not milligrams (400)."
   }
 ]
