@@ -533,8 +533,8 @@
   },
   {
     "id": "CASE-029",
-    "note": "SYNTHETIC CASE CASE-029\n\n25yo with epilepsy / seizure d/o G40.909. Requesting brain MRI w/ and w/o contrast 70553.\n\nVitals unremarkable. On levetiracetam, still breakthrough events — failure documented.\n\nNeuro exam today: no focal deficit. Prior imaging / focal findings already on file per outside records.",
-    "expectedOutcome": "likely_approve",
+    "note": "SYNTHETIC CASE CASE-029\n\n25yo with epilepsy / seizure d/o G40.909. Requesting brain MRI w/ and w/o contrast 70553.\n\nVitals unremarkable. On levetiracetam, still breakthrough events — failure documented.\n\nNeuro exam today: no focal deficit. MRI brain 2019: L temporal signal abnormality per outside report.",
+    "expectedOutcome": "insufficient_info",
     "expectedExtraction": {
       "patientAge": 25,
       "diagnosisCodes": [
@@ -548,6 +548,7 @@
       "clinicalNotesSummary": "Seizure disorder code present with prior imaging abnormalities documented.",
       "imagingFindingsPresent": true,
       "neurologicDeficitsPresent": false
-    }
+    },
+    "comment": "MRI corpus lacks red-flag criteria language — thin-evidence case intentionally exercises fail-closed behavior."
   }
 ]

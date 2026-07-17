@@ -1,0 +1,143 @@
+{
+  "timestamp": "2026-07-17T00:00:47.276Z",
+  "mode": "default",
+  "caseFilter": "CASE-029",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 0,
+    "extractionFieldAccuracy": 100,
+    "citationValidityRate": 0,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 5892,
+    "mismatchedCaseIds": [
+      "CASE-029"
+    ]
+  },
+  "metricsNumerators": {
+    "decisionMatches": 0,
+    "extractionFieldsCorrect": 10,
+    "extractionFieldsTotal": 10,
+    "validCitations": 0,
+    "totalCitations": 0,
+    "falseApproves": 0,
+    "expectedDenies": 0,
+    "totalLatencyMs": 5892
+  },
+  "perCase": [
+    {
+      "id": "CASE-029",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "insufficient_info",
+      "outcomeMatch": false,
+      "expectedExtraction": {
+        "patientAge": 25,
+        "diagnosisCodes": [
+          "G40.909"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "levetiracetam"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Seizure disorder code present with prior imaging abnormalities documented.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": false
+      },
+      "actualExtraction": {
+        "patientAge": 25,
+        "diagnosisCodes": [
+          "G40.909"
+        ],
+        "requestedProcedureCode": "70553",
+        "priorTreatmentsTried": [
+          "levetiracetam"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "25yo with epilepsy/seizure disorder requesting brain MRI. On levetiracetam, still experiencing breakthrough events. Neuro exam shows no focal deficit. Previous MRI in 2019 showed left temporal signal abnormality.",
+        "imagingFindingsPresent": true,
+        "neurologicDeficitsPresent": false
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 25,
+          "actual": 25,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "G40.909"
+          ],
+          "actual": [
+            "G40.909"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "70553",
+          "actual": "70553",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "levetiracetam"
+          ],
+          "actual": [
+            "levetiracetam"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Seizure disorder code present with prior imaging abnormalities documented.",
+          "actual": "25yo with epilepsy/seizure disorder requesting brain MRI. On levetiracetam, still experiencing breakthrough events. Neuro exam shows no focal deficit. Previous MRI in 2019 showed left temporal signal abnormality.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "expected": false,
+          "actual": false,
+          "match": true
+        }
+      ],
+      "citationsCount": 0,
+      "validCitationCount": 0,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p5-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p2-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p7-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p6-1",
+        "cms-via-radmd-ncd-220-2-magnetic-resonance-imaging-ncd-20220-2-20for-20magnetic--p1-1"
+      ],
+      "latencyMs": 5892,
+      "decisionReasoning": "Outcome insufficient_info was determined by deterministic guardrails (No validated citations available from retrieval.).\n\nClinical context: patient age 25; diagnosis G40.909; requested procedure 70553.\n\nRules applied (2): RED_FLAG_001, PRIOR_IMAGING_001.\n\nAll applied deterministic rules passed.\n\nNo validated policy citations were available from retrieval.",
+      "overrideLog": []
+    }
+  ]
+}

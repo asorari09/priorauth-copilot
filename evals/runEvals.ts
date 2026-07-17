@@ -109,6 +109,18 @@ function deepEqual(a: unknown, b: unknown): boolean {
   return JSON.stringify(a) === JSON.stringify(b);
 }
 
+/** clinicalNotesSummary is LLM prose, not a planted fact — score non-empty only. */
+function extractionFieldMatches(
+  field: keyof ClinicalExtraction,
+  expected: unknown,
+  actual: unknown,
+): boolean {
+  if (field === "clinicalNotesSummary") {
+    return typeof actual === "string" && actual.trim().length > 0;
+  }
+  return deepEqual(expected, actual);
+}
+
 function toPercent(numerator: number, denominator: number): number {
   if (denominator === 0) {
     return 0;
@@ -142,7 +154,7 @@ async function evaluateCase(
       field,
       expected,
       actual,
-      match: deepEqual(expected, actual),
+      match: extractionFieldMatches(field, expected, actual),
     };
   });
 

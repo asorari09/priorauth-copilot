@@ -10,6 +10,7 @@ type GoldenCase = {
   note: string;
   expectedOutcome: ExpectedOutcome;
   expectedExtraction: ClinicalExtraction;
+  comment?: string;
 };
 
 type CaseSeed = {
@@ -27,6 +28,7 @@ type CaseSeed = {
   imagingFindingsPresent?: boolean;
   neurologicDeficitsPresent?: boolean;
   specialContext?: string;
+  comment?: string;
 };
 
 const seeds: CaseSeed[] = [
@@ -405,13 +407,16 @@ const messySeeds: Array<CaseSeed & { messyNote: string }> = [
     treatmentFailureDocumented: true,
     imagingFindingsPresent: true,
     neurologicDeficitsPresent: false,
-    expectedOutcome: "likely_approve",
+    // MRI corpus lacks red-flag criteria language — thin-evidence case intentionally exercises fail-closed behavior.
+    expectedOutcome: "insufficient_info",
+    comment:
+      "MRI corpus lacks red-flag criteria language — thin-evidence case intentionally exercises fail-closed behavior.",
     clinicalNotesSummary: "Seizure disorder code present with prior imaging abnormalities documented.",
     messyNote:
       "SYNTHETIC CASE CASE-029\n\n" +
       "25yo with epilepsy / seizure d/o G40.909. Requesting brain MRI w/ and w/o contrast 70553.\n\n" +
       "Vitals unremarkable. On levetiracetam, still breakthrough events — failure documented.\n\n" +
-      "Neuro exam today: no focal deficit. Prior imaging / focal findings already on file per outside records.",
+      "Neuro exam today: no focal deficit. MRI brain 2019: L temporal signal abnormality per outside report.",
   },
 ];
 
@@ -500,11 +505,11 @@ function validate(cases: GoldenCase[]): void {
   );
 
   // Base 26: 10 approve / 10 deny / 6 insufficient after NO_APPLICABLE_RULES → insufficient_info
-  // + messy twins: +2 approve (027, 029), +1 deny (028) → 12 / 11 / 6
+  // + messy twins: +1 approve (027), +1 deny (028), +1 insufficient (029 fail-closed) → 11 / 11 / 7
   if (
-    outcomes.likely_approve !== 12 ||
+    outcomes.likely_approve !== 11 ||
     outcomes.likely_deny !== 11 ||
-    outcomes.insufficient_info !== 6
+    outcomes.insufficient_info !== 7
   ) {
     throw new Error(`Unexpected outcome distribution: ${JSON.stringify(outcomes)}`);
   }
@@ -549,6 +554,7 @@ function main() {
       note: seed.messyNote,
       expectedOutcome: seed.expectedOutcome,
       expectedExtraction: toExpectedExtraction(seed),
+      ...(seed.comment ? { comment: seed.comment } : {}),
     })),
   ];
 

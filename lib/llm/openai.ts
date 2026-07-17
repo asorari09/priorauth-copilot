@@ -49,6 +49,7 @@ Normalization rules:
 Data completeness rules:
 - Use only information explicitly present in the note.
 - Never guess, infer, or default missing facts.
+- Infer boolean clinical flags from explicit clinical evidence (e.g., a described prior imaging finding means imagingFindingsPresent: true); never infer from absence — omit when not stated.
 - For optional fields (requestedUnits, symptomDurationWeeks, imagingFindingsPresent, neurologicDeficitsPresent), set the field to null if the note does not explicitly state it.
 - Preserve diagnosis and procedure codes exactly as written when present.`;
 
