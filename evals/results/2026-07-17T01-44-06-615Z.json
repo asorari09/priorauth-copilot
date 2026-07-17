@@ -1,0 +1,149 @@
+{
+  "timestamp": "2026-07-17T01:44:06.615Z",
+  "mode": "default",
+  "caseFilter": "CASE-033",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 0,
+    "extractionFieldAccuracy": 90,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 6794,
+    "mismatchedCaseIds": [
+      "CASE-033"
+    ],
+    "appealGroundingFailures": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 0,
+    "extractionFieldsCorrect": 9,
+    "extractionFieldsTotal": 10,
+    "validCitations": 2,
+    "totalCitations": 2,
+    "falseApproves": 0,
+    "expectedDenies": 0,
+    "totalLatencyMs": 6794
+  },
+  "perCase": [
+    {
+      "id": "CASE-033",
+      "expectedOutcome": "likely_approve",
+      "actualOutcome": "insufficient_info",
+      "outcomeMatch": false,
+      "expectedExtraction": {
+        "patientAge": 68,
+        "diagnosisCodes": [
+          "M17.11"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "weight loss"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Advanced unilateral knee OA with prolonged conservative care failure.",
+        "symptomDurationWeeks": 20
+      },
+      "actualExtraction": {
+        "patientAge": 68,
+        "diagnosisCodes": [
+          "M17.11"
+        ],
+        "requestedProcedureCode": "27447",
+        "priorTreatmentsTried": [
+          "physical therapy",
+          "nsaid",
+          "weight loss"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Advanced unilateral knee OA with prolonged conservative care failure."
+      },
+      "extractionFieldAccuracy": 90,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "expected": 68,
+          "actual": 68,
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "M17.11"
+          ],
+          "actual": [
+            "M17.11"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "27447",
+          "actual": "27447",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "physical therapy",
+            "nsaid",
+            "weight loss"
+          ],
+          "actual": [
+            "physical therapy",
+            "nsaid",
+            "weight loss"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Advanced unilateral knee OA with prolonged conservative care failure.",
+          "actual": "Advanced unilateral knee OA with prolonged conservative care failure.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "expected": 20,
+          "match": false
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 2,
+      "validCitationCount": 2,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p11-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p5-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p5-1",
+        "kaiser-permanente-wa-total-knee-arthroplasty-clinical-review-criteria-tka-p6-1",
+        "premera-blue-cross-medical-policy-7-01-550-knee-arthroplasty-in-adults-7-01-550-p3-1"
+      ],
+      "latencyMs": 6794,
+      "decisionReasoning": "Outcome insufficient_info was determined by deterministic guardrails (All failed rules depend on optional fields that are absent in extraction.).\n\nClinical context: patient age 68; diagnosis M17.11; requested procedure 27447.\n\nRules applied (2): AGE_MINIMUM_002, CONSERVATIVE_CARE_001.\n\nFailed criteria:\n- CONSERVATIVE_CARE_001: Requires >= 12 weeks of failed conservative care including PT and NSAID use\n\nValidated policy citations:\n- Premera Blue Cross: The policy recognizes CPT 27447 as a covered procedure code for knee arthroplasty procedures.\n- Kaiser Permanente WA: The policy establishes that knee arthroplasty is appropriate for osteoarthritis when it causes significant functional limitation in daily activities.",
+      "overrideLog": [],
+      "appealDraftText": null,
+      "appealGroundingPass": null,
+      "appealGroundingFailure": null
+    }
+  ]
+}

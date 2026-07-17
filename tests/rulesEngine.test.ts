@@ -169,6 +169,35 @@ describe("runRulesEngine", () => {
       "PRIOR_IMAGING_001: Prior non-advanced imaging or focal findings must be documented",
     ]);
   });
+  it("fails J1745 age rule when patientAge is missing (optional-field path)", () => {
+    const result = runRulesEngine(
+      buildExtraction({
+        patientAge: undefined,
+      }),
+    );
+
+    expect(result.eligibleByRules).toBe(false);
+    expect(result.failedCriteria).toEqual([
+      "AGE_MINIMUM_001: Patient must be 6 or older per Crohn's disease initial therapy criteria",
+    ]);
+  });
+
+  it("fails 27447 age rule when patientAge is missing", () => {
+    const result = runRulesEngine(
+      buildExtraction({
+        requestedProcedureCode: "27447",
+        patientAge: undefined,
+        priorTreatmentsTried: ["physical therapy", "nsaid", "weight loss"],
+        symptomDurationWeeks: 20,
+        treatmentFailureDocumented: true,
+      }),
+    );
+
+    expect(result.eligibleByRules).toBe(false);
+    expect(result.failedCriteria).toEqual([
+      "AGE_MINIMUM_002: Patient must be 50 or older for synthetic joint-replacement criteria",
+    ]);
+  });
 });
 
 describe("RULES", () => {

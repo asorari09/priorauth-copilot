@@ -19,7 +19,7 @@ type CaseSeed = {
   patientLabel: string;
   requestedProcedureCode: "J1745" | "27447" | "70553" | "J9999";
   diagnosisCodes: string[];
-  patientAge: number;
+  patientAge?: number;
   priorTreatmentsTried: string[];
   treatmentFailureDocumented: boolean;
   expectedOutcome: ExpectedOutcome;
@@ -490,6 +490,50 @@ const declinedTherapySeeds: Array<
   },
 ];
 
+/** Date-derived duration — onset/encounter dates only; symptomDurationWeeks must be computed. */
+const dateDurationSeeds: Array<CaseSeed & { dateNote: string }> = [
+  {
+    id: "CASE-033",
+    patientLabel: "I",
+    requestedProcedureCode: "27447",
+    diagnosisCodes: ["M17.11"],
+    patientAge: 68,
+    priorTreatmentsTried: ["physical therapy", "nsaid", "weight loss"],
+    treatmentFailureDocumented: true,
+    symptomDurationWeeks: 26,
+    expectedOutcome: "likely_approve",
+    clinicalNotesSummary: "Advanced unilateral knee OA with prolonged conservative care failure.",
+    comment:
+      "Regression lock: symptomDurationWeeks computed from onset 2025-10-01 to encounter 2026-04-01 (exactly 26 weeks).",
+    dateNote:
+      "SYNTHETIC CASE CASE-033: Prior authorization intake for patient I. The ordering clinician documented diagnosis codes (M17.11) and requested procedure 27447. The patient is 68 years old and presented for coverage review in a routine outpatient workflow.\n\n" +
+      "Chart review states prior management included physical therapy, nsaid, and weight loss. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Advanced unilateral knee OA with prolonged conservative care failure.\"\n\n" +
+      "Left knee pain onset documented 2025-10-01. Encounter date for this authorization note: 2026-04-01.",
+  },
+];
+
+/** Categorical-age regression — "adult" only; patientAge must be omitted → insufficient_info. */
+const categoricalAgeSeeds: Array<CaseSeed & { ageNote: string }> = [
+  {
+    id: "CASE-034",
+    patientLabel: "A",
+    requestedProcedureCode: "J1745",
+    diagnosisCodes: ["K50.90"],
+    // patientAge intentionally omitted
+    priorTreatmentsTried: ["mesalamine", "azathioprine"],
+    treatmentFailureDocumented: true,
+    requestedUnits: 6,
+    expectedOutcome: "insufficient_info",
+    clinicalNotesSummary: "Adult Crohn patient with two failed therapies; numeric age not documented.",
+    comment:
+      "Regression lock: categorical 'adult' must not become a numeric patientAge; missing age → insufficient_info.",
+    ageNote:
+      "SYNTHETIC CASE CASE-034\n\n" +
+      "Adult patient with Crohn disease (K50.90). Requesting infliximab IV — J1745.\n\n" +
+      "Tried mesalamine and azathioprine; treatment failure documented. Asking for 6 units this auth period. No DOB or numeric age recorded in the note.",
+  },
+];
+
 function sentenceList(items: string[]): string {
   if (items.length === 0) return "";
   if (items.length === 1) return items[0];
@@ -542,7 +586,7 @@ function buildNote(seed: CaseSeed): string {
 
 function toExpectedExtraction(seed: CaseSeed): ClinicalExtraction {
   return {
-    patientAge: seed.patientAge,
+    ...(seed.patientAge !== undefined ? { patientAge: seed.patientAge } : {}),
     diagnosisCodes: seed.diagnosisCodes,
     requestedProcedureCode: seed.requestedProcedureCode,
     priorTreatmentsTried: seed.priorTreatmentsTried,
@@ -562,8 +606,8 @@ function toExpectedExtraction(seed: CaseSeed): ClinicalExtraction {
 }
 
 function validate(cases: GoldenCase[]): void {
-  if (cases.length !== 32) {
-    throw new Error(`Expected 32 cases, found ${cases.length}`);
+  if (cases.length !== 34) {
+    throw new Error(`Expected 34 cases, found ${cases.length}`);
   }
 
   const outcomes = cases.reduce<Record<ExpectedOutcome, number>>(
@@ -574,11 +618,11 @@ function validate(cases: GoldenCase[]): void {
     { likely_approve: 0, likely_deny: 0, insufficient_info: 0 },
   );
 
-  // + CASE-032 deny → 13 / 12 / 7
+  // + CASE-033 approve + CASE-034 insufficient → 14 / 12 / 8
   if (
-    outcomes.likely_approve !== 13 ||
+    outcomes.likely_approve !== 14 ||
     outcomes.likely_deny !== 12 ||
-    outcomes.insufficient_info !== 7
+    outcomes.insufficient_info !== 8
   ) {
     throw new Error(`Unexpected outcome distribution: ${JSON.stringify(outcomes)}`);
   }
@@ -589,9 +633,9 @@ function validate(cases: GoldenCase[]): void {
     return acc;
   }, {});
 
-  if (cptCounts.J1745 !== 11 || cptCounts["70553"] !== 9 || cptCounts["27447"] !== 10) {
+  if (cptCounts.J1745 !== 12 || cptCounts["70553"] !== 9 || cptCounts["27447"] !== 11) {
     throw new Error(
-      `Expected CPT counts J1745=11, 27447=10, 70553=9; found ${JSON.stringify(cptCounts)}`,
+      `Expected CPT counts J1745=12, 27447=11, 70553=9; found ${JSON.stringify(cptCounts)}`,
     );
   }
   if (cptCounts.J9999 !== 2) {
@@ -645,6 +689,20 @@ function main() {
       expectedOutcome: seed.expectedOutcome,
       expectedExtraction: toExpectedExtraction(seed),
       appealMustNotClaimTried: seed.appealMustNotClaimTried,
+      ...(seed.comment ? { comment: seed.comment } : {}),
+    })),
+    ...dateDurationSeeds.map((seed) => ({
+      id: seed.id,
+      note: seed.dateNote,
+      expectedOutcome: seed.expectedOutcome,
+      expectedExtraction: toExpectedExtraction(seed),
+      ...(seed.comment ? { comment: seed.comment } : {}),
+    })),
+    ...categoricalAgeSeeds.map((seed) => ({
+      id: seed.id,
+      note: seed.ageNote,
+      expectedOutcome: seed.expectedOutcome,
+      expectedExtraction: toExpectedExtraction(seed),
       ...(seed.comment ? { comment: seed.comment } : {}),
     })),
   ];

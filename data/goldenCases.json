@@ -613,5 +613,45 @@
       "budesonide"
     ],
     "comment": "Regression lock: budesonide discussed/declined must not appear as tried in the appeal draft."
+  },
+  {
+    "id": "CASE-033",
+    "note": "SYNTHETIC CASE CASE-033: Prior authorization intake for patient I. The ordering clinician documented diagnosis codes (M17.11) and requested procedure 27447. The patient is 68 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included physical therapy, nsaid, and weight loss. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Advanced unilateral knee OA with prolonged conservative care failure.\"\n\nLeft knee pain onset documented 2025-10-01. Encounter date for this authorization note: 2026-04-01.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 68,
+      "diagnosisCodes": [
+        "M17.11"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "physical therapy",
+        "nsaid",
+        "weight loss"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Advanced unilateral knee OA with prolonged conservative care failure.",
+      "symptomDurationWeeks": 26
+    },
+    "comment": "Regression lock: symptomDurationWeeks computed from onset 2025-10-01 to encounter 2026-04-01 (exactly 26 weeks)."
+  },
+  {
+    "id": "CASE-034",
+    "note": "SYNTHETIC CASE CASE-034\n\nAdult patient with Crohn disease (K50.90). Requesting infliximab IV — J1745.\n\nTried mesalamine and azathioprine; treatment failure documented. Asking for 6 units this auth period. No DOB or numeric age recorded in the note.",
+    "expectedOutcome": "insufficient_info",
+    "expectedExtraction": {
+      "diagnosisCodes": [
+        "K50.90"
+      ],
+      "requestedProcedureCode": "J1745",
+      "priorTreatmentsTried": [
+        "mesalamine",
+        "azathioprine"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Adult Crohn patient with two failed therapies; numeric age not documented.",
+      "requestedUnits": 6
+    },
+    "comment": "Regression lock: categorical 'adult' must not become a numeric patientAge; missing age → insufficient_info."
   }
 ]

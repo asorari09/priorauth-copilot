@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-07-17T01:44:17.827Z",
+  "mode": "default",
+  "caseFilter": "CASE-034",
+  "summary": {
+    "totalCases": 1,
+    "decisionAccuracy": 100,
+    "extractionFieldAccuracy": 100,
+    "citationValidityRate": 100,
+    "falseApproveRate": 0,
+    "meanLatencyMs": 9665,
+    "mismatchedCaseIds": [],
+    "appealGroundingFailures": []
+  },
+  "metricsNumerators": {
+    "decisionMatches": 1,
+    "extractionFieldsCorrect": 10,
+    "extractionFieldsTotal": 10,
+    "validCitations": 3,
+    "totalCitations": 3,
+    "falseApproves": 0,
+    "expectedDenies": 0,
+    "totalLatencyMs": 9665
+  },
+  "perCase": [
+    {
+      "id": "CASE-034",
+      "expectedOutcome": "insufficient_info",
+      "actualOutcome": "insufficient_info",
+      "outcomeMatch": true,
+      "expectedExtraction": {
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Adult Crohn patient with two failed therapies; numeric age not documented.",
+        "requestedUnits": 6
+      },
+      "actualExtraction": {
+        "diagnosisCodes": [
+          "K50.90"
+        ],
+        "requestedProcedureCode": "J1745",
+        "priorTreatmentsTried": [
+          "mesalamine",
+          "azathioprine"
+        ],
+        "treatmentFailureDocumented": true,
+        "clinicalNotesSummary": "Adult patient with Crohn disease requesting infliximab IV.",
+        "requestedUnits": 6
+      },
+      "extractionFieldAccuracy": 100,
+      "extractionFieldBreakdown": [
+        {
+          "field": "patientAge",
+          "match": true
+        },
+        {
+          "field": "diagnosisCodes",
+          "expected": [
+            "K50.90"
+          ],
+          "actual": [
+            "K50.90"
+          ],
+          "match": true
+        },
+        {
+          "field": "requestedProcedureCode",
+          "expected": "J1745",
+          "actual": "J1745",
+          "match": true
+        },
+        {
+          "field": "priorTreatmentsTried",
+          "expected": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "actual": [
+            "mesalamine",
+            "azathioprine"
+          ],
+          "match": true
+        },
+        {
+          "field": "treatmentFailureDocumented",
+          "expected": true,
+          "actual": true,
+          "match": true
+        },
+        {
+          "field": "clinicalNotesSummary",
+          "expected": "Adult Crohn patient with two failed therapies; numeric age not documented.",
+          "actual": "Adult patient with Crohn disease requesting infliximab IV.",
+          "match": true
+        },
+        {
+          "field": "requestedUnits",
+          "expected": 6,
+          "actual": 6,
+          "match": true
+        },
+        {
+          "field": "symptomDurationWeeks",
+          "match": true
+        },
+        {
+          "field": "imagingFindingsPresent",
+          "match": true
+        },
+        {
+          "field": "neurologicDeficitsPresent",
+          "match": true
+        }
+      ],
+      "citationsCount": 3,
+      "validCitationCount": 3,
+      "citationValidityRate": 100,
+      "invalidCitationIds": [],
+      "retrievedChunkIds": [
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p5-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p13-1",
+        "blue-shield-of-california-infliximab-medicare-part-b-step-therapy-policy-inflixi-p2-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p8-1",
+        "caresource-infliximab-intravenous-products-um-medical-policy-medicare-multi-poli-p5-1"
+      ],
+      "latencyMs": 9665,
+      "decisionReasoning": "Outcome insufficient_info was determined by deterministic guardrails (All failed rules depend on optional fields that are absent in extraction.).\n\nClinical context: patient age not documented; diagnosis K50.90; requested procedure J1745.\n\nRules applied (4): STEP_THERAPY_001, AGE_MINIMUM_001, DIAGNOSIS_MATCH_001, QUANTITY_LIMIT_001.\n\nFailed criteria:\n- AGE_MINIMUM_001: Patient must be 6 or older per Crohn's disease initial therapy criteria\n\nValidated policy citations:\n- Blue Shield of California: Step therapy with NSAIDs required before infliximab coverage for ankylosing spondylitis; rheumatologist involvement required\n- Blue Shield of California: PPO coverage for non-preferred infliximab products requires documented intolerable side effect with preferred agents or contraindication to both preferred options\n- CareSource: Continuation of infliximab therapy requires minimum 6 months of established treatment and documented beneficial clinical response\n\nUnverified items requiring confirmation (not presumed satisfied):\n- prescriber specialty documentation",
+      "overrideLog": [],
+      "appealDraftText": null,
+      "appealGroundingPass": null,
+      "appealGroundingFailure": null
+    }
+  ]
+}

@@ -91,7 +91,7 @@ export function generateTemplateReasoningSummary(params: {
   const lines: string[] = [
     `Outcome ${forcedOutcome} was determined by deterministic guardrails (${constraintReason}).`,
     "",
-    `Clinical context: patient age ${extraction.patientAge}; diagnosis ${extraction.diagnosisCodes.join(", ")}; requested procedure ${extraction.requestedProcedureCode}.`,
+    `Clinical context: patient age ${extraction.patientAge ?? "not documented"}; diagnosis ${extraction.diagnosisCodes.join(", ")}; requested procedure ${extraction.requestedProcedureCode}.`,
     "",
     `Rules applied (${rulesResult.ruleIdsApplied.length}): ${rulesResult.ruleIdsApplied.join(", ") || "none"}.`,
   ];

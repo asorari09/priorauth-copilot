@@ -6,6 +6,8 @@ import type {
 } from "../schemas";
 
 const OPTIONAL_RULE_DEPENDENCIES: Record<string, Array<keyof ClinicalExtraction>> = {
+  AGE_MINIMUM_001: ["patientAge"],
+  AGE_MINIMUM_002: ["patientAge"],
   QUANTITY_LIMIT_001: ["requestedUnits"],
   CONSERVATIVE_CARE_001: ["symptomDurationWeeks"],
   RED_FLAG_001: ["neurologicDeficitsPresent"],

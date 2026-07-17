@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const ClinicalExtractionSchema = z.object({
-  patientAge: z.number().int().min(0).max(120),
+  patientAge: z.number().int().min(0).max(120).optional(),
   diagnosisCodes: z.array(z.string().min(1)),
   requestedProcedureCode: z.string().min(1),
   priorTreatmentsTried: z.array(z.string().min(1)),

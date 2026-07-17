@@ -41,12 +41,29 @@ describe("determineOutcomeConstraint — NO_APPLICABLE_RULES", () => {
     );
   });
 
-  it("does not permit likely_deny for out-of-scope CPT even when citations exist", () => {
-    const extraction = buildExtraction({ requestedProcedureCode: "99999" });
+  it("routes missing patientAge through insufficient_info when age is the only failed rule", () => {
+    const extraction = buildExtraction({
+      requestedProcedureCode: "J1745",
+      diagnosisCodes: ["K50.90"],
+      patientAge: undefined,
+      priorTreatmentsTried: ["mesalamine", "azathioprine"],
+      treatmentFailureDocumented: true,
+      requestedUnits: 6,
+    });
     const rulesResult = runRulesEngine(extraction);
-    const constraint = determineOutcomeConstraint(extraction, rulesResult, [stubCitation]);
+    expect(rulesResult.failedCriteria).toHaveLength(1);
+    expect(rulesResult.failedCriteria[0]).toMatch(/^AGE_MINIMUM_001/);
+
+    const constraint = determineOutcomeConstraint(extraction, rulesResult, [
+      {
+        payerName: "CareSource",
+        documentTitle: "Infliximab UM",
+        sourceChunkId: "caresource-infliximab-p1-1",
+        requirementSummary: "Age and step therapy required.",
+        clauseTextParaphrased: "Patient must meet age and step therapy.",
+      },
+    ]);
 
     expect(constraint.forcedOutcome).toBe("insufficient_info");
-    expect(constraint.forcedOutcome).not.toBe("likely_deny");
   });
 });

@@ -21,7 +21,7 @@ export const RULES: RulesEngineRule[] = [
     ruleId: "AGE_MINIMUM_001",
     appliesToCpt: ["J1745"],
     description: "Patient must be 6 or older per Crohn's disease initial therapy criteria",
-    check: (e) => e.patientAge >= 6,
+    check: (e) => e.patientAge !== undefined && e.patientAge >= 6,
   },
   {
     ruleId: "DIAGNOSIS_MATCH_001",
@@ -46,7 +46,7 @@ export const RULES: RulesEngineRule[] = [
     ruleId: "AGE_MINIMUM_002",
     appliesToCpt: ["27447"],
     description: "Patient must be 50 or older for synthetic joint-replacement criteria",
-    check: (e) => e.patientAge >= 50,
+    check: (e) => e.patientAge !== undefined && e.patientAge >= 50,
   },
   {
     ruleId: "CONSERVATIVE_CARE_001",

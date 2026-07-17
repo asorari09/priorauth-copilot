@@ -9,7 +9,7 @@ import { ClinicalExtractionSchema, type ClinicalExtraction } from "../schemas";
 const DEFAULT_EXTRACTION_MODEL = "gpt-4o-mini";
 
 const ClinicalExtractionWireSchema = z.object({
-  patientAge: z.number().int().min(0).max(120),
+  patientAge: z.number().int().min(0).max(120).nullable(),
   diagnosisCodes: z.array(z.string().min(1)),
   requestedProcedureCode: z.string().min(1),
   priorTreatmentsTried: z.array(z.string().min(1)),
@@ -52,7 +52,9 @@ Data completeness rules:
 - Use only information explicitly present in the note.
 - Never guess, infer, or default missing facts.
 - Infer boolean clinical flags from explicit clinical evidence (e.g., a described prior imaging finding means imagingFindingsPresent: true); never infer from absence — omit when not stated.
-- For optional fields (requestedUnits, symptomDurationWeeks, imagingFindingsPresent, neurologicDeficitsPresent), set the field to null if the note does not explicitly state it.
+- For optional fields (patientAge, requestedUnits, symptomDurationWeeks, imagingFindingsPresent, neurologicDeficitsPresent), set the field to null if the note does not explicitly state it.
+- Never convert categorical age terms (adult, pediatric, elderly) into a numeric age — if no numeric age or DOB is stated, the age field must be omitted.
+- symptomDurationWeeks may be COMPUTED from explicit dates in the note (onset date to encounter date, rounded to weeks) — date arithmetic on stated dates is derivation, not guessing. When both an onset date and an encounter/note date are present, you MUST set symptomDurationWeeks to that computed week count; still omit when no dates or duration are stated.
 - requestedUnits = the count of units/vials/syringes requested, not milligrams.
 - Return bare procedure/diagnosis codes only (27447, J1745, K50.90) — never include prefixes like CPT, HCPCS, or ICD-10.`;
 
@@ -139,7 +141,7 @@ export async function extractClinicalExtractionFromNote(
 
       const normalized = ClinicalExtractionSchema.parse(
         normalizeExtractionCodes({
-          patientAge: parsed.patientAge,
+          ...(parsed.patientAge === null ? {} : { patientAge: parsed.patientAge }),
           diagnosisCodes: parsed.diagnosisCodes,
           requestedProcedureCode: parsed.requestedProcedureCode,
           priorTreatmentsTried: parsed.priorTreatmentsTried,
