@@ -420,6 +420,28 @@ const messySeeds: Array<CaseSeed & { messyNote: string }> = [
   },
 ];
 
+/** Prefixed-code regression twin — same facts as CASE-009 with CPT/ICD-10 labels in prose. */
+const prefixedCodeSeeds: Array<CaseSeed & { prefixedNote: string }> = [
+  {
+    id: "CASE-030",
+    patientLabel: "I",
+    requestedProcedureCode: "27447",
+    diagnosisCodes: ["M17.11"],
+    patientAge: 68,
+    priorTreatmentsTried: ["physical therapy", "nsaid", "weight loss"],
+    treatmentFailureDocumented: true,
+    symptomDurationWeeks: 20,
+    expectedOutcome: "likely_approve",
+    clinicalNotesSummary: "Advanced unilateral knee OA with prolonged conservative care failure.",
+    comment:
+      "Regression lock: note uses CPT/ICD-10 prefixes; normalizer must strip them before rules.",
+    prefixedNote:
+      "SYNTHETIC CASE CASE-030: Prior authorization intake for patient I. The ordering clinician documented diagnosis codes (ICD-10 M17.11) and requested procedure CPT 27447. The patient is 68 years old and presented for coverage review in a routine outpatient workflow.\n\n" +
+      "Chart review states prior management included physical therapy, nsaid, and weight loss. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Advanced unilateral knee OA with prolonged conservative care failure.\"\n\n" +
+      "Symptoms have persisted for 20 weeks despite conservative management.",
+  },
+];
+
 function sentenceList(items: string[]): string {
   if (items.length === 0) return "";
   if (items.length === 1) return items[0];
@@ -492,8 +514,8 @@ function toExpectedExtraction(seed: CaseSeed): ClinicalExtraction {
 }
 
 function validate(cases: GoldenCase[]): void {
-  if (cases.length !== 29) {
-    throw new Error(`Expected 29 cases, found ${cases.length}`);
+  if (cases.length !== 30) {
+    throw new Error(`Expected 30 cases, found ${cases.length}`);
   }
 
   const outcomes = cases.reduce<Record<ExpectedOutcome, number>>(
@@ -504,10 +526,9 @@ function validate(cases: GoldenCase[]): void {
     { likely_approve: 0, likely_deny: 0, insufficient_info: 0 },
   );
 
-  // Base 26: 10 approve / 10 deny / 6 insufficient after NO_APPLICABLE_RULES → insufficient_info
-  // + messy twins: +1 approve (027), +1 deny (028), +1 insufficient (029 fail-closed) → 11 / 11 / 7
+  // Base 26 + messy (027 approve, 028 deny, 029 insufficient) + CASE-030 approve → 12 / 11 / 7
   if (
-    outcomes.likely_approve !== 11 ||
+    outcomes.likely_approve !== 12 ||
     outcomes.likely_deny !== 11 ||
     outcomes.insufficient_info !== 7
   ) {
@@ -520,10 +541,10 @@ function validate(cases: GoldenCase[]): void {
     return acc;
   }, {});
 
-  for (const cpt of ["J1745", "27447", "70553"]) {
-    if (cptCounts[cpt] !== 9) {
-      throw new Error(`Expected 9 cases for ${cpt}, found ${cptCounts[cpt] ?? 0}`);
-    }
+  if (cptCounts.J1745 !== 9 || cptCounts["70553"] !== 9 || cptCounts["27447"] !== 10) {
+    throw new Error(
+      `Expected CPT counts J1745=9, 27447=10, 70553=9; found ${JSON.stringify(cptCounts)}`,
+    );
   }
   if (cptCounts.J9999 !== 2) {
     throw new Error(`Expected 2 cases for J9999, found ${cptCounts.J9999 ?? 0}`);
@@ -552,6 +573,13 @@ function main() {
     ...messySeeds.map((seed) => ({
       id: seed.id,
       note: seed.messyNote,
+      expectedOutcome: seed.expectedOutcome,
+      expectedExtraction: toExpectedExtraction(seed),
+      ...(seed.comment ? { comment: seed.comment } : {}),
+    })),
+    ...prefixedCodeSeeds.map((seed) => ({
+      id: seed.id,
+      note: seed.prefixedNote,
       expectedOutcome: seed.expectedOutcome,
       expectedExtraction: toExpectedExtraction(seed),
       ...(seed.comment ? { comment: seed.comment } : {}),

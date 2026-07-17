@@ -3,6 +3,7 @@ import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
 import { safeStartGeneration } from "../langfuse";
+import { normalizeExtractionCodes } from "../normalizeCodes";
 import { ClinicalExtractionSchema, type ClinicalExtraction } from "../schemas";
 
 const DEFAULT_EXTRACTION_MODEL = "gpt-4o-mini";
@@ -51,7 +52,7 @@ Data completeness rules:
 - Never guess, infer, or default missing facts.
 - Infer boolean clinical flags from explicit clinical evidence (e.g., a described prior imaging finding means imagingFindingsPresent: true); never infer from absence — omit when not stated.
 - For optional fields (requestedUnits, symptomDurationWeeks, imagingFindingsPresent, neurologicDeficitsPresent), set the field to null if the note does not explicitly state it.
-- Preserve diagnosis and procedure codes exactly as written when present.`;
+- Return bare procedure/diagnosis codes only (27447, J1745, K50.90) — never include prefixes like CPT, HCPCS, or ICD-10.`;
 
 function createClient(): OpenAI {
   const apiKey = process.env.OPENAI_API_KEY;
@@ -134,24 +135,26 @@ export async function extractClinicalExtractionFromNote(
         throw new Error("Missing parsed extraction in response.");
       }
 
-      const normalized = ClinicalExtractionSchema.parse({
-        patientAge: parsed.patientAge,
-        diagnosisCodes: parsed.diagnosisCodes,
-        requestedProcedureCode: parsed.requestedProcedureCode,
-        priorTreatmentsTried: parsed.priorTreatmentsTried,
-        treatmentFailureDocumented: parsed.treatmentFailureDocumented,
-        clinicalNotesSummary: parsed.clinicalNotesSummary,
-        ...(parsed.requestedUnits === null ? {} : { requestedUnits: parsed.requestedUnits }),
-        ...(parsed.symptomDurationWeeks === null
-          ? {}
-          : { symptomDurationWeeks: parsed.symptomDurationWeeks }),
-        ...(parsed.imagingFindingsPresent === null
-          ? {}
-          : { imagingFindingsPresent: parsed.imagingFindingsPresent }),
-        ...(parsed.neurologicDeficitsPresent === null
-          ? {}
-          : { neurologicDeficitsPresent: parsed.neurologicDeficitsPresent }),
-      });
+      const normalized = ClinicalExtractionSchema.parse(
+        normalizeExtractionCodes({
+          patientAge: parsed.patientAge,
+          diagnosisCodes: parsed.diagnosisCodes,
+          requestedProcedureCode: parsed.requestedProcedureCode,
+          priorTreatmentsTried: parsed.priorTreatmentsTried,
+          treatmentFailureDocumented: parsed.treatmentFailureDocumented,
+          clinicalNotesSummary: parsed.clinicalNotesSummary,
+          ...(parsed.requestedUnits === null ? {} : { requestedUnits: parsed.requestedUnits }),
+          ...(parsed.symptomDurationWeeks === null
+            ? {}
+            : { symptomDurationWeeks: parsed.symptomDurationWeeks }),
+          ...(parsed.imagingFindingsPresent === null
+            ? {}
+            : { imagingFindingsPresent: parsed.imagingFindingsPresent }),
+          ...(parsed.neurologicDeficitsPresent === null
+            ? {}
+            : { neurologicDeficitsPresent: parsed.neurologicDeficitsPresent }),
+        }),
+      );
 
       generation.end({
         output: normalized,

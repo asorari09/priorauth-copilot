@@ -550,5 +550,26 @@
       "neurologicDeficitsPresent": false
     },
     "comment": "MRI corpus lacks red-flag criteria language — thin-evidence case intentionally exercises fail-closed behavior."
+  },
+  {
+    "id": "CASE-030",
+    "note": "SYNTHETIC CASE CASE-030: Prior authorization intake for patient I. The ordering clinician documented diagnosis codes (ICD-10 M17.11) and requested procedure CPT 27447. The patient is 68 years old and presented for coverage review in a routine outpatient workflow.\n\nChart review states prior management included physical therapy, nsaid, and weight loss. Treatment failure was documented as true in the assessment narrative. The progress note summary reads: \"Advanced unilateral knee OA with prolonged conservative care failure.\"\n\nSymptoms have persisted for 20 weeks despite conservative management.",
+    "expectedOutcome": "likely_approve",
+    "expectedExtraction": {
+      "patientAge": 68,
+      "diagnosisCodes": [
+        "M17.11"
+      ],
+      "requestedProcedureCode": "27447",
+      "priorTreatmentsTried": [
+        "physical therapy",
+        "nsaid",
+        "weight loss"
+      ],
+      "treatmentFailureDocumented": true,
+      "clinicalNotesSummary": "Advanced unilateral knee OA with prolonged conservative care failure.",
+      "symptomDurationWeeks": 20
+    },
+    "comment": "Regression lock: note uses CPT/ICD-10 prefixes; normalizer must strip them before rules."
   }
 ]
