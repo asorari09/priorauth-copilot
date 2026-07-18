@@ -1,7 +1,7 @@
 <p align="center">
   <strong>PriorAuth Copilot</strong><br/>
-  LangGraph prior-authorization decision support — rules-first outcomes, policy-grounded citations, eval-gated quality.<br/>
-  <strong>✅ Project 1 — CLOSED &amp; COMPLETE</strong> · <a href="docs/PROJECT_STATUS.md">Status</a>
+  LangGraph prior-authorization decision support - rules-first outcomes, policy-grounded citations, eval-gated quality.<br/>
+  <strong>✅ Project 1 - CLOSED &amp; COMPLETE</strong> · <a href="docs/PROJECT_STATUS.md">Status</a>
 </p>
 
 <p align="center">
@@ -14,16 +14,39 @@
 
 ---
 
+<p align="center">
+  <a href="https://github.com/asorari09/priorauth-copilot/actions/workflows/ci.yml"><img src="https://github.com/asorari09/priorauth-copilot/workflows/CI/badge.svg" alt="CI"/></a>
+</p>
+
 ## At a glance
 
 | | |
 |---|---|
-| **Problem** | Prior-auth reviewers need structured facts, payer policy citations, and a defensible approve/deny/insufficient signal — without the LLM inventing outcomes. |
+| **Problem** | Prior-auth reviewers need structured facts, payer policy citations, and a defensible approve/deny/insufficient signal - without the LLM inventing outcomes. |
 | **Approach** | LangGraph pipeline: extract → rules + RAG in parallel → **code-forced outcome** → optional appeal draft. LLMs synthesize citations and prose; TypeScript owns the decision. |
-| **Default demo** | [CASE-001 instant replay](https://priorauth-copilot-swart.vercel.app/) — **no API key, no LLM cost**, real CareSource PDF links |
-| **Regression gate** | **100 / 0 / 100** verified post-optimization — [`evals/results/2026-07-10T02-38-26-825Z.json`](evals/results/2026-07-10T02-38-26-825Z.json) (`--no-cache`, CI [`workflow_dispatch`](https://github.com/asorari09/priorauth-copilot/actions/runs/29065131002) green) |
+| **Default demo** | [CASE-001 instant replay](https://priorauth-copilot-swart.vercel.app/) - **no API key, no LLM cost**, real CareSource PDF links |
+| **Regression gate** | **100 / 0 / 100** verified post-optimization - [`evals/results/2026-07-10T02-38-26-825Z.json`](evals/results/2026-07-10T02-38-26-825Z.json) (`--no-cache`, CI [`workflow_dispatch`](https://github.com/asorari09/priorauth-copilot/actions/runs/29065131002) green) |
 | **Measured cost** | **~$0.003/case** approve · **~$0.006/case** deny (Langfuse, full eval run) · **~90%** vs Sonnet baseline (~$0.041) |
 | **Stack** | Next.js 15 · LangGraph · OpenAI extract · Claude Haiku citations/appeals · Supabase pgvector · Langfuse |
+
+
+## Design decisions and tradeoffs
+
+| Decision | Why | Failure it prevents |
+|----------|-----|---------------------|
+| Outcome enum is **code-forced** via `determineOutcomeConstraint()` | A false approve is a coverage/compliance event, not a UX miss | LLM choosing `likely_approve` when rules or evidence say otherwise |
+| Rules engine is pure TypeScript (`lib/rulesEngine.ts`) | Eligibility checks must be reproducible and reviewable | Soft "vibes-based" denials that cannot be audited |
+| Citations are retrieved then validated before display | RAG can return near-miss chunks | Hallucinated policy quotes in a nurse's workflow |
+| Preset demo is honest `stored_result` replay (tagged in Langfuse) | Recruiters and reviewers need a zero-cost path | Demo that silently bills or pretends live inference |
+| Eval gate is manual `workflow_dispatch`, exits non-zero unless **100 / 0 / 100** | Push CI should stay cheap; quality gate must stay hard | Merging extraction regressions because "tests were green" |
+
+## Known limitations
+
+- Synthetic clinical notes and golden cases only; not a coverage decision; verify with the payer
+- Default demo path does not run the live graph (by design); live runs need `DEMO_KEY`
+- Policy corpus is a curated demo set, not a full multi-payer library
+- Appeal drafts always require human review; the model does not submit anything
+- Cost figures are from a named Langfuse eval window; they are not a vendor SLA
 
 **Full deep dive:** [`docs/PROJECT_DEEP_DIVE.md`](docs/PROJECT_DEEP_DIVE.md)
 
@@ -34,36 +57,36 @@
 ### Live UI (production)
 
 <p align="center">
-  <img src="docs/ui-case001-approve.png" alt="PriorAuth Copilot — CASE-001 approve replay on desktop" width="960"/>
+  <img src="docs/ui-case001-approve.png" alt="PriorAuth Copilot - CASE-001 approve replay on desktop" width="960"/>
 </p>
 
-<p align="center"><sub>Desktop — CASE-001 Instant Replay: honest <code>stored_result</code> timeline, <code>likely_approve</code>, CareSource citations with real PDF links.</sub></p>
+<p align="center"><sub>Desktop - CASE-001 Instant Replay: honest <code>stored_result</code> timeline, <code>likely_approve</code>, CareSource citations with real PDF links.</sub></p>
 
 <p align="center">
-  <img src="docs/ui-case004-deny-appeal.png" alt="PriorAuth Copilot — CASE-004 deny with appeal draft" width="960"/>
+  <img src="docs/ui-case004-deny-appeal.png" alt="PriorAuth Copilot - CASE-004 deny with appeal draft" width="960"/>
 </p>
 
-<p align="center"><sub>Desktop — CASE-004 Instant Replay: <code>likely_deny</code>, purple-bordered citations, amber appeal draft with human-review badge.</sub></p>
+<p align="center"><sub>Desktop - CASE-004 Instant Replay: <code>likely_deny</code>, purple-bordered citations, amber appeal draft with human-review badge.</sub></p>
 
 <p align="center">
   <img src="docs/ui-mobile-case001.png" alt="PriorAuth Copilot mobile stacked layout" width="390"/>
 </p>
 
-<p align="center"><sub>Mobile (390px) — three columns stack: input → trace → outcome.</sub></p>
+<p align="center"><sub>Mobile (390px) - three columns stack: input → trace → outcome.</sub></p>
 
 ### Architecture
 
 <p align="center">
-  <img src="docs/architecture-diagram.png" alt="PriorAuth Copilot system architecture — actual demo UI, LangGraph pipeline, Supabase, and Langfuse" width="960"/>
+  <img src="docs/architecture-diagram.png" alt="PriorAuth Copilot system architecture - actual demo UI, LangGraph pipeline, Supabase, and Langfuse" width="960"/>
 </p>
 
-<p align="center"><sub>Diagram reflects the shipped system only — single-page demo, code-forced outcomes, honest preset replay path.</sub></p>
+<p align="center"><sub>Diagram reflects the shipped system only - single-page demo, code-forced outcomes, honest preset replay path.</sub></p>
 
 ### Live pipeline (LangGraph)
 
 ```mermaid
 flowchart TB
-  subgraph Client["Browser — actual demo UI"]
+  subgraph Client["Browser - actual demo UI"]
     DD[Demo scenario dropdown]
     TA[Clinical note textarea]
     BTN[Run button]
@@ -75,7 +98,7 @@ flowchart TB
     BTN --> RS
   end
 
-  subgraph Vercel["Vercel — Next.js API"]
+  subgraph Vercel["Vercel - Next.js API"]
     API["POST /api/cases\nSSE stream"]
     Replay{{"Preset replay?\n(stored_result)"}}
     Graph[LangGraph compile]
@@ -184,7 +207,7 @@ erDiagram
 | **All five demo scenarios** | Not required | None | Instant replay from verified production runs (incl. CASE-004 deny + appeal draft) |
 | **Custom note + live** | Required | Yes | Real-time SSE node trace |
 
-Open the [live app](https://priorauth-copilot-swart.vercel.app/) → keep **CASE-001** → click **Run (instant cached demo)**. Click any **source document** link — it resolves to a real payer PDF, not a placeholder.
+Open the [live app](https://priorauth-copilot-swart.vercel.app/) → keep **CASE-001** → click **Run (instant cached demo)**. Click any **source document** link - it resolves to a real payer PDF, not a placeholder.
 
 ---
 
@@ -195,7 +218,7 @@ Open the [live app](https://priorauth-copilot-swart.vercel.app/) → keep **CASE
 | Extraction | OpenAI `gpt-4o-mini` | Yes | Structured clinical facts from free text |
 | Rules check | `lib/rulesEngine.ts` | **No** | Deterministic eligibility (step therapy, age, qty, diagnosis) |
 | Policy RAG | pgvector + Claude Haiku | Yes (cacheable) | Retrieve chunks; synthesize **validated** citations |
-| **Outcome** | `determineOutcomeConstraint()` | **No** | **Always code-set** — never LLM-chosen |
+| **Outcome** | `determineOutcomeConstraint()` | **No** | **Always code-set** - never LLM-chosen |
 | Reasoning prose | `templateReasoning.ts` (default) | **No** | Rules + citation summaries + unverified items |
 | Appeal draft | Claude Haiku | Yes (cacheable) | Deny-path letter only; human review required |
 
@@ -210,14 +233,14 @@ Open the [live app](https://priorauth-copilot-swart.vercel.app/) → keep **CASE
 | Appeal draft | content-hash | Haiku call | same table, `cache_kind=appeal_draft` |
 | Eval freshness | `--no-cache` flag | All inference cache | Used for regression runs |
 
-Cached replays **do not insert** into `cases` — demo traffic does not pollute live case data.
+Cached replays **do not insert** into `cases` - demo traffic does not pollute live case data.
 
 ---
 
 <br/>
 
 <details>
-<summary><strong>Reference — setup, commands, eval, and operations</strong></summary>
+<summary><strong>Reference - setup, commands, eval, and operations</strong></summary>
 
 ### Local setup
 
@@ -228,7 +251,7 @@ npm install
 cp .env.example .env    # fill keys
 ```
 
-Apply migrations — see [`docs/MIGRATIONS.md`](docs/MIGRATIONS.md) (`0001_init.sql` then `0002_citation_cache.sql`).
+Apply migrations - see [`docs/MIGRATIONS.md`](docs/MIGRATIONS.md) (`0001_init.sql` then `0002_citation_cache.sql`).
 
 ```bash
 npm run dev
@@ -240,9 +263,9 @@ npm run dev
 |----------|---------|---------|
 | `REASONING_MODE` | `template` | `template` = zero-cost reasoning; `llm` = Haiku prose |
 | `ANTHROPIC_MODEL_FAST` | `claude-haiku-4-5-20251001` | Citations + appeals |
-| `DEMO_KEY` | — | Required for live API runs (not cached CASE-001) |
-| `SUPABASE_*` | — | Policy RAG, cases, inference cache |
-| `LANGFUSE_*` | — | Traces: `priorauth-case-run` / `priorauth-preset-replay` |
+| `DEMO_KEY` | - | Required for live API runs (not cached CASE-001) |
+| `SUPABASE_*` | - | Policy RAG, cases, inference cache |
+| `LANGFUSE_*` | - | Traces: `priorauth-case-run` / `priorauth-preset-replay` |
 
 ### API smoke tests
 
@@ -250,12 +273,12 @@ npm run dev
 # Health
 curl -s https://priorauth-copilot-swart.vercel.app/api/health
 
-# Cached CASE-001 — no key
+# Cached CASE-001 - no key
 curl -N -X POST https://priorauth-copilot-swart.vercel.app/api/cases \
   -H "Content-Type: application/json" \
   -d '{"note":"<CASE-001 note>","presetCaseId":"CASE-001"}'
 
-# Live run — key required
+# Live run - key required
 curl -N -X POST https://priorauth-copilot-swart.vercel.app/api/cases \
   -H "Content-Type: application/json" \
   -H "x-demo-key: $DEMO_KEY" \
@@ -275,7 +298,7 @@ npm run rebuild:presets           # rebuild demo JSON from Supabase (no LLM)
 
 **CI:** every push → lint, tsc, vitest. **Eval** → manual `workflow_dispatch` only; exits non-zero unless **100 / 0 / 100**.
 
-### Cost model (measured — post-optimization full eval, `--no-cache`)
+### Cost model (measured - post-optimization full eval, `--no-cache`)
 
 Source: Langfuse `priorauth-case-run` traces from [`2026-07-10T02-38-26-825Z.json`](evals/results/2026-07-10T02-38-26-825Z.json) (26 cases, 100/0/100 gate).
 
@@ -285,7 +308,7 @@ Source: Langfuse `priorauth-case-run` traces from [`2026-07-10T02-38-26-825Z.jso
 | **Live approve** (n=10) | **$0.0033** | gpt-4o-mini extract + Haiku citation synthesis |
 | **Live deny** (n=12) | **$0.0057** | Above + Haiku appeal draft |
 | **Insufficient info** (n=4) | **$0.0029** | Extract + citations (no appeal) |
-| **All cases avg** (n=26) | **$0.0043** | — |
+| **All cases avg** (n=26) | **$0.0043** | - |
 | **Sonnet baseline** (pre-opt) | ~$0.041 | citation + decision + appeal on Sonnet 4.6 |
 
 **Reduction vs baseline:** ~**92%** approve path · ~**86%** deny path · ~**89%** blended.
@@ -293,16 +316,16 @@ Source: Langfuse `priorauth-case-run` traces from [`2026-07-10T02-38-26-825Z.jso
 Representative trace: [`88046535-fa61-47e5-bdf3-5ecb9e9aa476`](https://cloud.langfuse.com/project/cmrdrenon00chad0c3bi1gcoe/traces/88046535-fa61-47e5-bdf3-5ecb9e9aa476) (CASE-001, $0.0032).
 
 <p align="center">
-  <img src="docs/langfuse-post-optimization.png" alt="Langfuse dashboard — trace volume, cost by model, and observation breakdown for priorauth-case-run" width="900"/>
+  <img src="docs/langfuse-post-optimization.png" alt="Langfuse dashboard - trace volume, cost by model, and observation breakdown for priorauth-case-run" width="900"/>
 </p>
 
-<p align="center"><sub>Langfuse project dashboard — cumulative traces across development; per-case costs above are from the isolated post-optimization eval window.</sub></p>
+<p align="center"><sub>Langfuse project dashboard - cumulative traces across development; per-case costs above are from the isolated post-optimization eval window.</sub></p>
 
 ### Key files
 
 | Path | Role |
 |------|------|
-| `app/api/cases/route.ts` | SSE API — replay vs live, demo key gate |
+| `app/api/cases/route.ts` | SSE API - replay vs live, demo key gate |
 | `lib/graph/buildGraph.ts` | LangGraph wiring |
 | `lib/graph/nodes.ts` | Extract, RAG, decide, appeal nodes |
 | `lib/rulesEngine.ts` | Deterministic rules |
@@ -320,7 +343,7 @@ npm run lint && npx tsc --noEmit && npm test
 
 ### Observability
 
-[Langfuse project](https://cloud.langfuse.com/project/cmrdrenon00chad0c3bi1gcoe) — filter live runs vs replays via trace name or `replay` metadata/tag. Dashboard snapshot: [`docs/langfuse-post-optimization.png`](docs/langfuse-post-optimization.png).
+[Langfuse project](https://cloud.langfuse.com/project/cmrdrenon00chad0c3bi1gcoe) - filter live runs vs replays via trace name or `replay` metadata/tag. Dashboard snapshot: [`docs/langfuse-post-optimization.png`](docs/langfuse-post-optimization.png).
 
 </details>
 
